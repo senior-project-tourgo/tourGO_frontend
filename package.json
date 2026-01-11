@@ -8,13 +8,27 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
+    "prettier:check": "prettier . --check",
+    "prettier:fix": "prettier . --write",
+    "ts-check": "tsc --noEmit true --project ./tsconfig.json",
+    "pre-commit": "lint-staged",
+    "postinstall": "husky"
   },
   "dependencies": {
+    "@commitlint/cli": "^20.3.1",
+    "@commitlint/config-conventional": "^20.3.1",
+    "@expo-google-fonts/jost": "^0.4.2",
     "@expo/vector-icons": "^15.0.3",
     "@react-navigation/bottom-tabs": "^7.4.0",
     "@react-navigation/elements": "^2.6.3",
     "@react-navigation/native": "^7.1.8",
+    "@typescript-eslint/eslint-plugin": "^8.52.0",
+    "@typescript-eslint/parser": "^8.52.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "eslint-plugin-unused-imports": "^4.3.0",
     "expo": "~54.0.31",
     "expo-constants": "~18.0.13",
     "expo-font": "~14.0.10",
@@ -27,21 +41,28 @@
     "expo-symbols": "~1.0.8",
     "expo-system-ui": "~6.0.9",
     "expo-web-browser": "~15.0.10",
+    "lint-staged": "^16.2.7",
+    "nativewind": "^4.2.1",
+    "prettier": "^3.7.4",
+    "prettier-plugin-tailwindcss": "^0.7.2",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-native": "0.81.5",
     "react-native-gesture-handler": "~2.28.0",
-    "react-native-worklets": "0.5.1",
-    "react-native-reanimated": "~4.1.1",
+    "react-native-reanimated": "^3.16.2",
     "react-native-safe-area-context": "~5.6.0",
     "react-native-screens": "~4.16.0",
-    "react-native-web": "~0.21.0"
+    "react-native-web": "~0.21.0",
+    "react-native-worklets": "0.5.1",
+    "tailwindcss": "3.4"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.2",
     "@types/react": "~19.1.0",
-    "typescript": "~5.9.2",
-    "eslint": "^9.25.0",
-    "eslint-config-expo": "~10.0.0"
+    "eslint": "^9.39.2",
+    "eslint-config-expo": "~10.0.0",
+    "husky": "^9.1.7",
+    "typescript": "~5.9.2"
   },
   "private": true
 }

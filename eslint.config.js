@@ -5,6 +5,16 @@ const expoConfig = require('eslint-config-expo/flat');
 module.exports = defineConfig([
   expoConfig,
   {
-    ignores: ['dist/*'],
-  },
+    ignores: [
+      '.expo/**',
+      'node_modules/**',
+      'build/**',
+      'bin/**',
+      'ezpo-env.d.ts',
+      'nativewind-env.d.ts',
+      'package-lock.json',
+      'ios/**',
+      'android/**'
+    ]
+  }
 ]);

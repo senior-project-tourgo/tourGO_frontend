@@ -1,0 +1,9 @@
+/.expo
+node_modules
+build
+bin
+ezpo-env.d.ts
+nativewind-env.d.ts
+package-lock.json
+ios
+android
