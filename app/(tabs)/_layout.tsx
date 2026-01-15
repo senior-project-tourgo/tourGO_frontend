@@ -1,6 +1,9 @@
 import { Tabs } from 'expo-router';
 import TabIcon from '../../components/tabs/TabIcon';
 import colors from '../../theme/colors';
+import { HapticTab } from '@/components/tabs/HapticTab';
+import BlurTabBarBackground from '@/components/tabs/TabBarBackground';
+import { Platform } from 'react-native';
 
 export default function RootLayout() {
   return (
@@ -9,7 +12,16 @@ export default function RootLayout() {
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.muted,
         headerShown: false,
-        tabBarLabelPosition: 'below-icon'
+        tabBarLabelPosition: 'below-icon',
+        tabBarButton: HapticTab,
+        tabBarBackground: BlurTabBarBackground,
+        tabBarStyle: Platform.select({
+          ios: {
+            position: 'absolute'
+          },
+          default: {}
+        }),
+        animation: 'fade'
       }}
     >
       <Tabs.Screen
