@@ -1,3 +1,5 @@
+const colors = require('./theme/colors').default;
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -6,7 +8,15 @@ module.exports = {
   ],
   presets: [require('nativewind/preset')],
   theme: {
-    extend: {}
+    extend: {
+      colors,
+      fontFamily: {
+        inter: ['Inter-Regular'],
+        'inter-medium': ['Inter-Medium'],
+        'inter-semibold': ['Inter-SemiBold'],
+        'inter-bold': ['Inter-Bold']
+      }
+    }
   },
   plugins: []
 };
