@@ -1,9 +1,10 @@
-import { Tabs } from 'expo-router';
-import TabIcon from '../../components/tabs/TabIcon';
-import colors from '../../theme/colors';
 import { HapticTab } from '@/components/tabs/HapticTab';
 import BlurTabBarBackground from '@/components/tabs/TabBarBackground';
-import { Platform } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { Tabs } from 'expo-router';
+import { Platform, View } from 'react-native';
+import TabIcon from '../../components/tabs/TabIcon';
+import colors from '../../theme/colors';
 
 export default function RootLayout() {
   return (
@@ -11,7 +12,7 @@ export default function RootLayout() {
       screenOptions={{
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.muted,
-        headerShown: false,
+        // headerShown: false,
         tabBarLabelPosition: 'below-icon',
         tabBarButton: HapticTab,
         tabBarBackground: BlurTabBarBackground,
@@ -39,6 +40,19 @@ export default function RootLayout() {
           title: 'Itineraries',
           tabBarIcon: props => (
             <TabIcon {...props} activeName="map" inactiveName="map-outline" />
+          )
+        }}
+      />
+      <Tabs.Screen
+        name="preference"
+        options={{
+          tabBarLabelStyle: {
+            display: 'none'
+          },
+          tabBarIcon: props => (
+            <View className="mb-5 h-[60px] w-[60px] items-center justify-center rounded-full bg-black">
+              <Ionicons name="add" color="white" size={24} />
+            </View>
           )
         }}
       />
