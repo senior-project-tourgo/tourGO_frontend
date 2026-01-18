@@ -12,7 +12,8 @@ export default function RootLayout() {
       screenOptions={{
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.muted,
-        // headerShown: false,
+        headerShown: false,
+        popToTopOnBlur: true,
         tabBarLabelPosition: 'below-icon',
         tabBarButton: HapticTab,
         tabBarBackground: BlurTabBarBackground,
