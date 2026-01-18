@@ -50,9 +50,12 @@ export default function RootLayout() {
           tabBarLabelStyle: {
             display: 'none'
           },
-          tabBarIcon: props => (
-            <View className="mb-5 h-[60px] w-[60px] items-center justify-center rounded-full bg-black">
-              <Ionicons name="add" color="white" size={24} />
+          tabBarIcon: ({ focused, color }) => (
+            <View
+              className="mb-5 h-[60px] w-[60px] items-center justify-center rounded-full bg-black"
+              style={{ opacity: focused ? 1 : 0.8 }}
+            >
+              <Ionicons name="add" color={color} size={24} />
             </View>
           )
         }}
