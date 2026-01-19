@@ -45,7 +45,7 @@ export default function RootLayout() {
         }}
       />
       <Tabs.Screen
-        name="preference"
+        name="itinerary-generator"
         options={{
           tabBarLabelStyle: {
             display: 'none'
