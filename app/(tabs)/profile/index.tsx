@@ -18,6 +18,9 @@ export default function ProfileScreen() {
       <Link href="/(tabs)/profile/saved-places" asChild>
         <Button title="Saved Places"></Button>
       </Link>
+      <Link href="/leaderboard" asChild>
+        <Button title="Leaderboard"></Button>
+      </Link>
     </View>
   );
 }
