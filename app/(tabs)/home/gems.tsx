@@ -1,20 +1,25 @@
 import { Link } from 'expo-router';
-import { Text, View } from 'react-native';
+import { Text, View, FlatList } from 'react-native';
 import { Button } from '@/components/Button';
+import { placesMock } from '@/mock/places.mock';
 
 export default function CommunityGemsScreen() {
   return (
-    <View className="flex-1 items-center justify-center bg-background">
-      <Text className="text-lg font-semibold">Community-vetted Gems</Text>
-      <Link href="/places/1" asChild>
-        <Button title="Place 1"></Button>
-      </Link>
-      <Link href="/places/2" asChild>
-        <Button title="Place 2"></Button>
-      </Link>
-      <Link href="/places/3" asChild>
-        <Button title="Place 3"></Button>
-      </Link>
+    <View className="flex-1 bg-background px-6 pt-10">
+      <Text className="mb-6 text-center text-lg font-semibold">
+        Community-vetted Gems
+      </Text>
+
+      <FlatList
+        data={placesMock}
+        keyExtractor={item => item.placeId}
+        contentContainerStyle={{ gap: 12 }}
+        renderItem={({ item }) => (
+          <Link href={`/places/${item.placeId}`} asChild>
+            <Button title={item.placeName} />
+          </Link>
+        )}
+      />
     </View>
   );
 }
