@@ -6,7 +6,7 @@ export default function ItinerariesScreen() {
   return (
     <View className="flex-1 items-center justify-center bg-background">
       <Text className="text-lg font-semibold">Itinerary</Text>
-      <Link href="/(tabs)/itinerary-generator" asChild replace>
+      <Link href="/(tabs)/itinerary-generator" asChild>
         <Button title="Itinerary Generator"></Button>
       </Link>
     </View>

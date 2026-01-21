@@ -3,7 +3,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { promotionsMock } from '@/mock/promotions.mock';
 import { rewardsMock } from '@/mock/rewards.mock';
 
-export default function CouponDetails() {
+export default function PromotionsDetails() {
   const { id } = useLocalSearchParams();
   const promotion = promotionsMock.find(promo => promo.promotionId === id);
 
