@@ -6,14 +6,14 @@ import { Platform, View } from 'react-native';
 import TabIcon from '../../components/tabs/TabIcon';
 import colors from '../../theme/colors';
 
-export default function RootLayout() {
+export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.muted,
         headerShown: false,
-        popToTopOnBlur: true,
+        popToTopOnBlur: false /* true may create void*/,
         tabBarLabelPosition: 'below-icon',
         tabBarButton: HapticTab,
         tabBarBackground: BlurTabBarBackground,
@@ -23,7 +23,7 @@ export default function RootLayout() {
           },
           default: {}
         }),
-        animation: 'fade'
+        animation: 'shift' /* fade may create void*/
       }}
     >
       <Tabs.Screen
@@ -36,16 +36,16 @@ export default function RootLayout() {
         }}
       />
       <Tabs.Screen
-        name="itineraries"
+        name="trip"
         options={{
-          title: 'Itineraries',
+          title: 'Trip',
           tabBarIcon: props => (
             <TabIcon {...props} activeName="map" inactiveName="map-outline" />
           )
         }}
       />
       <Tabs.Screen
-        name="preference"
+        name="trip-generator"
         options={{
           tabBarLabelStyle: {
             display: 'none'
