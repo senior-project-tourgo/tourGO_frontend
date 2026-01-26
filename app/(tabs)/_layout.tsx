@@ -36,16 +36,16 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="itineraries"
+        name="trip"
         options={{
-          title: 'Itineraries',
+          title: 'trip',
           tabBarIcon: props => (
             <TabIcon {...props} activeName="map" inactiveName="map-outline" />
           )
         }}
       />
       <Tabs.Screen
-        name="itinerary-generator"
+        name="trip-generator"
         options={{
           tabBarLabelStyle: {
             display: 'none'

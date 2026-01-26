@@ -9,8 +9,8 @@ export default function ProfileScreen() {
       <Link href="/(tabs)/profile/edit" asChild>
         <Button title="Edit Profile"></Button>
       </Link>
-      <Link href="/(tabs)/profile/itinerary-history" asChild>
-        <Button title="Itineraries History"></Button>
+      <Link href="/(tabs)/profile/trip-history" asChild>
+        <Button title="Trips History"></Button>
       </Link>
       <Link href="/(tabs)/profile/saved-deals" asChild>
         <Button title="Saved Deals"></Button>
