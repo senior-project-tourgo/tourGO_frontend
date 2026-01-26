@@ -4,7 +4,7 @@ import { promotionsMock } from '@/mock/promotions.mock';
 import { rewardsMock } from '@/mock/rewards.mock';
 
 export default function PromotionsDetails() {
-  const { id } = useLocalSearchParams();
+  const { id } = useLocalSearchParams<{ id: string }>();
   const promotion = promotionsMock.find(promo => promo.promotionId === id);
 
   if (!promotion) {

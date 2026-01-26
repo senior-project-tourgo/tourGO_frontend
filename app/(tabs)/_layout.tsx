@@ -38,7 +38,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="trip"
         options={{
-          title: 'trip',
+          title: 'Trip',
           tabBarIcon: props => (
             <TabIcon {...props} activeName="map" inactiveName="map-outline" />
           )
