@@ -39,7 +39,7 @@ export const placesMock = [
   {
     placeId: 'plc_002',
     placeName: 'Night Owl Rooftop Bar',
-    promotions: ['promo_102'],
+    promotions: ['promo_102', 'promo_103'],
     image: 'https://images.example.com/night-owl.jpg',
     location: {
       area: 'Thonglor',

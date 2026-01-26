@@ -11,7 +11,7 @@ export default function CommunityGemsScreen() {
       </Text>
 
       <FlatList
-        data={placesMock}
+        data={placesMock.filter(place => place.isActive)}
         keyExtractor={item => item.placeId}
         contentContainerStyle={{ gap: 12 }}
         renderItem={({ item }) => (
