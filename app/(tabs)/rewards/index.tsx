@@ -10,7 +10,7 @@ export default function RewardsScreen() {
     <View className="flex-1 items-center justify-center bg-background">
       <Text className="text-lg font-semibold">Rewards</Text>
       <Link href="/leaderboard" asChild>
-        <Button title="Leaderboard"></Button>
+        <Button title="Leaderboard" />
       </Link>
       {/* Promotions */}
       {promotions.length > 0 && (

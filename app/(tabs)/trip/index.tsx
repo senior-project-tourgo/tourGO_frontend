@@ -7,7 +7,7 @@ export default function TripScreen() {
     <View className="flex-1 items-center justify-center bg-background">
       <Text className="text-lg font-semibold">Trip</Text>
       <Link href="/(tabs)/trip-generator" asChild>
-        <Button title="Trip Generator"></Button>
+        <Button title="Trip Generator" />
       </Link>
     </View>
   );

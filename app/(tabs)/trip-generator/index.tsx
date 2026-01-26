@@ -7,7 +7,7 @@ export default function TripGeneratorScreen() {
     <View className="flex-1 items-center justify-center bg-background">
       <Text className="text-lg font-semibold">Trip Generator</Text>
       <Link href="/(tabs)/trip-generator/vibe-selector" asChild>
-        <Button title="Select Vibes"></Button>
+        <Button title="Select Vibes" />
       </Link>
     </View>
   );

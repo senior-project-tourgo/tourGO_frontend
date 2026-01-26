@@ -7,19 +7,19 @@ export default function ProfileScreen() {
     <View className="flex-1 items-center justify-center bg-background">
       <Text className="text-lg font-semibold">Profile</Text>
       <Link href="/(tabs)/profile/edit" asChild>
-        <Button title="Edit Profile"></Button>
+        <Button title="Edit Profile" />
       </Link>
       <Link href="/(tabs)/profile/trip-history" asChild>
-        <Button title="Trips History"></Button>
+        <Button title="Trips History" />
       </Link>
       <Link href="/(tabs)/profile/saved-deals" asChild>
-        <Button title="Saved Deals"></Button>
+        <Button title="Saved Deals" />
       </Link>
       <Link href="/(tabs)/profile/saved-places" asChild>
-        <Button title="Saved Places"></Button>
+        <Button title="Saved Places" />
       </Link>
       <Link href="/leaderboard" asChild>
-        <Button title="Leaderboard"></Button>
+        <Button title="Leaderboard" />
       </Link>
     </View>
   );

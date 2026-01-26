@@ -7,7 +7,7 @@ export default function HomeScreen() {
     <View className="flex-1 items-center justify-center bg-background">
       <Text className="text-lg font-semibold">Home</Text>
       <Link href="/(tabs)/trip-generator" asChild>
-        <Button title="Curate New Trip"></Button>
+        <Button title="Curate New Trip" />
       </Link>
       <Link href="/(tabs)/home/gems" asChild>
         <Button title="Go to Gems" />
