@@ -1,4 +1,5 @@
-import { View, Text, TextInput } from 'react-native';
+import { View, TextInput } from 'react-native';
+import { AppText } from './Text';
 
 type InputProps = {
   label?: string;
@@ -10,7 +11,9 @@ type InputProps = {
 export function Input({ label, value, onChangeText, placeholder }: InputProps) {
   return (
     <View className="w-full">
-      {label && <Text className="mb-1 text-sm text-gray-500">{label}</Text>}
+      {label && (
+        <AppText className="mb-1 text-sm text-gray-500">{label}</AppText>
+      )}
       <TextInput
         value={value}
         onChangeText={onChangeText}

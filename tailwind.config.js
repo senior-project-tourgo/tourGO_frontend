@@ -6,7 +6,13 @@ module.exports = {
   presets: [require('nativewind/preset')],
   theme: {
     extend: {
-      colors,
+      colors: {
+        text: {
+          DEFAULT: '#2C302E', // your default text color
+          muted: '#FF7D00',
+          inverse: '#FFFFFF'
+        }
+      },
       fontFamily: {
         inter: ['Inter-Regular'],
         'inter-medium': ['Inter-Medium'],

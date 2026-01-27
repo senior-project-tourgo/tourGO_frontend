@@ -1,5 +1,6 @@
 // components/ui/Tag.tsx
-import { Pressable, Text } from 'react-native';
+import { Pressable } from 'react-native';
+import { AppText } from './Text';
 
 type TagProps = {
   label: string;
@@ -15,13 +16,13 @@ export function Tag({ label, selected = false, onPress }: TagProps) {
         selected ? 'bg-orange-500' : 'bg-gray-200'
       }`}
     >
-      <Text
+      <AppText
         className={`text-sm ${
           selected ? 'font-semibold text-white' : 'text-gray-700'
         }`}
       >
         {label}
-      </Text>
+      </AppText>
     </Pressable>
   );
 }

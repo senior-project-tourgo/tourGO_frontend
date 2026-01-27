@@ -1,6 +1,7 @@
 // components/ui/Dropdown.tsx
-import { View, Text, Pressable } from 'react-native';
+import { View, Pressable } from 'react-native';
 import { useState } from 'react';
+import { AppText } from './Text';
 
 type DropdownProps = {
   label?: string;
@@ -14,13 +15,15 @@ export function Dropdown({ label, options, value, onChange }: DropdownProps) {
 
   return (
     <View className="w-full">
-      {label && <Text className="mb-1 text-sm text-gray-500">{label}</Text>}
+      {label && (
+        <AppText className="mb-1 text-sm text-gray-500">{label}</AppText>
+      )}
 
       <Pressable
         onPress={() => setOpen(!open)}
         className="rounded-lg border border-gray-300 bg-white px-4 py-3"
       >
-        <Text>{value}</Text>
+        <AppText>{value}</AppText>
       </Pressable>
 
       {open && (
@@ -34,7 +37,7 @@ export function Dropdown({ label, options, value, onChange }: DropdownProps) {
               }}
               className="border-b border-gray-100 px-4 py-3"
             >
-              <Text>{option}</Text>
+              <AppText>{option}</AppText>
             </Pressable>
           ))}
         </View>

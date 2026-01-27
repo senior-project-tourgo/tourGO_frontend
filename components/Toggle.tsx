@@ -1,4 +1,5 @@
 import { Pressable, Text } from 'react-native';
+import { AppText } from './Text';
 
 type ToggleProps = {
   value: boolean;
@@ -20,13 +21,13 @@ export function Toggle({
         value ? 'bg-orange-500' : 'bg-gray-300'
       }`}
     >
-      <Text
+      <AppText
         className={`text-sm font-semibold ${
           value ? 'text-white' : 'text-gray-700'
         }`}
       >
         {value ? onText : offText}
-      </Text>
+      </AppText>
     </Pressable>
   );
 }
