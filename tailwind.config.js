@@ -7,11 +7,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        text: {
-          DEFAULT: '#2C302E', // your default text color
-          muted: '#FF7D00',
-          inverse: '#FFFFFF'
-        }
+        colors
       },
       fontFamily: {
         inter: ['Inter-Regular'],

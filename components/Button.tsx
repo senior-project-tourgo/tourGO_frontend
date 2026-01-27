@@ -9,8 +9,11 @@ export function Button({
   onPress?: () => void;
 }) {
   return (
-    <Pressable onPress={onPress} className="bg-primary rounded-full px-4 py-3">
-      <AppText className="text-center font-semibold text-text">{title}</AppText>
+    <Pressable
+      onPress={onPress}
+      className="rounded-full bg-colors-brand-primary px-4 py-3"
+    >
+      <AppText className="text-text text-center font-semibold">{title}</AppText>
     </Pressable>
   );
 }
