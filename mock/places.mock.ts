@@ -1,4 +1,6 @@
-export const placesMock = [
+import type { Place } from '@/features/place/place.types';
+
+export const placesMock: Place[] = [
   {
     placeId: 'plc_001',
     placeName: 'Hidden Yard Café',
@@ -69,9 +71,7 @@ export const placesMock = [
         page: 'Night Owl Rooftop Bar',
         likes: 33400
       },
-      whatsapp: {
-        number: '+66 92 888 1122'
-      }
+      whatsapp: null
     }
   },
 
@@ -104,6 +104,82 @@ export const placesMock = [
       facebook: {
         page: 'Local Legend Noodles',
         likes: 21000
+      },
+      whatsapp: null
+    }
+  },
+  {
+    placeId: 'plc_004',
+    placeName: 'Moonlight Brew',
+    promotions: ['promo_102'],
+    image: 'https://images.example.com/moonlight-brew.jpg',
+    location: {
+      area: 'Bangna',
+      city: 'Bangkok',
+      lat: 13.7304,
+      lng: 100.5696
+    },
+    mapsLinkKey: 'ChIJ_moonlight_brew_key',
+    averageRatingKey: 'rating_moonlight_brew',
+    priceRange: '$',
+    openingHours: '10:00 - 23:00',
+    isActive: true,
+    typicalTimeSpent: '2–3 hours',
+    vibe: ['chill', 'modern', 'night-friendly'],
+    specialFacilities: [
+      'Craft coffee',
+      'Outdoor seating',
+      'Live DJ (weekends)'
+    ],
+    contactNumber: '+66 92 567 8910',
+    socialMedia: {
+      instagram: {
+        handle: '@moonlightbrew.bkk',
+        likes: 18900
+      },
+      tiktok: {
+        handle: '@moonlightbrew',
+        likes: 62300
+      },
+      facebook: {
+        page: 'Moonlight Brew',
+        likes: 14200
+      },
+      whatsapp: null
+    }
+  },
+  {
+    placeId: 'plc_005',
+    placeName: 'Canopy Corner',
+    promotions: ['promo_103', 'promo_105'],
+    image: 'https://images.example.com/canopy-corner.jpg',
+    location: {
+      area: 'Sathorn',
+      city: 'Bangkok',
+      lat: 13.7212,
+      lng: 100.5298
+    },
+    mapsLinkKey: 'ChIJ_canopy_corner_key',
+    averageRatingKey: 'rating_canopy_corner',
+    priceRange: '$$',
+    openingHours: '08:00 - 18:30',
+    isActive: true,
+    typicalTimeSpent: '1–2 hours',
+    vibe: ['green', 'calm', 'work-friendly'],
+    specialFacilities: ['Indoor plants', 'Quiet zones', 'Specialty tea'],
+    contactNumber: '+66 88 345 9021',
+    socialMedia: {
+      instagram: {
+        handle: '@canopycorner.bkk',
+        likes: 9400
+      },
+      tiktok: {
+        handle: '@canopycorner',
+        likes: 21700
+      },
+      facebook: {
+        page: 'Canopy Corner',
+        likes: 7600
       },
       whatsapp: null
     }
