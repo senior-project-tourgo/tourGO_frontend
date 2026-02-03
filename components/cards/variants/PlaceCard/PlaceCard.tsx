@@ -7,6 +7,7 @@ import { Pressable, View } from 'react-native';
 import { BaseCardProps } from '../../BaseCard';
 import { ImageWithFallback } from './ImageWithFallback';
 import { getPlaceOpeningStatus } from '@/utils/openingHours';
+import { Badge } from '@/components/Badge';
 
 interface PlaceCardProps extends BaseCardProps {
   place: Place;
@@ -25,10 +26,10 @@ export function PlaceCard({ place, onPress }: PlaceCardProps) {
           resizeMode="contain"
         />
 
-        <View className="mt-3 gap-1">
+        <View className="gap-1">
           <AppText variant="title">{place.placeName}</AppText>
           <AppText variant="muted">
-            <Ionicons name="star" color={colors.brand.primary} />
+            <Ionicons name="star" color={colors.brand.primary} /> {''}
             {place.averageRating}
           </AppText>
 
@@ -50,6 +51,14 @@ export function PlaceCard({ place, onPress }: PlaceCardProps) {
               .map(hour => hour.open + ' - ' + hour.close)
               .join(' - ')}
           </AppText>
+
+          <View className="flex-row gap-2">
+            {place.vibe.map(vibe => (
+              <View key={vibe}>
+                <Badge label={vibe} />
+              </View>
+            ))}
+          </View>
         </View>
       </View>
     </Pressable>

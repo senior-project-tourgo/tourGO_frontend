@@ -1,26 +1,28 @@
-import { Link } from 'expo-router';
-import { View, FlatList } from 'react-native';
-import { AppText } from '@/components/Text';
-import { Button } from '@/components/Button';
+import { AppText } from '@/components/AppText';
+import { PlaceCard } from '@/components/cards/variants/PlaceCard/PlaceCard';
+import { Screen } from '@/components/Screen';
 import { placesMock } from '@/mock/places.mock';
+import { router } from 'expo-router';
+import { View } from 'react-native';
 
 export default function CommunityGemsScreen() {
+  const activePlaces = placesMock.filter(place => place.isActive);
+
   return (
-    <View className="bg-background flex-1 px-6 pt-10">
-      <AppText className="mb-6 text-center text-lg font-semibold">
+    <Screen>
+      <AppText className="text-center text-lg font-semibold">
         Community-vetted Gems
       </AppText>
 
-      <FlatList
-        data={placesMock.filter(place => place.isActive)}
-        keyExtractor={item => item.placeId}
-        contentContainerStyle={{ gap: 12 }}
-        renderItem={({ item }) => (
-          <Link href={`/places/${item.placeId}`} asChild>
-            <Button title={item.placeName} />
-          </Link>
-        )}
-      />
-    </View>
+      <View className="gap-3">
+        {activePlaces.map(place => (
+          <PlaceCard
+            key={place.placeId}
+            place={place}
+            onPress={() => router.push(`/places/${place.placeId}`)}
+          />
+        ))}
+      </View>
+    </Screen>
   );
 }

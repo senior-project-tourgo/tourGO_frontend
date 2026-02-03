@@ -12,7 +12,7 @@ export default function HomeScreen() {
   return (
     <Screen>
       <View className="flex-1 gap-4">
-        <AppText className="text-lg font-semibold">Home</AppText>
+        <AppText className="font-inter-bold text-xl">Namaste!</AppText>
         <Button
           title="Curate New Trip"
           onPress={() => router.push('/(tabs)/trip-generator')}

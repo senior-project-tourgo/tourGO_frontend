@@ -31,7 +31,13 @@ export default function PlaceDetails() {
         {place.location.area}, {place.location.city}
       </AppText>
 
-      <AppText className="mt-2 text-sm">⏰ {place.openingHours}</AppText>
+      <AppText className="mt-2 text-sm">
+        {typeof place.openingHours === 'string'
+          ? place.openingHours
+          : Array.isArray(place.openingHours)
+            ? place.openingHours.join(', ')
+            : 'N/A'}
+      </AppText>
 
       <AppText className="mt-2 text-sm">
         💸 Price range: {place.priceRange}
