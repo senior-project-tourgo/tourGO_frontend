@@ -5,7 +5,8 @@ export const placesMock: Place[] = [
     placeId: 'plc_001',
     placeName: 'Hidden Yard Café',
     promotions: ['promo_101', 'promo_104'],
-    image: 'https://images.example.com/hidden-yard.jpg',
+    image:
+      'https://ignitetravelsolution.com/wp-content/uploads/2024/09/Tourist-Attractions-in-Kathmandu-Nepal-.jpg',
     location: {
       area: 'Ari',
       city: 'Bangkok',
@@ -13,9 +14,20 @@ export const placesMock: Place[] = [
       lng: 100.5449
     },
     mapsLinkKey: 'ChIJ_hidden_yard_key',
-    averageRatingKey: 'rating_hidden_yard',
+    averageRating: 3.7,
     priceRange: '$$',
-    openingHours: '09:00 - 20:00',
+    openingHours: {
+      monday: [{ open: '09:00', close: '18:00' }],
+      tuesday: [{ open: '09:00', close: '18:00' }],
+      wednesday: [{ open: '09:00', close: '18:00' }],
+      thursday: [{ open: '09:00', close: '20:00' }],
+      friday: [
+        { open: '09:00', close: '14:00' },
+        { open: '17:00', close: '22:00' }
+      ],
+      saturday: [{ open: '10:00', close: '22:00' }],
+      sunday: [] // closed
+    },
     isActive: true,
     typicalTimeSpent: '1–2 hours',
     vibe: ['cozy', 'quiet', 'work-friendly'],
@@ -42,7 +54,8 @@ export const placesMock: Place[] = [
     placeId: 'plc_002',
     placeName: 'Night Owl Rooftop Bar',
     promotions: ['promo_102', 'promo_103'],
-    image: 'https://images.example.com/night-owl.jpg',
+    image:
+      'https://storage.googleapis.com/stateless-www-justwravel-com/2024/09/9e074796-swayambhunath-temple-in-kathmandu-nepal.jpg',
     location: {
       area: 'Thonglor',
       city: 'Bangkok',
@@ -50,9 +63,20 @@ export const placesMock: Place[] = [
       lng: 100.5804
     },
     mapsLinkKey: 'ChIJ_night_owl_key',
-    averageRatingKey: 'rating_night_owl',
+    averageRating: 4.4,
     priceRange: '$$$',
-    openingHours: '18:00 - 02:00',
+    openingHours: {
+      monday: [{ open: '09:00', close: '18:00' }],
+      tuesday: [{ open: '09:00', close: '18:00' }],
+      wednesday: [{ open: '09:00', close: '18:00' }],
+      thursday: [{ open: '09:00', close: '20:00' }],
+      friday: [
+        { open: '09:00', close: '14:00' },
+        { open: '17:00', close: '22:00' }
+      ],
+      saturday: [{ open: '10:00', close: '22:00' }],
+      sunday: [] // closed
+    },
     isActive: true,
     typicalTimeSpent: '2–3 hours',
     vibe: ['luxury', 'romantic', 'nightlife'],
@@ -79,7 +103,8 @@ export const placesMock: Place[] = [
     placeId: 'plc_003',
     placeName: 'Local Legend Noodles',
     promotions: [],
-    image: 'https://images.example.com/local-legend.jpg',
+    image:
+      'https://www.himalayanglacier.com/wp-content/uploads/2021/06/Patan-Durbar-Square.jpg',
     location: {
       area: 'Chinatown',
       city: 'Bangkok',
@@ -87,9 +112,20 @@ export const placesMock: Place[] = [
       lng: 100.5131
     },
     mapsLinkKey: 'ChIJ_local_legend_key',
-    averageRatingKey: 'rating_local_legend',
+    averageRating: 4.9,
     priceRange: '$',
-    openingHours: '10:00 - 22:00',
+    openingHours: {
+      monday: [{ open: '09:00', close: '18:00' }],
+      tuesday: [{ open: '09:00', close: '18:00' }],
+      wednesday: [{ open: '09:00', close: '18:00' }],
+      thursday: [{ open: '09:00', close: '20:00' }],
+      friday: [
+        { open: '09:00', close: '14:00' },
+        { open: '17:00', close: '22:00' }
+      ],
+      saturday: [{ open: '10:00', close: '22:00' }],
+      sunday: [] // closed
+    },
     isActive: false,
     typicalTimeSpent: '30–45 minutes',
     vibe: ['local', 'casual', 'street-food'],
@@ -112,7 +148,8 @@ export const placesMock: Place[] = [
     placeId: 'plc_004',
     placeName: 'Moonlight Brew',
     promotions: ['promo_102'],
-    image: 'https://images.example.com/moonlight-brew.jpg',
+    image:
+      'https://wanderlusters.com/wp-content/uploads/2016/10/Sharada-Prasad-CS-CC-Flickr.jpg',
     location: {
       area: 'Bangna',
       city: 'Bangkok',
@@ -120,9 +157,20 @@ export const placesMock: Place[] = [
       lng: 100.5696
     },
     mapsLinkKey: 'ChIJ_moonlight_brew_key',
-    averageRatingKey: 'rating_moonlight_brew',
+    averageRating: 4.1,
     priceRange: '$',
-    openingHours: '10:00 - 23:00',
+    openingHours: {
+      monday: [{ open: '09:00', close: '18:00' }],
+      tuesday: [{ open: '09:00', close: '18:00' }],
+      wednesday: [{ open: '09:00', close: '18:00' }],
+      thursday: [{ open: '09:00', close: '20:00' }],
+      friday: [
+        { open: '09:00', close: '14:00' },
+        { open: '17:00', close: '22:00' }
+      ],
+      saturday: [{ open: '10:00', close: '22:00' }],
+      sunday: [] // closed
+    },
     isActive: true,
     typicalTimeSpent: '2–3 hours',
     vibe: ['chill', 'modern', 'night-friendly'],
@@ -152,7 +200,7 @@ export const placesMock: Place[] = [
     placeId: 'plc_005',
     placeName: 'Canopy Corner',
     promotions: ['promo_103', 'promo_105'],
-    image: 'https://images.example.com/canopy-corner.jpg',
+    image: 'https://www.holidify.com/images/bgImages/POKHARA.jpg',
     location: {
       area: 'Sathorn',
       city: 'Bangkok',
@@ -160,9 +208,20 @@ export const placesMock: Place[] = [
       lng: 100.5298
     },
     mapsLinkKey: 'ChIJ_canopy_corner_key',
-    averageRatingKey: 'rating_canopy_corner',
+    averageRating: 3.9,
     priceRange: '$$',
-    openingHours: '08:00 - 18:30',
+    openingHours: {
+      monday: [{ open: '09:00', close: '18:00' }],
+      tuesday: [{ open: '09:00', close: '18:00' }],
+      wednesday: [{ open: '09:00', close: '18:00' }],
+      thursday: [{ open: '09:00', close: '20:00' }],
+      friday: [
+        { open: '09:00', close: '14:00' },
+        { open: '17:00', close: '22:00' }
+      ],
+      saturday: [{ open: '10:00', close: '22:00' }],
+      sunday: [] // closed
+    },
     isActive: true,
     typicalTimeSpent: '1–2 hours',
     vibe: ['green', 'calm', 'work-friendly'],

@@ -7,15 +7,30 @@ export type Place = {
   image: string;
   location: PlaceLocation;
   mapsLinkKey: string; // key to resolve Google Maps link
-  averageRatingKey: string; // key to resolve rating from ratings table/service
+  averageRating: number; // key to resolve rating from ratings table/service
   priceRange: PriceRange;
-  openingHours: string;
+  openingHours: OpeningHours;
   isActive: boolean;
   typicalTimeSpent: string;
   vibe: string[];
   specialFacilities: string[];
   contactNumber: string;
   socialMedia: SocialMedia;
+};
+
+export type OpeningHours = {
+  monday: TimeRange[];
+  tuesday: TimeRange[];
+  wednesday: TimeRange[];
+  thursday: TimeRange[];
+  friday: TimeRange[];
+  saturday: TimeRange[];
+  sunday: TimeRange[];
+};
+
+export type TimeRange = {
+  open: string; // 'HH:mm'
+  close: string; // 'HH:mm'
 };
 
 export type PlaceLocation = {
