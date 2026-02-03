@@ -1,7 +1,8 @@
 const colors = {
   brand: {
     primary: '#FF7D00',
-    secondary: '#754A17'
+    secondary: '#754A17',
+    neutrals: '#FFECD1'
   },
   surface: {
     background: '#FFFFFF',
