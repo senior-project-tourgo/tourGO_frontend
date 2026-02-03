@@ -1,4 +1,4 @@
-import { AppText } from '@/components/Text';
+import { AppText } from '@/components/AppText';
 import { Pressable } from 'react-native';
 
 export function Button({

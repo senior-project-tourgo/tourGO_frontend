@@ -1,7 +1,7 @@
 // components/ui/Dropdown.tsx
-import { View, Pressable } from 'react-native';
 import { useState } from 'react';
-import { AppText } from './Text';
+import { Pressable, View } from 'react-native';
+import { AppText } from './AppText';
 
 type DropdownProps = {
   label?: string;

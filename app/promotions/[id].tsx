@@ -1,8 +1,8 @@
-import { View } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { AppText } from '@/components/AppText';
 import { promotionsMock } from '@/mock/promotions.mock';
 import { rewardsMock } from '@/mock/rewards.mock';
-import { AppText } from '@/components/Text';
+import { useLocalSearchParams } from 'expo-router';
+import { View } from 'react-native';
 
 export default function PromotionsDetails() {
   const { id } = useLocalSearchParams<{ id: string }>();

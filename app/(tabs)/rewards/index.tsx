@@ -1,8 +1,8 @@
-import { Link } from 'expo-router';
-import { View, Pressable } from 'react-native';
+import { AppText } from '@/components/AppText';
 import { Button } from '@/components/Button';
 import { promotionsMock } from '@/mock/promotions.mock';
-import { AppText } from '@/components/Text';
+import { Link } from 'expo-router';
+import { Pressable, View } from 'react-native';
 
 export default function RewardsScreen() {
   const promotions = promotionsMock;

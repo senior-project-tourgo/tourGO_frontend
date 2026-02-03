@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { AppText } from './Text';
+import { AppText } from './AppText';
 
 export function EmptyState({ message }: { message: string }) {
   return (

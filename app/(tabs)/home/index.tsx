@@ -1,23 +1,39 @@
+import { AppText } from '@/components/AppText';
 import { Button } from '@/components/Button';
-import { Link } from 'expo-router';
-import { ScrollView, View } from 'react-native';
-import { AppText } from '@/components/Text';
+import { PlaceCard } from '@/components/cards/variants/PlaceCard/PlaceCard';
+import { Screen } from '@/components/Screen';
+import { placesMock } from '@/mock/places.mock';
+import { router } from 'expo-router';
+import { View } from 'react-native';
 
 export default function HomeScreen() {
+  const activePlaces = placesMock.filter(place => place.isActive).slice(0, 3);
+
   return (
-    <ScrollView
-      className="bg-background flex-1"
-      contentContainerStyle={{ padding: 16 }}
-    >
-      <View className="items-center">
+    <Screen>
+      <View className="flex-1 gap-4">
         <AppText className="text-lg font-semibold">Home</AppText>
-        <Link href="/(tabs)/trip-generator" asChild>
-          <Button title="Curate New Trip" />
-        </Link>
-        <Link href="/(tabs)/home/gems" asChild>
-          <Button title="Go to Gems" />
-        </Link>
+        <Button
+          title="Curate New Trip"
+          onPress={() => router.push('/(tabs)/trip-generator')}
+        />
+
+        {/* Places list */}
+        <View className="gap-3">
+          {activePlaces.map(place => (
+            <PlaceCard
+              key={place.placeId}
+              place={place}
+              onPress={() => router.push(`/places/${place.placeId}`)}
+            />
+          ))}
+
+          <Button
+            title="Go to Gems"
+            onPress={() => router.push('/(tabs)/home/gems')}
+          />
+        </View>
       </View>
-    </ScrollView>
+    </Screen>
   );
 }

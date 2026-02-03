@@ -2,7 +2,7 @@ import { Pressable, View } from 'react-native';
 import { useLocalSearchParams, Stack, Link } from 'expo-router';
 import { promotionsMock } from '@/mock/promotions.mock';
 import { placesMock } from '@/mock/places.mock';
-import { AppText } from '@/components/Text';
+import { AppText } from '@/components/AppText';
 
 export default function PlaceDetails() {
   const { id } = useLocalSearchParams<{ id: string }>();

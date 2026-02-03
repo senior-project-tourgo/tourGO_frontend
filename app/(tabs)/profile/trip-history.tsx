@@ -1,4 +1,4 @@
-import { AppText } from '@/components/Text';
+import { AppText } from '@/components/AppText';
 import { View } from 'react-native';
 
 export default function HistoryScreen() {

@@ -1,5 +1,5 @@
-import { Pressable, Text } from 'react-native';
-import { AppText } from './Text';
+import { Pressable } from 'react-native';
+import { AppText } from './AppText';
 
 type ToggleProps = {
   value: boolean;

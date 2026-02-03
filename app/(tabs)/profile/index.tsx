@@ -1,7 +1,7 @@
-import { View } from 'react-native';
-import { Link } from 'expo-router';
+import { AppText } from '@/components/AppText';
 import { Button } from '@/components/Button';
-import { AppText } from '@/components/Text';
+import { Link } from 'expo-router';
+import { View } from 'react-native';
 
 export default function ProfileScreen() {
   return (
