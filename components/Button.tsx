@@ -13,7 +13,9 @@ export function Button({
       onPress={onPress}
       className="rounded-full bg-colors-brand-primary px-4 py-3"
     >
-      <AppText className="text-text text-center font-semibold">{title}</AppText>
+      <AppText className="text-center font-semibold text-colors-text">
+        {title}
+      </AppText>
     </Pressable>
   );
 }

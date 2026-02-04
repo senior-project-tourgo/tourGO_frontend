@@ -3,7 +3,7 @@ import { View } from 'react-native';
 
 export default function EditScreen() {
   return (
-    <View className="bg-background flex-1 items-center justify-center">
+    <View className="flex-1 items-center justify-center bg-colors-surface-background">
       <AppText className="text-lg font-semibold">Edit</AppText>
     </View>
   );

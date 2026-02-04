@@ -8,7 +8,7 @@ export default function RewardsScreen() {
   const promotions = promotionsMock;
 
   return (
-    <View className="bg-background flex-1 items-center justify-center">
+    <View className="flex-1 items-center justify-center bg-colors-surface-background">
       <AppText className="text-lg font-semibold">Rewards</AppText>
       <Link href="/leaderboard" asChild>
         <Button title="Leaderboard" />
