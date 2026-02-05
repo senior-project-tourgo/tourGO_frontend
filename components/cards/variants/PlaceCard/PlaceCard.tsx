@@ -23,7 +23,6 @@ export function PlaceCard({ place, onPress }: PlaceCardProps) {
         <ImageWithFallback
           primaryImageUrl={place.image}
           className="aspect-square h-full rounded-xl"
-          resizeMode="contain"
         />
 
         <View className="gap-1">

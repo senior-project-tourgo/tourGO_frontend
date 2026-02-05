@@ -1,30 +1,42 @@
-import React, { useState } from 'react';
-import { Image, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  Image,
+  View,
+  ImageSourcePropType,
+  ImageResizeMode
+} from 'react-native';
 
 interface ImageWithFallbackProps {
-  primaryImageUrl: string;
-  fallbackImageUrl?: string;
+  primaryImageUrl?: string;
+  fallbackImage?: ImageSourcePropType;
+  resizeMode?: ImageResizeMode;
   className?: string;
-  resizeMode?: string;
 }
 
 export function ImageWithFallback({
   primaryImageUrl,
-  fallbackImageUrl = require('@/assets/images/no_image.png'),
+  fallbackImage = require('@/assets/images/no_image.png'),
+  resizeMode = 'cover',
   className
 }: ImageWithFallbackProps) {
   const [imageError, setImageError] = useState(false);
-  const imageSource = imageError
-    ? { uri: fallbackImageUrl }
-    : { uri: primaryImageUrl };
+
+  useEffect(() => {
+    setImageError(false);
+  }, [primaryImageUrl]);
+
+  const imageSource: ImageSourcePropType =
+    !primaryImageUrl || imageError ? fallbackImage : { uri: primaryImageUrl };
 
   return (
     <View>
       <Image
         source={imageSource}
         className={`h-40 w-full ${className ?? ''}`}
-        onError={() => setImageError(true)}
-        resizeMode="cover"
+        resizeMode={resizeMode}
+        onError={() => {
+          if (!imageError) setImageError(true);
+        }}
       />
     </View>
   );
