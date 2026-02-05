@@ -7,7 +7,7 @@ export type Place = {
   image: string;
   location: PlaceLocation;
   mapsLinkKey: string; // key to resolve Google Maps link
-  averageRating: number; // key to resolve rating from ratings table/service
+  averageRating: number; // numeric average rating value (e.g. 4.3)
   priceRange: PriceRange;
   openingHours: OpeningHours;
   isActive: boolean;

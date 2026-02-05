@@ -6,6 +6,12 @@ export type BaseCardProps = {
   className?: string;
 };
 
-export function BaseCard({ children }: { children: React.ReactNode }) {
-  return <View className="rounded-xl bg-white p-4 shadow-sm">{children}</View>;
+export function BaseCard({ children, className }: BaseCardProps) {
+  return (
+    <View
+      className={`rounded-xl bg-white p-4 shadow-sm${className ? ` ${className}` : ''}`}
+    >
+      {children}
+    </View>
+  );
 }

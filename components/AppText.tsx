@@ -12,7 +12,7 @@ const variantClasses: Record<TextVariant, string> = {
   title: 'text-lg font-semibold',
   subtitle: 'text-base font-medium',
   caption: 'text-xs',
-  muted: 'text-sm text-colors-surface-muted'
+  muted: 'text-sm'
 };
 
 export function AppText({
