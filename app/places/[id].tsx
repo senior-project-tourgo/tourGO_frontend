@@ -18,12 +18,17 @@ export default function PlaceDetails() {
   }
 
   const openingStatus = getPlaceOpeningStatus(place.openingHours);
-  const todayOpeningLabel =
-    openingStatus.todayHours.length === 0
-      ? 'Closed'
-      : openingStatus.todayHours
-          .map(range => `${range.open} - ${range.close}`)
-          .join(', ');
+  const todayOpeningLabel = openingStatus.nextTime
+    ? openingStatus.nextTime.type === 'close'
+      ? `Closes at ${openingStatus.nextTime.time.toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit'
+        })}`
+      : `Opens at ${openingStatus.nextTime.time.toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit'
+        })}`
+    : 'Closed';
 
   const placePromotions = promotionsMock.filter(
     promo => promo.placeId === place.placeId

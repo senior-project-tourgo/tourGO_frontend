@@ -45,10 +45,28 @@ export function PlaceCard({ place, onPress }: PlaceCardProps) {
             >
               {openingHours.isOpenNow ? 'Open' : 'Closed'}
             </AppText>
+
             {' · '}
-            {openingHours.todayHours
-              .map(hour => hour.open + ' - ' + hour.close)
-              .join(' - ')}
+
+            <AppText variant="muted">
+              {openingHours.nextTime
+                ? openingHours.nextTime.type === 'close'
+                  ? `Closes at ${openingHours.nextTime.time.toLocaleTimeString(
+                      [],
+                      {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      }
+                    )}`
+                  : `Opens at ${openingHours.nextTime.time.toLocaleTimeString(
+                      [],
+                      {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      }
+                    )}`
+                : 'Hours unavailable'}
+            </AppText>
           </AppText>
 
           <View className="flex-row gap-2">
