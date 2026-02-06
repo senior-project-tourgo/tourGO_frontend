@@ -1,4 +1,3 @@
-// features/place/utils/openingHours.ts
 import type { Place } from '@/features/place/place.types';
 
 type TodayOpeningStatus = {

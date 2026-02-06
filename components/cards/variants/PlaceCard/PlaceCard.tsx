@@ -1,4 +1,3 @@
-// Pressable card
 import { AppText } from '@/components/AppText';
 import type { Place } from '@/features/place/place.types';
 import colors from '@/theme/colors';
@@ -36,7 +35,7 @@ export function PlaceCard({ place, onPress }: PlaceCardProps) {
             {place.location.area} · {place.priceRange}
           </AppText>
 
-          <AppText variant="muted">
+          <AppText>
             <AppText
               variant="muted"
               className={
@@ -46,9 +45,8 @@ export function PlaceCard({ place, onPress }: PlaceCardProps) {
               {openingHours.isOpenNow ? 'Open' : 'Closed'}
             </AppText>
 
-            {' · '}
-
             <AppText variant="muted">
+              {' · '}
               {openingHours.nextTime
                 ? openingHours.nextTime.type === 'close'
                   ? `Closes at ${openingHours.nextTime.time.toLocaleTimeString(
