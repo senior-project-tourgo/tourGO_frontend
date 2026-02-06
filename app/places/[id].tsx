@@ -3,6 +3,7 @@ import { useLocalSearchParams, Stack, Link } from 'expo-router';
 import { promotionsMock } from '@/mock/promotions.mock';
 import { placesMock } from '@/mock/places.mock';
 import { AppText } from '@/components/AppText';
+import { getPlaceOpeningStatus } from '@/utils/openingHours';
 
 export default function PlaceDetails() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -15,6 +16,14 @@ export default function PlaceDetails() {
       </View>
     );
   }
+
+  const openingStatus = getPlaceOpeningStatus(place.openingHours);
+  const todayOpeningLabel =
+    openingStatus.todayHours.length === 0
+      ? 'Closed'
+      : openingStatus.todayHours
+          .map(range => `${range.open} - ${range.close}`)
+          .join(', ');
 
   const placePromotions = promotionsMock.filter(
     promo => promo.placeId === place.placeId
@@ -32,11 +41,8 @@ export default function PlaceDetails() {
       </AppText>
 
       <AppText className="mt-2 text-sm">
-        {typeof place.openingHours === 'string'
-          ? place.openingHours
-          : Array.isArray(place.openingHours)
-            ? place.openingHours.join(', ')
-            : 'N/A'}
+        {openingStatus.isOpenNow ? 'Open now' : 'Closed now'} ·{' '}
+        {todayOpeningLabel}
       </AppText>
 
       <AppText className="mt-2 text-sm">
