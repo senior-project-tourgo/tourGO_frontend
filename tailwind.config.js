@@ -6,7 +6,9 @@ module.exports = {
   presets: [require('nativewind/preset')],
   theme: {
     extend: {
-      colors,
+      colors: {
+        colors
+      },
       fontFamily: {
         inter: ['Inter-Regular'],
         'inter-medium': ['Inter-Medium'],

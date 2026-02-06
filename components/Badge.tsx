@@ -1,9 +1,9 @@
-import { Text } from 'react-native';
+import { AppText } from './AppText';
 
 export function Badge({ label }: { label: string }) {
   return (
-    <Text className="rounded-full bg-secondary px-3 py-1 text-xs text-white">
+    <AppText className="rounded-full bg-colors-brand-neutrals px-2 py-1 text-xs">
       {label}
-    </Text>
+    </AppText>
   );
 }

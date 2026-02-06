@@ -1,9 +1,12 @@
-export const placesMock = [
+import type { Place } from '@/features/place/place.types';
+
+export const placesMock: Place[] = [
   {
     placeId: 'plc_001',
     placeName: 'Hidden Yard Café',
     promotions: ['promo_101', 'promo_104'],
-    image: 'https://images.example.com/hidden-yard.jpg',
+    image:
+      'https://ignitetravelsolution.com/wp-content/uploads/2024/09/Tourist-Attractions-in-Kathmandu-Nepal-.jpg',
     location: {
       area: 'Ari',
       city: 'Bangkok',
@@ -11,9 +14,20 @@ export const placesMock = [
       lng: 100.5449
     },
     mapsLinkKey: 'ChIJ_hidden_yard_key',
-    averageRatingKey: 'rating_hidden_yard',
+    averageRating: 3.7,
     priceRange: '$$',
-    openingHours: '09:00 - 20:00',
+    openingHours: {
+      monday: [{ open: '09:00', close: '18:00' }],
+      tuesday: [{ open: '09:00', close: '18:00' }],
+      wednesday: [{ open: '09:00', close: '18:00' }],
+      thursday: [{ open: '09:00', close: '20:00' }],
+      friday: [
+        { open: '09:00', close: '14:00' },
+        { open: '17:00', close: '22:00' }
+      ],
+      saturday: [{ open: '10:00', close: '22:00' }],
+      sunday: [] // closed
+    },
     isActive: true,
     typicalTimeSpent: '1–2 hours',
     vibe: ['cozy', 'quiet', 'work-friendly'],
@@ -40,7 +54,8 @@ export const placesMock = [
     placeId: 'plc_002',
     placeName: 'Night Owl Rooftop Bar',
     promotions: ['promo_102', 'promo_103'],
-    image: 'https://images.example.com/night-owl.jpg',
+    image:
+      'https://storage.googleapis.com/stateless-www-justwravel-com/2024/09/9e074796-swayambhunath-temple-in-kathmandu-nepal.jpg',
     location: {
       area: 'Thonglor',
       city: 'Bangkok',
@@ -48,9 +63,20 @@ export const placesMock = [
       lng: 100.5804
     },
     mapsLinkKey: 'ChIJ_night_owl_key',
-    averageRatingKey: 'rating_night_owl',
+    averageRating: 4.4,
     priceRange: '$$$',
-    openingHours: '18:00 - 02:00',
+    openingHours: {
+      monday: [{ open: '09:00', close: '18:00' }],
+      tuesday: [{ open: '09:00', close: '18:00' }],
+      wednesday: [{ open: '09:00', close: '18:00' }],
+      thursday: [{ open: '09:00', close: '20:00' }],
+      friday: [
+        { open: '09:00', close: '14:00' },
+        { open: '17:00', close: '22:00' }
+      ],
+      saturday: [{ open: '10:00', close: '22:00' }],
+      sunday: [] // closed
+    },
     isActive: true,
     typicalTimeSpent: '2–3 hours',
     vibe: ['luxury', 'romantic', 'nightlife'],
@@ -69,9 +95,7 @@ export const placesMock = [
         page: 'Night Owl Rooftop Bar',
         likes: 33400
       },
-      whatsapp: {
-        number: '+66 92 888 1122'
-      }
+      whatsapp: null
     }
   },
 
@@ -79,7 +103,8 @@ export const placesMock = [
     placeId: 'plc_003',
     placeName: 'Local Legend Noodles',
     promotions: [],
-    image: 'https://images.example.com/local-legend.jpg',
+    image:
+      'https://www.himalayanglacier.com/wp-content/uploads/2021/06/Patan-Durbar-Square.jpg',
     location: {
       area: 'Chinatown',
       city: 'Bangkok',
@@ -87,9 +112,20 @@ export const placesMock = [
       lng: 100.5131
     },
     mapsLinkKey: 'ChIJ_local_legend_key',
-    averageRatingKey: 'rating_local_legend',
+    averageRating: 4.9,
     priceRange: '$',
-    openingHours: '10:00 - 22:00',
+    openingHours: {
+      monday: [{ open: '09:00', close: '18:00' }],
+      tuesday: [{ open: '09:00', close: '18:00' }],
+      wednesday: [{ open: '09:00', close: '18:00' }],
+      thursday: [{ open: '09:00', close: '20:00' }],
+      friday: [
+        { open: '09:00', close: '14:00' },
+        { open: '17:00', close: '22:00' }
+      ],
+      saturday: [{ open: '10:00', close: '22:00' }],
+      sunday: [] // closed
+    },
     isActive: false,
     typicalTimeSpent: '30–45 minutes',
     vibe: ['local', 'casual', 'street-food'],
@@ -104,6 +140,105 @@ export const placesMock = [
       facebook: {
         page: 'Local Legend Noodles',
         likes: 21000
+      },
+      whatsapp: null
+    }
+  },
+  {
+    placeId: 'plc_004',
+    placeName: 'Moonlight Brew',
+    promotions: ['promo_102'],
+    image:
+      'https://wanderlusters.com/wp-content/uploads/2016/10/Sharada-Prasad-CS-CC-Flickr.jpg',
+    location: {
+      area: 'Bangna',
+      city: 'Bangkok',
+      lat: 13.7304,
+      lng: 100.5696
+    },
+    mapsLinkKey: 'ChIJ_moonlight_brew_key',
+    averageRating: 4.1,
+    priceRange: '$',
+    openingHours: {
+      monday: [{ open: '09:00', close: '18:00' }],
+      tuesday: [{ open: '09:00', close: '18:00' }],
+      wednesday: [{ open: '09:00', close: '18:00' }],
+      thursday: [{ open: '09:00', close: '20:00' }],
+      friday: [
+        { open: '09:00', close: '14:00' },
+        { open: '17:00', close: '22:00' }
+      ],
+      saturday: [{ open: '10:00', close: '22:00' }],
+      sunday: [] // closed
+    },
+    isActive: true,
+    typicalTimeSpent: '2–3 hours',
+    vibe: ['chill', 'modern', 'night-friendly'],
+    specialFacilities: [
+      'Craft coffee',
+      'Outdoor seating',
+      'Live DJ (weekends)'
+    ],
+    contactNumber: '+66 92 567 8910',
+    socialMedia: {
+      instagram: {
+        handle: '@moonlightbrew.bkk',
+        likes: 18900
+      },
+      tiktok: {
+        handle: '@moonlightbrew',
+        likes: 62300
+      },
+      facebook: {
+        page: 'Moonlight Brew',
+        likes: 14200
+      },
+      whatsapp: null
+    }
+  },
+  {
+    placeId: 'plc_005',
+    placeName: 'Canopy Corner',
+    promotions: ['promo_103', 'promo_105'],
+    image: 'https://www.holidify.com/images/bgImages/POKHARA.jpg',
+    location: {
+      area: 'Sathorn',
+      city: 'Bangkok',
+      lat: 13.7212,
+      lng: 100.5298
+    },
+    mapsLinkKey: 'ChIJ_canopy_corner_key',
+    averageRating: 3.9,
+    priceRange: '$$',
+    openingHours: {
+      monday: [{ open: '09:00', close: '18:00' }],
+      tuesday: [{ open: '09:00', close: '18:00' }],
+      wednesday: [{ open: '09:00', close: '18:00' }],
+      thursday: [{ open: '09:00', close: '20:00' }],
+      friday: [
+        { open: '09:00', close: '14:00' },
+        { open: '17:00', close: '22:00' }
+      ],
+      saturday: [{ open: '10:00', close: '22:00' }],
+      sunday: [] // closed
+    },
+    isActive: true,
+    typicalTimeSpent: '1–2 hours',
+    vibe: ['green', 'calm', 'work-friendly'],
+    specialFacilities: ['Indoor plants', 'Quiet zones', 'Specialty tea'],
+    contactNumber: '+66 88 345 9021',
+    socialMedia: {
+      instagram: {
+        handle: '@canopycorner.bkk',
+        likes: 9400
+      },
+      tiktok: {
+        handle: '@canopycorner',
+        likes: 21700
+      },
+      facebook: {
+        page: 'Canopy Corner',
+        likes: 7600
       },
       whatsapp: null
     }

@@ -1,7 +1,8 @@
-import { Text, View } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { AppText } from '@/components/AppText';
 import { promotionsMock } from '@/mock/promotions.mock';
 import { rewardsMock } from '@/mock/rewards.mock';
+import { useLocalSearchParams } from 'expo-router';
+import { View } from 'react-native';
 
 export default function PromotionsDetails() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -9,8 +10,10 @@ export default function PromotionsDetails() {
 
   if (!promotion) {
     return (
-      <View className="flex-1 items-center justify-center bg-background">
-        <Text className="text-lg font-semibold">Promotion not found 😢</Text>
+      <View className="bg-background flex-1 items-center justify-center">
+        <AppText className="text-lg font-semibold">
+          Promotion not found 😢
+        </AppText>
       </View>
     );
   }
@@ -19,13 +22,13 @@ export default function PromotionsDetails() {
     promotion.rewardIds.includes(reward.rewardId)
   );
   return (
-    <View className="flex-1 items-center justify-center bg-background">
+    <View className="bg-background flex-1 items-center justify-center">
       {promotionRewards.map(reward => (
         <View key={reward.rewardId} className="mt-3 rounded-xl border p-4">
-          <Text className="font-semibold">{reward.rewardName}</Text>
-          <Text className="text-muted-foreground mt-1 text-sm">
+          <AppText className="font-semibold">{reward.rewardName}</AppText>
+          <AppText className="text-muted-foreground mt-1 text-sm">
             {reward.rewardDescription}
-          </Text>
+          </AppText>
         </View>
       ))}
     </View>

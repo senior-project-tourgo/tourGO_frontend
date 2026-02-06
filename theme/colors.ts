@@ -1,8 +1,17 @@
 const colors = {
-  primary: '#2563EB',
-  secondary: '#22C55E',
-  muted: '#6B7280',
-  background: '#F9FAFB'
+  brand: {
+    primary: '#FF7D00',
+    secondary: '#754A17',
+    neutrals: '#FFECD1'
+  },
+  surface: {
+    background: '#FFFFFF',
+    muted: '#FFECD1'
+  },
+  text: {
+    DEFAULT: '#2C302E',
+    inverse: '#FFFFFF'
+  }
 };
 
 export default colors;

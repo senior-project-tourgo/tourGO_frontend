@@ -10,8 +10,8 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.muted,
+        tabBarActiveTintColor: colors.brand.primary,
+        tabBarInactiveTintColor: colors.text.DEFAULT,
         headerShown: false,
         popToTopOnBlur: false /* true may create void*/,
         tabBarLabelPosition: 'below-icon',
@@ -52,10 +52,14 @@ export default function TabLayout() {
           },
           tabBarIcon: ({ focused, color }) => (
             <View
-              className="mb-5 h-[60px] w-[60px] items-center justify-center rounded-full bg-black"
+              className="mb-5 h-[60px] w-[60px] items-center justify-center rounded-full bg-colors-brand-primary"
               style={{ opacity: focused ? 1 : 0.8 }}
             >
-              <Ionicons name="add" color={color} size={24} />
+              <Ionicons
+                name="add"
+                color={colors.surface.background}
+                size={24}
+              />
             </View>
           )
         }}

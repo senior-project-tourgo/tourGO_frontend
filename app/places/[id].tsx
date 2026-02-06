@@ -1,7 +1,9 @@
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { useLocalSearchParams, Stack, Link } from 'expo-router';
 import { promotionsMock } from '@/mock/promotions.mock';
 import { placesMock } from '@/mock/places.mock';
+import { AppText } from '@/components/AppText';
+import { getPlaceOpeningStatus } from '@/utils/openingHours';
 
 export default function PlaceDetails() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -9,39 +11,59 @@ export default function PlaceDetails() {
   const place = placesMock.find(p => p.placeId === id);
   if (!place) {
     return (
-      <View className="flex-1 items-center justify-center bg-background">
-        <Text className="text-lg font-semibold">Place not found 😢</Text>
+      <View className="bg-background flex-1 items-center justify-center">
+        <AppText className="text-lg font-semibold">Place not found 😢</AppText>
       </View>
     );
   }
+
+  const openingStatus = getPlaceOpeningStatus(place.openingHours);
+  const todayOpeningLabel = openingStatus.nextTime
+    ? openingStatus.nextTime.type === 'close'
+      ? `Closes at ${openingStatus.nextTime.time.toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit'
+        })}`
+      : `Opens at ${openingStatus.nextTime.time.toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit'
+        })}`
+    : 'Closed';
 
   const placePromotions = promotionsMock.filter(
     promo => promo.placeId === place.placeId
   );
 
   return (
-    <View className="flex-1 bg-background px-6 pt-10">
+    <View className="bg-background flex-1 px-6 pt-10">
       <Stack.Screen options={{ title: place.placeName }} />
 
       {/* Place info */}
-      <Text className="text-2xl font-bold">{place.placeName}</Text>
+      <AppText className="text-2xl font-bold">{place.placeName}</AppText>
 
-      <Text className="text-muted-foreground mt-2 text-sm">
+      <AppText className="text-muted-foreground mt-2 text-sm">
         {place.location.area}, {place.location.city}
-      </Text>
+      </AppText>
 
-      <Text className="mt-2 text-sm">⏰ {place.openingHours}</Text>
+      <AppText className="mt-2 text-sm">
+        {openingStatus.isOpenNow ? 'Open now' : 'Closed now'} ·{' '}
+        {todayOpeningLabel}
+      </AppText>
 
-      <Text className="mt-2 text-sm">💸 Price range: {place.priceRange}</Text>
+      <AppText className="mt-2 text-sm">
+        💸 Price range: {place.priceRange}
+      </AppText>
 
-      <Text className="mt-2 text-sm">🎧 Vibe: {place.vibe.join(', ')}</Text>
+      <AppText className="mt-2 text-sm">
+        🎧 Vibe: {place.vibe.join(', ')}
+      </AppText>
 
       {/* Promotions */}
       {placePromotions.length > 0 && (
         <>
-          <Text className="mt-8 text-lg font-semibold">
+          <AppText className="mt-8 text-lg font-semibold">
             Available Promotions
-          </Text>
+          </AppText>
 
           {placePromotions.map(promo => (
             <Link
@@ -50,13 +72,15 @@ export default function PlaceDetails() {
               asChild
             >
               <Pressable className="mt-3 rounded-xl border p-4">
-                <Text className="font-semibold">{promo.promotionName}</Text>
-                <Text className="text-muted-foreground mt-1 text-sm">
+                <AppText className="font-semibold">
+                  {promo.promotionName}
+                </AppText>
+                <AppText className="text-muted-foreground mt-1 text-sm">
                   {promo.promotionDescription}
-                </Text>
-                <Text className="text-muted-foreground mt-2 text-xs">
+                </AppText>
+                <AppText className="text-muted-foreground mt-2 text-xs">
                   Expires: {promo.expirationDate}
-                </Text>
+                </AppText>
               </Pressable>
             </Link>
           ))}
@@ -64,9 +88,9 @@ export default function PlaceDetails() {
       )}
 
       {placePromotions.length === 0 && (
-        <Text className="text-muted-foreground mt-6 text-sm">
+        <AppText className="text-muted-foreground mt-6 text-sm">
           No promotions available right now.
-        </Text>
+        </AppText>
       )}
     </View>
   );
