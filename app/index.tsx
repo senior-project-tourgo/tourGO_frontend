@@ -1,7 +1,22 @@
-// app/index.tsx
 import { Redirect } from 'expo-router';
+import { ActivityIndicator, View } from 'react-native';
+import { useAuth } from '../context/AuthContext';
 
-// placeholder but will be replaced by splash page and login
 export default function Index() {
-  return <Redirect href="/(tabs)/home" />;
+  const { isAuthenticated, isLoading } = useAuth();
+
+  // Wait until auth state is loaded
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  if (isAuthenticated) {
+    return <Redirect href="/(tabs)/home" />;
+  }
+
+  return <Redirect href="/(auth)/login" />;
 }

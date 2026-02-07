@@ -22,6 +22,9 @@ export default function ProfileScreen() {
       <Link href="/leaderboard" asChild>
         <Button title="Leaderboard" />
       </Link>
+      <Link href="/(tabs)/profile/logout" asChild>
+        <Button title="Logout" />
+      </Link>
     </View>
   );
 }
