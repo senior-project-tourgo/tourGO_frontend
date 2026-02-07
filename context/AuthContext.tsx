@@ -46,6 +46,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
      */
     useEffect(() => {
         const loadAuthData = async () => {
+            // TEMP: clear storage on every app start
+            await clearAuthData();
+
             try {
                 const storedToken = await getToken();
                 const storedUser = await getUser();
