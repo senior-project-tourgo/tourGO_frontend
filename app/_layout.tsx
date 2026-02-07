@@ -3,7 +3,6 @@ import { AuthProvider } from '../context/AuthContext';
 import '../global.css';
 
 export default function RootLayout() {
-  console.log("Root layout rendered");
   return (
     <AuthProvider>
       <Stack>
