@@ -18,7 +18,7 @@ import { useAuth } from '../../context/AuthContext';
  * Login Screen Component
  * Allows users to login with email/phone and password
  */
-const LoginScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+const LoginScreen: React.FC = () => {
     const { login } = useAuth();
     const router = useRouter();
 
