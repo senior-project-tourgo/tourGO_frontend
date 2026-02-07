@@ -169,7 +169,7 @@ const RegisterScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                     {/* Login Link */}
                     <TouchableOpacity
                         style={styles.linkContainer}
-                        onPress={() => navigation.navigate('Login')}
+                        onPress={() => router.replace('/(auth)/login')}
                         disabled={isLoading}
                     >
                         <Text style={styles.linkText}>
