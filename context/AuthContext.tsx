@@ -114,9 +114,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             await saveToken(newToken);
             await saveUser(newUser);
 
-            console.log("Token", newToken);
-            console.log("User received", newUser);
-
             // Update state
             setToken(newToken);
             setUser(newUser);

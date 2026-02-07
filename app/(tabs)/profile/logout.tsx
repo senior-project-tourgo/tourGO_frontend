@@ -13,8 +13,7 @@ export default function LogoutScreen() {
             try {
                 await logout();
                 router.replace('/(auth)/login');
-            } catch (error) {
-                console.log('Logout failed:', error);
+            } catch {
                 router.replace('/(auth)/login');
             }
         };
