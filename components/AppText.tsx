@@ -9,8 +9,8 @@ type AppTextProps = TextProps & {
 
 const variantClasses: Record<TextVariant, string> = {
   body: 'text-base',
-  title: 'text-lg font-semibold',
-  subtitle: 'text-base font-medium',
+  title: 'text-3xl font-inter-semibold',
+  subtitle: 'text-base font-inter-medium',
   caption: 'text-xs',
   muted: 'text-sm'
 };
@@ -22,7 +22,7 @@ export function AppText({
 }: AppTextProps) {
   return (
     <Text
-      className={`font-inter text-colors-text ${variantClasses[variant]} ${className}`}
+      className={`text-colors-text ${variantClasses[variant]} ${className}`}
       {...props}
     />
   );

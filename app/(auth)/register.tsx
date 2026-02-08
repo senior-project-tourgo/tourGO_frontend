@@ -1,17 +1,17 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Text,
-  TextInput,
   TouchableOpacity
 } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
 import { BaseCard } from '@/components/cards/BaseCard';
+import { Button } from '@/components/Button';
+import { AppText } from '@/components/AppText';
+import { AppTextInput } from '@/components/AppTextInput';
 
 /**
  * Registration Screen Component
@@ -89,18 +89,16 @@ const RegisterScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     >
       <ScrollView contentContainerClassName="flex-grow justify-center px-5">
         <BaseCard className="p-5 shadow-lg">
-          <Text className="mb-2 text-center text-3xl font-bold text-colors-text">
+          <AppText className="mb-2 text-center" variant="title">
             Create Account
-          </Text>
-          <Text className="mb-8 text-center text-base text-gray-500">
+          </AppText>
+          <AppText className="mb-8 text-center" variant="muted">
             Sign up to get started
-          </Text>
+          </AppText>
 
           {/* Name Input */}
-          <TextInput
-            className="mb-4 rounded-lg border border-gray-300 bg-gray-50 px-4 py-4 text-base text-colors-text"
+          <AppTextInput
             placeholder="Full Name"
-            placeholderTextColor="#999"
             value={name}
             onChangeText={setName}
             autoCapitalize="words"
@@ -108,10 +106,8 @@ const RegisterScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           />
 
           {/* Username Input */}
-          <TextInput
-            className="mb-4 rounded-lg border border-gray-300 bg-gray-50 px-4 py-4 text-base text-colors-text"
+          <AppTextInput
             placeholder="Username"
-            placeholderTextColor="#999"
             value={username}
             onChangeText={setUsername}
             autoCapitalize="none"
@@ -119,10 +115,8 @@ const RegisterScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           />
 
           {/* Email or Phone Input */}
-          <TextInput
-            className="mb-4 rounded-lg border border-gray-300 bg-gray-50 px-4 py-4 text-base text-colors-text"
+          <AppTextInput
             placeholder="Email or Phone Number"
-            placeholderTextColor="#999"
             value={identifier}
             onChangeText={setIdentifier}
             autoCapitalize="none"
@@ -131,10 +125,8 @@ const RegisterScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           />
 
           {/* Password Input */}
-          <TextInput
-            className="mb-4 rounded-lg border border-gray-300 bg-gray-50 px-4 py-4 text-base text-colors-text"
+          <AppTextInput
             placeholder="Password"
-            placeholderTextColor="#999"
             value={password}
             onChangeText={setPassword}
             secureTextEntry
@@ -142,10 +134,8 @@ const RegisterScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           />
 
           {/* Confirm Password Input */}
-          <TextInput
-            className="mb-4 rounded-lg border border-gray-300 bg-gray-50 px-4 py-4 text-base text-colors-text"
+          <AppTextInput
             placeholder="Confirm Password"
-            placeholderTextColor="#999"
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             secureTextEntry
@@ -153,19 +143,11 @@ const RegisterScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           />
 
           {/* Register Button */}
-          <TouchableOpacity
-            className={`mb-4 mt-2 items-center rounded-lg py-4 ${
-              isLoading ? 'bg-colors-surface-muted' : 'bg-colors-brand-primary'
-            }`}
+          <Button
+            title="Register"
             onPress={handleRegister}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text className="text-lg font-semibold text-white">Register</Text>
-            )}
-          </TouchableOpacity>
+            isLoading={isLoading}
+          />
 
           {/* Login Link */}
           <TouchableOpacity
@@ -173,12 +155,12 @@ const RegisterScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             onPress={() => router.replace('/(auth)/login')}
             disabled={isLoading}
           >
-            <Text className="text-sm text-gray-500">
+            <AppText className="text-sm text-gray-500">
               Already have an account?{' '}
-              <Text className="font-semibold text-colors-brand-primary">
+              <AppText className="font-semibold text-colors-brand-primary">
                 Login
-              </Text>
-            </Text>
+              </AppText>
+            </AppText>
           </TouchableOpacity>
         </BaseCard>
       </ScrollView>

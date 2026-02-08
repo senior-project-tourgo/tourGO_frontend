@@ -1,17 +1,17 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Text,
-  TextInput,
   TouchableOpacity
 } from 'react-native';
-import { useAuth } from '../../context/AuthContext';
 import { BaseCard } from '@/components/cards/BaseCard';
+import { AppTextInput } from '@/components/AppTextInput';
+import { useAuth } from '../../context/AuthContext';
+import { AppText } from '@/components/AppText';
+import { Button } from '@/components/Button';
 
 /**
  * Login Screen Component
@@ -61,18 +61,16 @@ const LoginScreen: React.FC = () => {
     >
       <ScrollView contentContainerClassName="flex-grow justify-center px-5">
         <BaseCard className="p-5 shadow-lg">
-          <Text className="mb-2 text-center text-3xl font-bold text-colors-text">
+          <AppText className="mb-2 text-center text-3xl" variant="title">
             Welcome Back
-          </Text>
-          <Text className="mb-8 text-center text-base text-gray-500">
+          </AppText>
+          <AppText className="mb-8 text-center" variant="muted">
             Login to continue
-          </Text>
+          </AppText>
 
           {/* Email or Phone Input */}
-          <TextInput
-            className="mb-4 rounded-lg border border-gray-300 bg-gray-50 px-4 py-4 text-base text-colors-text"
+          <AppTextInput
             placeholder="Email or Phone Number"
-            placeholderTextColor="#999"
             value={identifier}
             onChangeText={setIdentifier}
             autoCapitalize="none"
@@ -81,10 +79,8 @@ const LoginScreen: React.FC = () => {
           />
 
           {/* Password Input */}
-          <TextInput
-            className="mb-4 rounded-lg border border-gray-300 bg-gray-50 px-4 py-4 text-base text-colors-text"
+          <AppTextInput
             placeholder="Password"
-            placeholderTextColor="#999"
             value={password}
             onChangeText={setPassword}
             secureTextEntry
@@ -92,21 +88,7 @@ const LoginScreen: React.FC = () => {
           />
 
           {/* Login Button */}
-          <TouchableOpacity
-            className={`mb-4 mt-2 items-center rounded-lg py-4 ${
-              isLoading ? 'bg-colors-surface-muted' : 'bg-colors-brand-primary'
-            }`}
-            onPress={handleLogin}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text className="text-lg font-semibold text-colors-text-inverse">
-                Login
-              </Text>
-            )}
-          </TouchableOpacity>
+          <Button title="Login" onPress={handleLogin} isLoading={isLoading} />
 
           {/* Register Link */}
           <TouchableOpacity
@@ -114,10 +96,15 @@ const LoginScreen: React.FC = () => {
             onPress={() => router.push('/(auth)/register')}
             disabled={isLoading}
           >
-            <Text className="text-sm text-gray-500">
+            <AppText className=" text-gray-500" variant="muted">
               {"Don't have an account? "}
-              <Text className="font-semibold text-colors-text">Sign Up</Text>
-            </Text>
+              <AppText
+                className="font-semibold text-colors-text"
+                variant="muted"
+              >
+                Sign Up
+              </AppText>
+            </AppText>
           </TouchableOpacity>
         </BaseCard>
       </ScrollView>
