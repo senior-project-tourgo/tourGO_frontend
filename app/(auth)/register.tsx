@@ -4,8 +4,9 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
-  TouchableOpacity
+  TouchableOpacity,
+  Image,
+  View
 } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
 import { BaseCard } from '@/components/cards/BaseCard';
@@ -88,7 +89,14 @@ const RegisterScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
     >
-      <ScrollView contentContainerClassName="justify-end flex-grow">
+      <View className="items-center pt-24">
+        <Image
+          source={require('@/assets/images/icon.png')}
+          className="h-48 w-48"
+          resizeMode="contain"
+        />
+      </View>
+      <View className="flex-grow justify-end">
         <BaseCard className="w-full rounded-t-[40px] px-8 py-16">
           <AppText className="mb-2" variant="title">
             Create Account
@@ -164,7 +172,7 @@ const RegisterScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             </AppText>
           </TouchableOpacity>
         </BaseCard>
-      </ScrollView>
+      </View>
     </KeyboardAvoidingView>
   );
 };

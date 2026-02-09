@@ -5,6 +5,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   View,
+  Image,
   TouchableOpacity
 } from 'react-native';
 import { BaseCard } from '@/components/cards/BaseCard';
@@ -59,6 +60,13 @@ const LoginScreen: React.FC = () => {
       className="flex-1 bg-colors-brand-secondary"
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
+      <View className="items-center pt-40">
+        <Image
+          source={require('@/assets/images/icon.png')}
+          className="h-64 w-64"
+          resizeMode="contain"
+        />
+      </View>
       <View className="w-full flex-grow justify-end">
         <BaseCard className="rounded-t-[40px] px-8 py-16">
           <AppText className="mb-2 text-3xl" variant="title">
