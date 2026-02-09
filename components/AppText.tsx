@@ -8,11 +8,11 @@ type AppTextProps = TextProps & {
 };
 
 const variantClasses: Record<TextVariant, string> = {
-  body: 'text-base',
+  body: 'text-base font-inter',
   title: 'text-3xl font-inter-semibold',
-  subtitle: 'text-base font-inter-medium',
-  caption: 'text-xs',
-  muted: 'text-sm'
+  subtitle: 'text-lg font-inter-medium',
+  caption: 'text-xs font-inter',
+  muted: 'text-sm font-inter'
 };
 
 export function AppText({

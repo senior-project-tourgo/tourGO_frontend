@@ -84,16 +84,17 @@ const RegisterScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-gray-100"
+      className="flex-1 bg-colors-brand-secondary"
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
     >
-      <ScrollView contentContainerClassName="flex-grow justify-center px-5">
-        <BaseCard className="p-5 shadow-lg">
-          <AppText className="mb-2 text-center" variant="title">
+      <ScrollView contentContainerClassName="justify-end flex-grow">
+        <BaseCard className="w-full rounded-t-[40px] px-8 py-16">
+          <AppText className="mb-2" variant="title">
             Create Account
           </AppText>
-          <AppText className="mb-8 text-center" variant="muted">
-            Sign up to get started
+          <AppText className="mb-8" variant="muted">
+            Sign up to continue!
           </AppText>
 
           {/* Name Input */}

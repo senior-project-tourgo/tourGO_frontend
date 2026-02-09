@@ -1,4 +1,3 @@
-import React from 'react';
 import { TextInput, TextInputProps } from 'react-native';
 
 interface AppTextInputProps extends TextInputProps {
@@ -13,9 +12,14 @@ export function AppTextInput({
 }: AppTextInputProps) {
   return (
     <TextInput
-      className={`mb-4 rounded-full border border-gray-300 bg-gray-50 px-4 py-3 text-base text-colors-text ${className}`}
+      className={`mb-4 h-12 rounded-full border border-gray-300 bg-gray-50 px-4 text-base text-colors-text ${className}`}
+      style={{
+        paddingVertical: 0,
+        lineHeight: 18
+      }}
       placeholderTextColor={placeholderTextColor}
       editable={editable}
+      textAlignVertical="center"
       {...props}
     />
   );

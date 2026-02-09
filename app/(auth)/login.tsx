@@ -4,7 +4,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
+  View,
   TouchableOpacity
 } from 'react-native';
 import { BaseCard } from '@/components/cards/BaseCard';
@@ -56,16 +56,16 @@ const LoginScreen: React.FC = () => {
 
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-gray-100"
+      className="flex-1 bg-colors-brand-secondary"
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView contentContainerClassName="flex-grow justify-center px-5">
-        <BaseCard className="p-5 shadow-lg">
-          <AppText className="mb-2 text-center text-3xl" variant="title">
-            Welcome Back
+      <View className="w-full flex-grow justify-end">
+        <BaseCard className="rounded-t-[40px] px-8 py-16">
+          <AppText className="mb-2 text-3xl" variant="title">
+            Login
           </AppText>
-          <AppText className="mb-8 text-center" variant="muted">
-            Login to continue
+          <AppText className="mb-8" variant="muted">
+            Welcome back!
           </AppText>
 
           {/* Email or Phone Input */}
@@ -107,7 +107,7 @@ const LoginScreen: React.FC = () => {
             </AppText>
           </TouchableOpacity>
         </BaseCard>
-      </ScrollView>
+      </View>
     </KeyboardAvoidingView>
   );
 };
