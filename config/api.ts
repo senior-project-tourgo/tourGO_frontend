@@ -6,7 +6,7 @@ import axios from 'axios';
  * Automatically includes JWT token in Authorization header if available
  */
 const api = axios.create({
-  baseURL: 'http://172.20.10.2:5001/api',
+  baseURL: process.env.EXPO_PUBLIC_API_URL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json'
