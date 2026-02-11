@@ -12,7 +12,7 @@ export function AppTextInput({
 }: AppTextInputProps) {
   return (
     <TextInput
-      className={`mb-4 h-12 rounded-full border border-gray-300 bg-gray-50 px-4 text-base text-colors-text ${className}`}
+      className={`mb-4 h-14 rounded-full border border-gray-300 bg-gray-50 px-4 text-base text-colors-text ${className}`}
       style={{
         paddingVertical: 0,
         lineHeight: 18

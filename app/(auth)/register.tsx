@@ -18,7 +18,7 @@ import { AppTextInput } from '@/components/AppTextInput';
  * Registration Screen Component
  * Allows users to create a new account with email or phone number
  */
-const RegisterScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+const RegisterScreen: React.FC = () => {
   const { register } = useAuth();
   const router = useRouter();
 

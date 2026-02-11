@@ -20,7 +20,7 @@ export function Button({
     <Pressable
       onPress={onPress}
       disabled={isDisabled}
-      className={`h-12 items-center justify-center rounded-full ${
+      className={`h-14 items-center justify-center rounded-full ${
         isDisabled ? 'bg-colors-surface-muted' : 'bg-colors-brand-primary'
       } ${className}`}
     >
