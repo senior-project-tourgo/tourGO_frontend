@@ -1,204 +1,123 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    ActivityIndicator,
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  View,
+  Image,
+  TouchableOpacity
 } from 'react-native';
+import { BaseCard } from '@/components/cards/BaseCard';
+import { AppTextInput } from '@/components/AppTextInput';
 import { useAuth } from '../../context/AuthContext';
+import { AppText } from '@/components/AppText';
+import { Button } from '@/components/Button';
 
 /**
  * Login Screen Component
  * Allows users to login with email/phone and password
  */
 const LoginScreen: React.FC = () => {
-    const { login } = useAuth();
-    const router = useRouter();
+  const { login } = useAuth();
+  const router = useRouter();
 
-    // Form state
-    const [identifier, setIdentifier] = useState(''); // Email or phone
-    const [password, setPassword] = useState('');
+  // Form state
+  const [identifier, setIdentifier] = useState('');
+  const [password, setPassword] = useState('');
 
-    // UI state
-    const [isLoading, setIsLoading] = useState(false);
+  // UI state
+  const [isLoading, setIsLoading] = useState(false);
 
-    /**
-     * Handle login form submission
-     */
-    const handleLogin = async () => {
-        // Validation
-        if (!identifier.trim()) {
-            Alert.alert('Error', 'Please enter your email or phone number');
-            return;
-        }
+  /**
+   * Handle login form submission
+   */
+  const handleLogin = async () => {
+    if (!identifier.trim()) {
+      Alert.alert('Error', 'Please enter your email or phone number');
+      return;
+    }
 
-        if (!password) {
-            Alert.alert('Error', 'Please enter your password');
-            return;
-        }
+    if (!password) {
+      Alert.alert('Error', 'Please enter your password');
+      return;
+    }
 
-        // Attempt login
-        setIsLoading(true);
-        try {
-            await login(identifier.trim(), password);
+    setIsLoading(true);
+    try {
+      await login(identifier.trim(), password);
+      Alert.alert('Success', 'Logged in successfully!');
+      router.replace('/(tabs)/home');
+    } catch (error: any) {
+      Alert.alert('Login Failed', error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-            Alert.alert('Success', 'Logged in successfully!');
-            // Navigation will be handled by AuthContext state change
-            router.replace('/(tabs)/home');
-        } catch (error: any) {
-            Alert.alert('Login Failed', error.message);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+  return (
+    <KeyboardAvoidingView
+      className="flex-1 bg-colors-brand-secondary"
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <View className="w-full flex-grow justify-end">
+        <View className="items-center pb-20">
+          <Image
+            source={require('@/assets/images/icon.png')}
+            className="h-64 w-64"
+            resizeMode="contain"
+          />
+        </View>
+        <BaseCard className="rounded-t-[40px] px-8 py-16">
+          <AppText className="mb-2 text-3xl" variant="title">
+            Login
+          </AppText>
+          <AppText className="mb-8" variant="muted">
+            Welcome back!
+          </AppText>
 
-    return (
-        <KeyboardAvoidingView
-            style={styles.container}
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        >
-            <ScrollView contentContainerStyle={styles.scrollContainer}>
-                <View style={styles.formContainer}>
-                    <Text style={styles.title}>Welcome Back</Text>
-                    <Text style={styles.subtitle}>Login to continue</Text>
+          {/* Email or Phone Input */}
+          <AppTextInput
+            placeholder="Email or Phone Number"
+            value={identifier}
+            onChangeText={setIdentifier}
+            autoCapitalize="none"
+            keyboardType="email-address"
+            editable={!isLoading}
+          />
 
-                    {/* Email or Phone Input */}
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Email or Phone Number"
-                        placeholderTextColor="#999"
-                        value={identifier}
-                        onChangeText={setIdentifier}
-                        autoCapitalize="none"
-                        keyboardType="email-address"
-                        editable={!isLoading}
-                    />
+          {/* Password Input */}
+          <AppTextInput
+            placeholder="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            editable={!isLoading}
+          />
 
-                    {/* Password Input */}
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Password"
-                        placeholderTextColor="#999"
-                        value={password}
-                        onChangeText={setPassword}
-                        secureTextEntry
-                        editable={!isLoading}
-                    />
+          {/* Login Button */}
+          <Button title="Login" onPress={handleLogin} isLoading={isLoading} />
 
-                    {/* Login Button */}
-                    <TouchableOpacity
-                        style={[styles.button, isLoading && styles.buttonDisabled]}
-                        onPress={handleLogin}
-                        disabled={isLoading}
-                    >
-                        {isLoading ? (
-                            <ActivityIndicator color="#fff" />
-                        ) : (
-                            <Text style={styles.buttonText}>Login</Text>
-                        )}
-                    </TouchableOpacity>
-
-                    {/* Register Link */}
-                    <TouchableOpacity
-                        style={styles.linkContainer}
-                        onPress={() => router.push('/(auth)/register')}
-                        disabled={isLoading}
-                    >
-                        <Text style={styles.linkText}>
-                            {"Don't have an account?"} <Text style={styles.linkBold}>Sign Up</Text>
-                        </Text>
-                    </TouchableOpacity>
-                </View>
-            </ScrollView>
-        </KeyboardAvoidingView>
-    );
+          {/* Register Link */}
+          <TouchableOpacity
+            className="items-center py-2"
+            onPress={() => router.push('/(auth)/register')}
+            disabled={isLoading}
+          >
+            <AppText className=" text-gray-500" variant="muted">
+              {"Don't have an account? "}
+              <AppText
+                className="font-semibold text-colors-text"
+                variant="muted"
+              >
+                Sign Up
+              </AppText>
+            </AppText>
+          </TouchableOpacity>
+        </BaseCard>
+      </View>
+    </KeyboardAvoidingView>
+  );
 };
-
-/**
- * Stylesheet for LoginScreen
- * Matches the design of RegisterScreen
- */
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#f5f5f5',
-    },
-    scrollContainer: {
-        flexGrow: 1,
-        justifyContent: 'center',
-        padding: 20,
-    },
-    formContainer: {
-        backgroundColor: '#fff',
-        borderRadius: 10,
-        padding: 20,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 5,
-    },
-    title: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: '#333',
-        textAlign: 'center',
-        marginBottom: 8,
-    },
-    subtitle: {
-        fontSize: 16,
-        color: '#666',
-        textAlign: 'center',
-        marginBottom: 30,
-    },
-    input: {
-        backgroundColor: '#f9f9f9',
-        borderWidth: 1,
-        borderColor: '#ddd',
-        borderRadius: 8,
-        padding: 15,
-        fontSize: 16,
-        marginBottom: 15,
-        color: '#333',
-    },
-    button: {
-        backgroundColor: '#007AFF',
-        borderRadius: 8,
-        padding: 15,
-        alignItems: 'center',
-        marginTop: 10,
-        marginBottom: 15,
-    },
-    buttonDisabled: {
-        backgroundColor: '#99c5ff',
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 18,
-        fontWeight: '600',
-    },
-    linkContainer: {
-        alignItems: 'center',
-        padding: 10,
-    },
-    linkText: {
-        color: '#666',
-        fontSize: 14,
-    },
-    linkBold: {
-        color: '#007AFF',
-        fontWeight: '600',
-    },
-});
 
 export default LoginScreen;

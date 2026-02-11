@@ -25,7 +25,7 @@ export function PlaceCard({ place, onPress }: PlaceCardProps) {
         />
 
         <View className="gap-1">
-          <AppText variant="title">{place.placeName}</AppText>
+          <AppText variant="subtitle">{place.placeName}</AppText>
           <AppText variant="muted">
             <Ionicons name="star" color={colors.brand.primary} /> {''}
             {place.averageRating}
