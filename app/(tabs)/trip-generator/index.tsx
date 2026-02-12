@@ -6,6 +6,7 @@ import { AppText } from '@/components/AppText';
 import { AppTextInput } from '@/components/AppTextInput';
 import { Button } from '@/components/Button';
 import { Screen } from '@/components/Screen';
+import { HeaderWithBack } from '@/components/PageHeader';
 import { Dropdown } from '@/components/Dropdown';
 import { SliderField } from '@/components/SliderField';
 import { OptionSelector } from '@/components/OptionSelector';
@@ -62,9 +63,7 @@ export default function TripGeneratorScreen() {
   return (
     <Screen>
       <ScrollView className="flex-1 px-4">
-        <AppText className="pb-8" variant="heading24">
-          Create New Itinerary
-        </AppText>
+        <HeaderWithBack title="Create New Itinerary" />
 
         <View className="gap-6">
           {/* Itinerary Name */}

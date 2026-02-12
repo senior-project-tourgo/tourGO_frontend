@@ -23,7 +23,7 @@ export function FloatingBackButton() {
       style={{
         top: insets.top + 8
       }}
-      className="absolute left-4 z-50 h-11 w-11 items-center justify-center rounded-full bg-colors-surface-background"
+      className="absolute left-6 z-50 h-11 w-11 items-center justify-center rounded-full bg-colors-surface-background"
     >
       <Ionicons name="chevron-back" size={26} color="#111" />
     </TouchableOpacity>
