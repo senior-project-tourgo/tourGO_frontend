@@ -30,8 +30,7 @@ export function Screen({ children, scroll = true }: ScreenProps) {
       contentContainerStyle={{
         paddingTop: 64,
         paddingHorizontal: 24,
-        paddingBottom: 32,
-        gap: 16
+        paddingBottom: 120
       }}
     >
       {children}

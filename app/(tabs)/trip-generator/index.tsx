@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Alert, ScrollView } from 'react-native';
+import { View, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 
 import { AppText } from '@/components/AppText';
@@ -62,96 +62,90 @@ export default function TripGeneratorScreen() {
 
   return (
     <Screen>
-      <ScrollView className="flex-1 px-4">
-        <HeaderWithBack title="Create New Itinerary" />
+      <HeaderWithBack title="Create New Itinerary" />
 
-        <View className="gap-6">
-          {/* Itinerary Name */}
-          <AppTextInput
-            label="Itinerary Name"
-            placeholder="e.g. Weekend in Pokhara"
-            value={itineraryName}
-            onChangeText={setItineraryName}
-            required
-            error={
-              isItineraryInvalid ? 'Itinerary name is required' : undefined
+      <View className="gap-6">
+        {/* Itinerary Name */}
+        <AppTextInput
+          label="Itinerary Name"
+          placeholder="e.g. Weekend in Pokhara"
+          value={itineraryName}
+          onChangeText={setItineraryName}
+          required
+          error={isItineraryInvalid ? 'Itinerary name is required' : undefined}
+        />
+
+        {/* Number of Places */}
+        <AppTextInput
+          label="Number of Places"
+          placeholder="e.g. 4"
+          value={placesCount}
+          onChangeText={setPlacesCount}
+          keyboardType="numeric"
+          required
+          error={isPlacesInvalid ? 'Please enter a valid number' : undefined}
+        />
+
+        {/* Traveling Area */}
+        <Dropdown
+          label="Traveling Area"
+          options={areaOptions}
+          value={area}
+          onChange={setArea}
+        />
+
+        {/* Number of People */}
+        <OptionSelector
+          label="Number of People"
+          options={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, '>10']}
+          value={people > 10 ? '>10' : people}
+          onChange={val => {
+            if (val === '>10') {
+              setPeople(11);
+            } else {
+              setPeople(Number(val));
             }
-          />
+          }}
+          renderOption={(option, selected) => (
+            <AppText className={selected ? 'text-white' : ''}>{option}</AppText>
+          )}
+        />
 
-          {/* Number of Places */}
-          <AppTextInput
-            label="Number of Places"
-            placeholder="e.g. 4"
-            value={placesCount}
-            onChangeText={setPlacesCount}
-            keyboardType="numeric"
-            required
-            error={isPlacesInvalid ? 'Please enter a valid number' : undefined}
-          />
+        {/* Budget */}
+        <OptionSelector
+          label="Budget"
+          options={[1, 2, 3, 4]}
+          value={budget}
+          onChange={setBudget}
+          renderOption={(level, selected) => (
+            <AppText
+              className={`text-2xl ${
+                budget >= level ? 'opacity-100' : 'opacity-30'
+              }`}
+            >
+              {'रु '.repeat(level).trim()}
+            </AppText>
+          )}
+        />
 
-          {/* Traveling Area */}
-          <Dropdown
-            label="Traveling Area"
-            options={areaOptions}
-            value={area}
-            onChange={setArea}
-          />
+        {/* Duration */}
+        <SliderField
+          label="Duration"
+          value={duration}
+          onChange={setDuration}
+          minimumValue={1}
+          maximumValue={12}
+          step={1}
+          unit="hours"
+        />
 
-          {/* Number of People */}
-          <OptionSelector
-            label="Number of People"
-            options={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, '>10']}
-            value={people > 10 ? '>10' : people}
-            onChange={val => {
-              if (val === '>10') {
-                setPeople(11);
-              } else {
-                setPeople(Number(val));
-              }
-            }}
-            renderOption={(option, selected) => (
-              <AppText className={selected ? 'text-white' : ''}>
-                {option}
-              </AppText>
-            )}
-          />
-
-          {/* Budget */}
-          <OptionSelector
-            label="Budget"
-            options={[1, 2, 3, 4]}
-            value={budget}
-            onChange={setBudget}
-            renderOption={(level, selected) => (
-              <AppText
-                className={`text-2xl ${
-                  budget >= level ? 'opacity-100' : 'opacity-30'
-                }`}
-              >
-                {'रु '.repeat(level).trim()}
-              </AppText>
-            )}
-          />
-
-          {/* Duration */}
-          <SliderField
-            label="Duration"
-            value={duration}
-            onChange={setDuration}
-            minimumValue={1}
-            maximumValue={12}
-            step={1}
-            unit="hours"
-          />
-
-          {/* Continue Button */}
-          <Button
-            title="Continue to Select Vibes"
-            onPress={handleContinue}
-            isLoading={isLoading}
-          />
-        </View>
-      </ScrollView>
+        {/* Continue Button */}
+        <Button
+          title="Continue to Select Vibes"
+          onPress={handleContinue}
+          isLoading={isLoading}
+        />
+      </View>
     </Screen>
   );
 }
