@@ -52,7 +52,7 @@ export default function TripGeneratorScreen() {
         pathname: '/(tabs)/trip-generator/vibe-selector',
         params: payload
       });
-    } catch (err) {
+    } catch {
       Alert.alert('Error', 'Something went wrong');
     } finally {
       setIsLoading(false);
