@@ -3,9 +3,9 @@ import { useRouter, useSegments } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-/** Tab root screens: (tabs)/home, (tabs)/trip, (tabs)/profile, (tabs)/rewards, (tabs)/trip-generator index only. */
+/** Only hide back button on actual tab roots: (tabs)/home, (tabs)/trip, etc. Not on /places/[id] or /promotions/[id]. */
 function isTabRoot(segments: string[]): boolean {
-  return segments.length <= 2;
+  return segments[0] === '(tabs)' && segments.length === 2;
 }
 
 export function FloatingBackButton() {
@@ -23,7 +23,7 @@ export function FloatingBackButton() {
       style={{
         top: insets.top + 8
       }}
-      className="absolute left-4 z-50 h-11 w-11 items-center justify-center rounded-full bg-white shadow-md"
+      className="absolute left-4 z-50 h-11 w-11 items-center justify-center rounded-full bg-colors-surface-background"
     >
       <Ionicons name="chevron-back" size={26} color="#111" />
     </TouchableOpacity>

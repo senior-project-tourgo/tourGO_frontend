@@ -11,9 +11,14 @@ export default function HomeScreen() {
   const activePlaces = placesMock.filter(place => place.isActive).slice(0, 3);
   const { user } = useAuth();
 
+  const username = user?.username ?? '';
+  const formattedUsername =
+    username.charAt(0).toUpperCase() + username.slice(1);
+
   return (
     <Screen>
-      <AppText variant="title">Namaste! {user?.username} </AppText>
+      <AppText variant="title">Namaste! {formattedUsername}</AppText>
+      <AppText variant="subtitle">How are you doing today?</AppText>
       <Button
         title="Curate New Trip"
         onPress={() => router.push('/(tabs)/trip-generator')}
