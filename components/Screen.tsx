@@ -1,5 +1,6 @@
 import { ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { FloatingBackButton } from './FloatingBackButton';
 
 interface ScreenProps {
   children: React.ReactNode;
@@ -15,9 +16,10 @@ export function Screen({ children, scroll = true }: ScreenProps) {
         className="flex-1 bg-colors-surface-background"
         style={{
           padding: 16,
-          paddingBottom: insets.bottom + 16
+          paddingBottom: insets.bottom
         }}
       >
+        <FloatingBackButton />
         {children}
       </View>
     );
@@ -28,11 +30,13 @@ export function Screen({ children, scroll = true }: ScreenProps) {
       className="bg-colors-surface-background"
       keyboardShouldPersistTaps="handled"
       contentContainerStyle={{
-        padding: 16,
-        paddingBottom: insets.bottom + 80,
+        paddingTop: 64,
+        paddingHorizontal: 24,
+        paddingBottom: 32,
         gap: 16
       }}
     >
+      <FloatingBackButton />
       {children}
     </ScrollView>
   );
