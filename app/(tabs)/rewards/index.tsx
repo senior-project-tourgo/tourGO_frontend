@@ -1,15 +1,15 @@
 import { AppText } from '@/components/AppText';
 import { Button } from '@/components/Button';
+import { Screen } from '@/components/Screen';
 import { promotionsMock } from '@/mock/promotions.mock';
 import { Link } from 'expo-router';
-import { Pressable, View } from 'react-native';
+import { Pressable } from 'react-native';
 
 export default function RewardsScreen() {
   const promotions = promotionsMock;
 
   return (
-    <View className="flex-1 items-center justify-center bg-colors-surface-background">
-      <AppText className="text-lg font-semibold">Rewards</AppText>
+    <Screen>
       <Link href="/leaderboard" asChild>
         <Button title="Leaderboard" />
       </Link>
@@ -41,6 +41,6 @@ export default function RewardsScreen() {
           ))}
         </>
       )}
-    </View>
+    </Screen>
   );
 }

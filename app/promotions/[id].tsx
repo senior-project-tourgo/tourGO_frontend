@@ -1,4 +1,5 @@
 import { AppText } from '@/components/AppText';
+import { Screen } from '@/components/Screen';
 import { promotionsMock } from '@/mock/promotions.mock';
 import { rewardsMock } from '@/mock/rewards.mock';
 import { useLocalSearchParams } from 'expo-router';
@@ -22,7 +23,7 @@ export default function PromotionsDetails() {
     promotion.rewardIds.includes(reward.rewardId)
   );
   return (
-    <View className="bg-background flex-1 items-center justify-center">
+    <Screen>
       {promotionRewards.map(reward => (
         <View key={reward.rewardId} className="mt-3 rounded-xl border p-4">
           <AppText className="font-semibold">{reward.rewardName}</AppText>
@@ -31,6 +32,6 @@ export default function PromotionsDetails() {
           </AppText>
         </View>
       ))}
-    </View>
+    </Screen>
   );
 }

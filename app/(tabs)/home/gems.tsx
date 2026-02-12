@@ -10,7 +10,7 @@ export default function CommunityGemsScreen() {
 
   return (
     <Screen>
-      <AppText className="text-center text-lg font-semibold">
+      <AppText className="text-center font-semibold" variant="heading24">
         Community-vetted Gems
       </AppText>
 

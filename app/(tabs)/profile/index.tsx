@@ -1,11 +1,11 @@
 import { AppText } from '@/components/AppText';
 import { Button } from '@/components/Button';
+import { Screen } from '@/components/Screen';
 import { Link } from 'expo-router';
-import { View } from 'react-native';
 
 export default function ProfileScreen() {
   return (
-    <View className="flex-1 items-center justify-center bg-colors-surface-background">
+    <Screen>
       <AppText className="text-lg font-semibold">Profile</AppText>
       <Link href="/(tabs)/profile/edit" asChild>
         <Button title="Edit Profile" />
@@ -25,6 +25,6 @@ export default function ProfileScreen() {
       <Link href="/(tabs)/profile/logout" asChild>
         <Button title="Logout" />
       </Link>
-    </View>
+    </Screen>
   );
 }

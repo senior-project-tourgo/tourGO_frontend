@@ -1,10 +1,10 @@
 import { AppText } from '@/components/AppText';
-import { View } from 'react-native';
+import { Screen } from '@/components/Screen';
 
 export default function SavedPlacesScreen() {
   return (
-    <View className="flex-1 items-center justify-center bg-colors-surface-background">
+    <Screen>
       <AppText className="text-lg font-semibold">Saved Places</AppText>
-    </View>
+    </Screen>
   );
 }
