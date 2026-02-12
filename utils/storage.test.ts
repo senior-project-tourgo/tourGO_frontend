@@ -10,10 +10,6 @@ import {
   clearAuthData
 } from './storage';
 
-jest.mock('@react-native-async-storage/async-storage', () =>
-  require('@react-native-async-storage/async-storage/jest/async-storage-mock')
-);
-
 describe('Storage Utility', () => {
   const TOKEN_KEY = 'userToken';
   const USER_KEY = 'userData';
