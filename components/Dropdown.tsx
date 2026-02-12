@@ -14,6 +14,9 @@ type DropdownProps = {
 
 export function Dropdown({ label, options, value, onChange }: DropdownProps) {
   const [open, setOpen] = useState(false);
+  const sortedOptions = [...options].sort((a, b) =>
+    String(a).localeCompare(String(b))
+  );
 
   return (
     <View className="w-full">
@@ -33,7 +36,7 @@ export function Dropdown({ label, options, value, onChange }: DropdownProps) {
 
       {open && (
         <View className="mt-2 rounded-lg border border-gray-200 bg-colors-surface-background">
-          {options.map(option => (
+          {sortedOptions.map(option => (
             <Pressable
               key={option}
               onPress={() => {

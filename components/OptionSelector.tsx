@@ -26,12 +26,21 @@ export function OptionSelector<T>({
       <AppText>{label}</AppText>
 
       <View className={containerClassName}>
-        {options.map((option, index) => {
+        {options.map(option => {
           const selected = option === value;
+
+          // Try to use a unique, stable key
+          let key: React.Key;
+          if (typeof option === 'object' && option !== null && 'id' in option) {
+            // @ts-ignore - assumes presence of id field
+            key = option.id;
+          } else {
+            key = String(option);
+          }
 
           return (
             <TouchableOpacity
-              key={index}
+              key={key}
               onPress={() => onChange(option)}
               className={`${optionClassName} ${
                 selected

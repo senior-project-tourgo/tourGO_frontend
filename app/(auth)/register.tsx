@@ -5,7 +5,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
-  Image,
   View
 } from 'react-native';
 

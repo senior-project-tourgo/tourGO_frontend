@@ -1,7 +1,7 @@
-import { View } from 'react-native';
-import Slider from '@react-native-community/slider';
 import { AppText } from '@/components/AppText';
 import colors from '@/theme/colors';
+import Slider from '@react-native-community/slider';
+import { View } from 'react-native';
 
 type SliderFieldProps = {
   label?: string;
@@ -26,7 +26,8 @@ export function SliderField({
     <View className="w-full">
       {(label || unit) && (
         <AppText>
-          {label} {unit && `: ${value} ${unit}`}
+          {label}
+          {unit && `${label ? ' ' : ''}: ${value} ${unit}`}
         </AppText>
       )}
 

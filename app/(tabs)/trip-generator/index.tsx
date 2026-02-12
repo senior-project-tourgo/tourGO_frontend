@@ -7,7 +7,7 @@ import { AppTextInput } from '@/components/AppTextInput';
 import { Button } from '@/components/Button';
 import { Screen } from '@/components/Screen';
 import { Dropdown } from '@/components/Dropdown';
-import { SliderField } from '@/components/SliderFeild';
+import { SliderField } from '@/components/SliderField';
 import { OptionSelector } from '@/components/OptionSelector';
 
 export default function TripGeneratorScreen() {
