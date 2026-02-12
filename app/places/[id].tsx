@@ -4,6 +4,7 @@ import { promotionsMock } from '@/mock/promotions.mock';
 import { placesMock } from '@/mock/places.mock';
 import { AppText } from '@/components/AppText';
 import { getPlaceOpeningStatus } from '@/utils/openingHours';
+import { Screen } from '@/components/Screen';
 
 export default function PlaceDetails() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -35,7 +36,7 @@ export default function PlaceDetails() {
   );
 
   return (
-    <View className="bg-background flex-1 px-6 pt-10">
+    <Screen>
       <Stack.Screen options={{ title: place.placeName }} />
 
       {/* Place info */}
@@ -92,6 +93,6 @@ export default function PlaceDetails() {
           No promotions available right now.
         </AppText>
       )}
-    </View>
+    </Screen>
   );
 }
