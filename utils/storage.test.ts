@@ -1,4 +1,3 @@
-// 👇 MUST be at the very top before imports
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   saveToken,
