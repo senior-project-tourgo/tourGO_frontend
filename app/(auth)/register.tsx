@@ -1,80 +1,58 @@
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
-  Image,
   View
 } from 'react-native';
+
 import { useAuth } from '../../context/AuthContext';
 import { BaseCard } from '@/components/cards/BaseCard';
 import { Button } from '@/components/Button';
 import { AppText } from '@/components/AppText';
 import { AppTextInput } from '@/components/AppTextInput';
 
-/**
- * Registration Screen Component
- * Allows users to create a new account with email or phone number
- */
-const RegisterScreen: React.FC = () => {
+export default function RegisterScreen() {
   const { register } = useAuth();
   const router = useRouter();
 
-  // Form state
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  // UI state
   const [isLoading, setIsLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
-  /**
-   * Handle registration form submission
-   */
+  const isNameInvalid = submitted && !name.trim();
+  const isUsernameInvalid =
+    submitted && (!username.trim() || username.length < 3);
+  const isIdentifierInvalid = submitted && !identifier.trim();
+  const isPasswordInvalid = submitted && (!password || password.length < 6);
+  const isConfirmPasswordInvalid = submitted && password !== confirmPassword;
+
   const handleRegister = async () => {
-    if (!name.trim()) {
-      Alert.alert('Error', 'Please enter your name');
-      return;
-    }
+    setSubmitted(true);
 
-    if (!username.trim()) {
-      Alert.alert('Error', 'Please enter a username');
-      return;
-    }
-
-    if (username.length < 3) {
-      Alert.alert('Error', 'Username must be at least 3 characters');
-      return;
-    }
-
-    if (!identifier.trim()) {
-      Alert.alert('Error', 'Please enter your email or phone number');
-      return;
-    }
-
-    if (!password) {
-      Alert.alert('Error', 'Please enter a password');
-      return;
-    }
-
-    if (password.length < 6) {
-      Alert.alert('Error', 'Password must be at least 6 characters');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
+    if (
+      !name.trim() ||
+      !username.trim() ||
+      username.length < 3 ||
+      !identifier.trim() ||
+      !password ||
+      password.length < 6 ||
+      password !== confirmPassword
+    ) {
       return;
     }
 
     setIsLoading(true);
     try {
       await register(name.trim(), username.trim(), identifier.trim(), password);
-      Alert.alert('Success', 'Account created successfully!');
+
       router.replace('/(auth)/login');
     } catch (error: any) {
       Alert.alert('Registration Failed', error.message);
@@ -87,78 +65,97 @@ const RegisterScreen: React.FC = () => {
     <KeyboardAvoidingView
       className="flex-1 bg-colors-brand-secondary"
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
     >
       <View className="flex-grow justify-end">
-        <View className="items-center pt-24">
-          <Image
-            source={require('@/assets/images/icon.png')}
-            className="h-48 w-48"
-            resizeMode="contain"
-          />
-        </View>
         <BaseCard className="w-full rounded-t-[40px] px-8 py-16">
           <AppText className="mb-2" variant="title">
             Create Account
           </AppText>
+
           <AppText className="mb-8" variant="muted">
             Sign up to continue!
           </AppText>
 
-          {/* Name Input */}
-          <AppTextInput
-            placeholder="Full Name"
-            value={name}
-            onChangeText={setName}
-            autoCapitalize="words"
-            editable={!isLoading}
-          />
+          <View className="gap-5">
+            <AppTextInput
+              label="Full Name"
+              placeholder="Enter your full name"
+              value={name}
+              onChangeText={setName}
+              autoCapitalize="words"
+              editable={!isLoading}
+              required
+              error={isNameInvalid ? 'Full name is required' : undefined}
+            />
 
-          {/* Username Input */}
-          <AppTextInput
-            placeholder="Username"
-            value={username}
-            onChangeText={setUsername}
-            autoCapitalize="none"
-            editable={!isLoading}
-          />
+            <AppTextInput
+              label="Username"
+              placeholder="Enter a username"
+              value={username}
+              onChangeText={setUsername}
+              autoCapitalize="none"
+              editable={!isLoading}
+              required
+              error={
+                isUsernameInvalid
+                  ? username.length < 3 && username.length > 0
+                    ? 'Username must be at least 3 characters'
+                    : 'Username is required'
+                  : undefined
+              }
+            />
 
-          {/* Email or Phone Input */}
-          <AppTextInput
-            placeholder="Email or Phone Number"
-            value={identifier}
-            onChangeText={setIdentifier}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            editable={!isLoading}
-          />
+            <AppTextInput
+              label="Email or Phone"
+              placeholder="Enter your email or phone"
+              value={identifier}
+              onChangeText={setIdentifier}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              editable={!isLoading}
+              required
+              error={
+                isIdentifierInvalid ? 'Email or phone is required' : undefined
+              }
+            />
 
-          {/* Password Input */}
-          <AppTextInput
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            editable={!isLoading}
-          />
+            <AppTextInput
+              label="Password"
+              placeholder="Enter a password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              editable={!isLoading}
+              required
+              error={
+                isPasswordInvalid
+                  ? password.length < 6 && password.length > 0
+                    ? 'Password must be at least 6 characters'
+                    : 'Password is required'
+                  : undefined
+              }
+            />
 
-          {/* Confirm Password Input */}
-          <AppTextInput
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            secureTextEntry
-            editable={!isLoading}
-          />
+            <AppTextInput
+              label="Confirm Password"
+              placeholder="Re-enter your password"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry
+              editable={!isLoading}
+              required
+              error={
+                isConfirmPasswordInvalid ? 'Passwords do not match' : undefined
+              }
+            />
 
-          {/* Register Button */}
-          <Button
-            title="Register"
-            onPress={handleRegister}
-            isLoading={isLoading}
-          />
+            <Button
+              title="Register"
+              onPress={handleRegister}
+              isLoading={isLoading}
+            />
+          </View>
 
-          {/* Login Link */}
           <TouchableOpacity
             className="items-center py-2"
             onPress={() => router.replace('/(auth)/login')}
@@ -175,6 +172,4 @@ const RegisterScreen: React.FC = () => {
       </View>
     </KeyboardAvoidingView>
   );
-};
-
-export default RegisterScreen;
+}

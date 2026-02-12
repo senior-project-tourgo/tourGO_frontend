@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -8,45 +8,36 @@ import {
   Image,
   TouchableOpacity
 } from 'react-native';
+
 import { BaseCard } from '@/components/cards/BaseCard';
 import { AppTextInput } from '@/components/AppTextInput';
 import { useAuth } from '../../context/AuthContext';
 import { AppText } from '@/components/AppText';
 import { Button } from '@/components/Button';
 
-/**
- * Login Screen Component
- * Allows users to login with email/phone and password
- */
-const LoginScreen: React.FC = () => {
+export default function LoginScreen() {
   const { login } = useAuth();
   const router = useRouter();
 
-  // Form state
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
 
-  // UI state
   const [isLoading, setIsLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
-  /**
-   * Handle login form submission
-   */
+  const isIdentifierInvalid = submitted && !identifier.trim();
+  const isPasswordInvalid = submitted && !password;
+
   const handleLogin = async () => {
-    if (!identifier.trim()) {
-      Alert.alert('Error', 'Please enter your email or phone number');
-      return;
-    }
+    setSubmitted(true);
 
-    if (!password) {
-      Alert.alert('Error', 'Please enter your password');
+    if (!identifier.trim() || !password) {
       return;
     }
 
     setIsLoading(true);
     try {
       await login(identifier.trim(), password);
-      Alert.alert('Success', 'Logged in successfully!');
       router.replace('/(tabs)/home');
     } catch (error: any) {
       Alert.alert('Login Failed', error.message);
@@ -68,43 +59,51 @@ const LoginScreen: React.FC = () => {
             resizeMode="contain"
           />
         </View>
+
         <BaseCard className="rounded-t-[40px] px-8 py-16">
           <AppText className="mb-2 text-3xl" variant="title">
             Login
           </AppText>
+
           <AppText className="mb-8" variant="muted">
             Welcome back!
           </AppText>
 
-          {/* Email or Phone Input */}
-          <AppTextInput
-            placeholder="Email or Phone Number"
-            value={identifier}
-            onChangeText={setIdentifier}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            editable={!isLoading}
-          />
+          <View className="gap-5">
+            <AppTextInput
+              label="Email or Phone"
+              placeholder="Enter your email or phone"
+              value={identifier}
+              onChangeText={setIdentifier}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              editable={!isLoading}
+              required
+              error={
+                isIdentifierInvalid ? 'Email or phone is required' : undefined
+              }
+            />
 
-          {/* Password Input */}
-          <AppTextInput
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            editable={!isLoading}
-          />
+            <AppTextInput
+              label="Password"
+              placeholder="Enter your password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              editable={!isLoading}
+              required
+              error={isPasswordInvalid ? 'Password is required' : undefined}
+            />
 
-          {/* Login Button */}
-          <Button title="Login" onPress={handleLogin} isLoading={isLoading} />
+            <Button title="Login" onPress={handleLogin} isLoading={isLoading} />
+          </View>
 
-          {/* Register Link */}
           <TouchableOpacity
             className="items-center py-2"
             onPress={() => router.push('/(auth)/register')}
             disabled={isLoading}
           >
-            <AppText className=" text-gray-500" variant="muted">
+            <AppText className="text-gray-500" variant="muted">
               {"Don't have an account? "}
               <AppText
                 className="font-semibold text-colors-text"
@@ -118,6 +117,4 @@ const LoginScreen: React.FC = () => {
       </View>
     </KeyboardAvoidingView>
   );
-};
-
-export default LoginScreen;
+}

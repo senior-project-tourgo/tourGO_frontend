@@ -1,4 +1,3 @@
-// components/AppText.tsx
 import { Text, TextProps } from 'react-native';
 
 type TextVariant =
