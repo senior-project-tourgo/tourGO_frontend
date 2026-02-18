@@ -40,7 +40,13 @@
           }
         }
       ],
-      "expo-font"
+      "expo-font",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow $(tourGO) to use your location."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
