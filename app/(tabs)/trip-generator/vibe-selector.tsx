@@ -24,7 +24,7 @@ export default function VibeSelectorScreen() {
       pathname: '/(tabs)/trip-generator/review-trip',
       params: {
         ...params,
-        vibes: selectedVibes
+        vibes: selectedVibes.join(',')
       }
     });
   };

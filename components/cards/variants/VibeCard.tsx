@@ -26,7 +26,7 @@ export function VibeCard({ title, image, selected, onPress }: VibeCardProps) {
       <View className="p-3">
         <AppText
           className={`text-center text-sm ${
-            selected ? 'text-primary font-semibold' : ''
+            selected ? 'font-semibold text-colors-text' : ''
           }`}
         >
           {title}

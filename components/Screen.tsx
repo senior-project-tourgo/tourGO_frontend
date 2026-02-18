@@ -1,5 +1,4 @@
 import { ScrollView, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface ScreenProps {
   children: React.ReactNode;

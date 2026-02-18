@@ -7,7 +7,7 @@ interface HeaderWithBackProps {
   title: string;
   subtitle?: string;
   center?: boolean;
-  showBack?: boolean; // 🔥 new
+  showBack?: boolean; // Allows callers to disable rendering the back button when it would normally be shown.
 }
 
 /** Only hide back on actual tab roots: (tabs)/home, (tabs)/trip, etc. */
