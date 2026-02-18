@@ -19,20 +19,22 @@ export default function HomeScreen() {
     <Screen>
       <AppText variant="title">Namaste! {formattedUsername}</AppText>
       <AppText variant="subtitle">How are you doing today?</AppText>
-      <Button
-        title="Curate New Trip"
-        onPress={() => router.push('/(tabs)/trip-generator')}
-      />
+      <View className="gap-6 pt-6">
+        <Button
+          title="Curate New Trip"
+          onPress={() => router.push('/(tabs)/trip-generator')}
+        />
 
-      {/* Places list */}
-      <View className="gap-3">
-        {activePlaces.map(place => (
-          <PlaceCard
-            key={place.placeId}
-            place={place}
-            onPress={() => router.push(`/places/${place.placeId}`)}
-          />
-        ))}
+        {/* Places list */}
+        <View className="gap-3">
+          {activePlaces.map(place => (
+            <PlaceCard
+              key={place.placeId}
+              place={place}
+              onPress={() => router.push(`/places/${place.placeId}`)}
+            />
+          ))}
+        </View>
 
         <Button
           title="Go to Gems"

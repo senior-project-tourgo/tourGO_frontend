@@ -5,6 +5,7 @@ import { placesMock } from '@/mock/places.mock';
 import { AppText } from '@/components/AppText';
 import { getPlaceOpeningStatus } from '@/utils/openingHours';
 import { Screen } from '@/components/Screen';
+import { HeaderWithBack } from '@/components/PageHeader';
 
 export default function PlaceDetails() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -39,8 +40,7 @@ export default function PlaceDetails() {
     <Screen>
       <Stack.Screen options={{ title: place.placeName }} />
 
-      {/* Place info */}
-      <AppText className="text-2xl font-bold">{place.placeName}</AppText>
+      <HeaderWithBack title={place.placeName} />
 
       <AppText className="text-muted-foreground mt-2 text-sm">
         {place.location.area}, {place.location.city}

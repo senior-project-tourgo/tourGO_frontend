@@ -1,4 +1,4 @@
-import { AppText } from '@/components/AppText';
+import { HeaderWithBack } from '@/components/PageHeader';
 import { PlaceCard } from '@/components/cards/variants/PlaceCard/PlaceCard';
 import { Screen } from '@/components/Screen';
 import { placesMock } from '@/mock/places.mock';
@@ -10,9 +10,7 @@ export default function CommunityGemsScreen() {
 
   return (
     <Screen>
-      <AppText className="text-center font-semibold" variant="heading24">
-        Community-vetted Gems
-      </AppText>
+      <HeaderWithBack title="Community-vetted Gems" />
 
       <View className="gap-3">
         {activePlaces.map(place => (

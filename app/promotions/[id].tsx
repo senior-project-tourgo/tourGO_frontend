@@ -4,6 +4,7 @@ import { promotionsMock } from '@/mock/promotions.mock';
 import { rewardsMock } from '@/mock/rewards.mock';
 import { useLocalSearchParams } from 'expo-router';
 import { View } from 'react-native';
+import { HeaderWithBack } from '@/components/PageHeader';
 
 export default function PromotionsDetails() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -24,6 +25,7 @@ export default function PromotionsDetails() {
   );
   return (
     <Screen>
+      <HeaderWithBack title={promotion.promotionName} />
       {promotionRewards.map(reward => (
         <View key={reward.rewardId} className="mt-3 rounded-xl border p-4">
           <AppText className="font-semibold">{reward.rewardName}</AppText>
