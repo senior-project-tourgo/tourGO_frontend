@@ -27,13 +27,12 @@ export default function ReviewTrip() {
 
   if (!region) return null;
   return (
-    <View
-      className="flex-1 bg-colors-surface-background"
-      style={{
-        paddingTop: 64
-      }}
-    >
-      <HeaderWithBack title="Review Your Trip" className="pl-6" />
+    <View className="flex-1">
+      <HeaderWithBack
+        title="Review Your Trip"
+        className="absolute z-10 bg-transparent pl-6 pt-16"
+        backbg={true}
+      />
 
       <Map region={region} />
     </View>

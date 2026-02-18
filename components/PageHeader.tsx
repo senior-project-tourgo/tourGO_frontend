@@ -9,6 +9,7 @@ interface HeaderWithBackProps {
   className?: string;
   center?: boolean;
   showBack?: boolean; // Allows callers to disable rendering the back button when it would normally be shown.
+  backbg?: boolean;
 }
 
 /** Only hide back on actual tab roots: (tabs)/home, (tabs)/trip, etc. */
@@ -21,7 +22,8 @@ export function HeaderWithBack({
   subtitle,
   className,
   center = false,
-  showBack = true
+  showBack = true,
+  backbg = false
 }: HeaderWithBackProps) {
   const router = useRouter();
   const segments = useSegments();
@@ -36,7 +38,7 @@ export function HeaderWithBack({
         <TouchableOpacity
           onPress={router.back}
           activeOpacity={0.7}
-          className="h-10 items-center justify-center rounded-full bg-colors-surface-background"
+          className={`${backbg ? 'h-10 w-10' : ''} items-center justify-center rounded-full bg-colors-surface-background`}
         >
           <Ionicons name="chevron-back" size={22} color="#111" />
         </TouchableOpacity>
