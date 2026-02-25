@@ -1,17 +1,18 @@
 import { useState } from 'react';
 import { FlatList } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 
 import { Screen } from '@/components/Screen';
 import { HeaderWithBack } from '@/components/PageHeader';
 import { Button } from '@/components/Button';
 import { VibeCard } from '@/components/cards/variants/VibeCard';
 import { mockVibes } from '@/mock/vibes.mock';
+import { generateTrip } from '@/services/trip.service';
 
 export default function VibeSelectorScreen() {
   const router = useRouter();
-  const params = useLocalSearchParams();
   const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const toggleVibe = (id: string) => {
     setSelectedVibes(prev =>
@@ -19,14 +20,23 @@ export default function VibeSelectorScreen() {
     );
   };
 
-  const handleContinue = () => {
-    router.push({
-      pathname: '/(tabs)/trip-generator/review-trip',
-      params: {
-        ...params,
-        vibes: selectedVibes.join(',')
-      }
-    });
+  const handleContinue = async () => {
+    try {
+      setIsLoading(true);
+
+      // 1️⃣ Call simulated backend
+      const tripId = await generateTrip('usr_001');
+
+      // 2️⃣ Navigate to review page
+      router.push({
+        pathname: '/review-trip/[id]',
+        params: { id: tripId }
+      });
+    } catch (error) {
+      console.error('Failed to generate trip:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -42,7 +52,7 @@ export default function VibeSelectorScreen() {
         contentContainerStyle={{
           paddingTop: 16,
           gap: 16,
-          paddingBottom: 16 // space for button
+          paddingBottom: 16
         }}
         renderItem={({ item }) => (
           <VibeCard
@@ -53,10 +63,12 @@ export default function VibeSelectorScreen() {
           />
         )}
       />
+
       <Button
         title="Generate Itinerary"
         onPress={handleContinue}
         disabled={selectedVibes.length === 0}
+        isLoading={isLoading}
       />
     </Screen>
   );
