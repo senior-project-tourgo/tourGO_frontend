@@ -12,5 +12,9 @@ export const tripPlacesMock = [
   { tripPlaceId: 'tp_006', tripId: 'trip_003', placeId: 'plc_003', order: 2 },
 
   // trip_004
-  { tripPlaceId: 'tp_007', tripId: 'trip_004', placeId: 'plc_003', order: 1 }
+  { tripPlaceId: 'tp_007', tripId: 'trip_004', placeId: 'plc_003', order: 1 },
+
+  // trip_005
+  { tripPlaceId: 'tp_008', tripId: 'trip_005', placeId: 'plc_002', order: 1 },
+  { tripPlaceId: 'tp_009', tripId: 'trip_005', placeId: 'plc_003', order: 2 }
 ];

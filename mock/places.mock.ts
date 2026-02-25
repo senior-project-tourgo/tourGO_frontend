@@ -30,7 +30,7 @@ export const placesMock: Place[] = [
     },
     isActive: true,
     typicalTimeSpent: '1–2 hours',
-    vibe: ['cozy', 'quiet', 'work-friendly'],
+    vibe: ['Heritage Walk', 'quiet', 'work-friendly'],
     specialFacilities: ['Free Wi-Fi', 'Power outlets', 'Pet-friendly'],
     contactNumber: '+66 81 234 5678',
     socialMedia: {
