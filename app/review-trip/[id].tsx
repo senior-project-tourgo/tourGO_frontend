@@ -10,6 +10,7 @@ import { placesMock } from '@/mock/places.mock';
 import { tripPlacesMock } from '@/mock/tripplaces.mock';
 import { EditableTripPlace, useEditableTrip } from '@/hooks/useEditableTrip';
 import { Button } from '@/components/Button';
+import { NoPlaceCard } from '@/components/cards/variants/PlaceCard/NoPlaceCard';
 
 export default function ReviewTripDetails() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -111,13 +112,21 @@ export default function ReviewTripDetails() {
               />
             </View>
           ))}
+          <NoPlaceCard
+            title="+ Add Place"
+            subtitle="Find another spot"
+            onPress={() => router.push('./review-trip/add-place')}
+          />
         </ScrollView>
-        <View className="flex w-[361px] flex-row gap-4 pl-4">
+        <View className="flex w-[350px] flex-row justify-center gap-4 self-center">
           <Link href="/(tabs)/trip" asChild>
-            <Button title="Save Plan" className="bg-colors-brand-secondary" />
+            <Button
+              title="Save Plan"
+              className="flex-1 bg-colors-brand-secondary"
+            />
           </Link>
           <Link href="/during-trip" asChild>
-            <Button title="Start Trip" />
+            <Button title="Start Trip" className="flex-1" />
           </Link>
         </View>
       </View>
