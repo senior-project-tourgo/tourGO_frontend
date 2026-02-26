@@ -1,4 +1,4 @@
-import { router, useLocalSearchParams } from 'expo-router';
+import { Link, router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState, useMemo } from 'react';
 import { Map, MapRegion } from '@/components/Map';
 import * as Location from 'expo-location';
@@ -9,6 +9,7 @@ import { AppText } from '@/components/AppText';
 import { placesMock } from '@/mock/places.mock';
 import { tripPlacesMock } from '@/mock/tripplaces.mock';
 import { EditableTripPlace, useEditableTrip } from '@/hooks/useEditableTrip';
+import { Button } from '@/components/Button';
 
 export default function ReviewTripDetails() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -79,38 +80,47 @@ export default function ReviewTripDetails() {
 
       <Map region={region} />
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingHorizontal: 16,
-          gap: 8
-        }}
-        className="absolute bottom-6 z-10"
-      >
-        {places.map((item, index) => (
-          <View
-            key={item.place.placeId}
-            style={{ marginRight: index === places.length - 1 ? 0 : 12 }}
-          >
-            <PlaceCard
-              place={item.place}
-              onPress={() => router.push(`/places/${item.place.placeId}`)}
-              showCross
-              onPressCross={place => {
-                if (places.length === 1) {
-                  Alert.alert(
-                    'Cannot Remove',
-                    'A trip must have at least one place😕'
-                  );
-                  return;
-                }
-                removePlace(place.placeId);
-              }}
-            />
-          </View>
-        ))}
-      </ScrollView>
+      <View className="absolute bottom-6 z-10 gap-4">
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingHorizontal: 16,
+            gap: 8
+          }}
+        >
+          {places.map((item, index) => (
+            <View
+              key={item.place.placeId}
+              style={{ marginRight: index === places.length - 1 ? 0 : 12 }}
+            >
+              <PlaceCard
+                place={item.place}
+                onPress={() => router.push(`/places/${item.place.placeId}`)}
+                showCross
+                onPressCross={place => {
+                  if (places.length === 1) {
+                    Alert.alert(
+                      'Cannot Remove',
+                      'A trip must have at least one place😕'
+                    );
+                    return;
+                  }
+                  removePlace(place.placeId);
+                }}
+              />
+            </View>
+          ))}
+        </ScrollView>
+        <View className="flex w-[361px] flex-row gap-4 pl-4">
+          <Link href="/(tabs)/trip" asChild>
+            <Button title="Save Plan" className="bg-colors-brand-secondary" />
+          </Link>
+          <Link href="/during-trip" asChild>
+            <Button title="Start Trip" />
+          </Link>
+        </View>
+      </View>
     </View>
   );
 }
