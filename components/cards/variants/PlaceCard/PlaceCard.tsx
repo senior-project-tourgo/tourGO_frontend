@@ -24,15 +24,15 @@ export function PlaceCard({
   const openingHours = getPlaceOpeningStatus(place.openingHours);
 
   return (
-    <Pressable onPress={() => onPress?.(place)}>
-      <View className="h-50 w-100 relative flex-row gap-4 rounded-2xl bg-white p-4 shadow-sm">
+    <Pressable onPress={() => onPress?.(place)} className="w-[345px]">
+      <View className="relative h-60 flex-row gap-4 rounded-2xl bg-white p-4 shadow-sm">
         <ImageWithFallback
           primaryImageUrl={place.image}
-          className="h-40 w-32 rounded-xl"
+          className="h-52 w-32 rounded-xl"
           resizeMode="cover"
         />
 
-        <View className="gap-1">
+        <View className="flex-1 gap-1">
           <AppText variant="subtitle">{place.placeName}</AppText>
           <AppText variant="muted">
             <Ionicons name="star" color={colors.brand.primary} /> {''}
@@ -75,7 +75,7 @@ export function PlaceCard({
             </AppText>
           </AppText>
 
-          <View className="flex-row gap-2">
+          <View className="flex-row flex-wrap gap-2">
             {place.vibe.map(vibe => (
               <View key={vibe}>
                 <Badge label={vibe} />
