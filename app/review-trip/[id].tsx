@@ -2,29 +2,50 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState, useMemo } from 'react';
 import { Map, MapRegion } from '@/components/Map';
 import * as Location from 'expo-location';
-import { ScrollView, View } from 'react-native';
+import { ScrollView, View, Alert } from 'react-native';
 import { HeaderWithBack } from '@/components/PageHeader';
 import { PlaceCard } from '@/components/cards/variants/PlaceCard/PlaceCard';
 import { AppText } from '@/components/AppText';
 import { placesMock } from '@/mock/places.mock';
 import { tripPlacesMock } from '@/mock/tripplaces.mock';
+import { EditableTripPlace, useEditableTrip } from '@/hooks/useEditableTrip';
 
 export default function ReviewTripDetails() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const places = useMemo(() => {
+
+  const initialEditablePlaces = useMemo(() => {
     const tripPlaces = tripPlacesMock
       .filter(tp => tp.tripId === id)
       .sort((a, b) => a.order - b.order);
 
     return tripPlaces
-      .map(tp => placesMock.find(p => p.placeId === tp.placeId))
-      .filter(Boolean);
+      .map((tp, index) => {
+        const place = placesMock.find(p => p.placeId === tp.placeId);
+        if (!place) return null;
+
+        return {
+          place,
+          order: index + 1
+        };
+      })
+      .filter(Boolean) as EditableTripPlace[];
   }, [id]);
+  const { places, removePlace } = useEditableTrip(initialEditablePlaces);
 
   const [region, setRegion] = useState<MapRegion | null>(null);
 
   useEffect(() => {
-    async function getLocation() {
+    async function initializeRegion() {
+      if (places.length > 0) {
+        setRegion({
+          latitude: Number(places[0].place.location.lat),
+          longitude: Number(places[0].place.location.lng),
+          latitudeDelta: 0.05,
+          longitudeDelta: 0.05
+        });
+        return;
+      }
+
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') return;
 
@@ -38,8 +59,8 @@ export default function ReviewTripDetails() {
       });
     }
 
-    getLocation();
-  }, []);
+    initializeRegion();
+  }, [places]);
 
   if (!region) {
     return (
@@ -49,7 +70,7 @@ export default function ReviewTripDetails() {
     );
   }
   return (
-    <View className="flex-1">
+    <View className="relative flex-1">
       <HeaderWithBack
         title="Review Your Trip"
         className="absolute z-10 bg-transparent pl-6 pt-16"
@@ -59,16 +80,35 @@ export default function ReviewTripDetails() {
       <Map region={region} />
 
       <ScrollView
-        horizontal={true}
-        className="absolute bottom-[3%] z-10 gap-3 px-6"
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingHorizontal: 16,
+          gap: 8
+        }}
+        className="absolute bottom-6 z-10"
       >
-        {places.map(place => (
-          <PlaceCard
-            key={place!.placeId}
-            place={place!}
-            onPress={() => router.push(`/places/${place!.placeId}`)}
-            showCross={true}
-          />
+        {places.map((item, index) => (
+          <View
+            key={item.place.placeId}
+            style={{ marginRight: index === places.length - 1 ? 0 : 12 }}
+          >
+            <PlaceCard
+              place={item.place}
+              onPress={() => router.push(`/places/${item.place.placeId}`)}
+              showCross
+              onPressCross={place => {
+                if (places.length === 1) {
+                  Alert.alert(
+                    'Cannot Remove',
+                    'A trip must have at least one place😕'
+                  );
+                  return;
+                }
+                removePlace(place.placeId);
+              }}
+            />
+          </View>
         ))}
       </ScrollView>
     </View>
