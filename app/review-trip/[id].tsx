@@ -49,7 +49,16 @@ export default function ReviewTripDetails() {
       }
 
       const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') return;
+      if (status !== 'granted') {
+        // Fallback region when location permission is denied
+        setRegion({
+          latitude: 0,
+          longitude: 0,
+          latitudeDelta: 60,
+          longitudeDelta: 60
+        });
+        return;
+      }
 
       const location = await Location.getCurrentPositionAsync({});
 
@@ -115,7 +124,7 @@ export default function ReviewTripDetails() {
           <NoPlaceCard
             title="+ Add Place"
             subtitle="Find another spot"
-            onPress={() => router.push('./review-trip/add-place')}
+            onPress={() => router.push('/review-trip/add-place')}
           />
         </ScrollView>
         <View className="flex w-[350px] flex-row justify-center gap-4 self-center">

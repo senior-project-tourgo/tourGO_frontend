@@ -1,6 +1,5 @@
 import { View } from 'react-native';
 import MapView, { Region } from 'react-native-maps';
-import { HeaderWithBack } from './PageHeader';
 
 export type MapRegion = Region;
 

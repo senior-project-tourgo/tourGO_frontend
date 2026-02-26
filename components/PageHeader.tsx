@@ -32,13 +32,13 @@ export function HeaderWithBack({
 
   return (
     <View
-      className={`mb-4 ${shouldShowBack ? 'flex-row items-center gap-3' : ''} ${className}`}
+      className={`mb-4 ${shouldShowBack ? 'flex-row items-center gap-3' : ''} ${className ?? ''}`}
     >
       {shouldShowBack && (
         <TouchableOpacity
           onPress={router.back}
           activeOpacity={0.7}
-          className={`${backbg ? 'h-10 w-10' : ''} items-center justify-center rounded-full bg-colors-surface-background`}
+          className={`h-10 w-10 items-center justify-center rounded-full ${backbg ? 'bg-colors-surface-background' : ''}`}
         >
           <Ionicons name="chevron-back" size={22} color="#111" />
         </TouchableOpacity>
