@@ -43,7 +43,7 @@ export default function PlaceDetails() {
       <HeaderWithBack title={place.placeName} />
 
       <AppText className="text-muted-foreground mt-2 text-sm">
-        {place.location.area}, {place.location.city}
+        {place.location.area}
       </AppText>
 
       <AppText className="mt-2 text-sm">
