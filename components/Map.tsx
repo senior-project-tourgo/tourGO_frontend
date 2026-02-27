@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import MapView, { Region } from 'react-native-maps';
+import MapView, { Marker, Region } from 'react-native-maps';
 
 export type MapRegion = Region;
 
