@@ -1,28 +1,94 @@
-// services/trip.service.ts
-
 import { tripsMock } from '@/mock/trips.mock';
 import { tripPlacesMock } from '@/mock/tripplaces.mock';
 import { placesMock } from '@/mock/places.mock';
 
-export async function generateTrip(userId: string) {
-  // simulate network delay
+type GenerateTripInput = {
+  area?: 'Kathmandu' | 'Pokhara' | 'Bhaktapur' | 'Lalitpur';
+  vibes?: string[];
+  numberOfPlaces?: number;
+  itineraryName?: string;
+  budgetLevel?: number;
+  durationHours?: number;
+  numberOfPeople?: number;
+};
+
+export async function generateTrip(
+  userId: string,
+  preferences: GenerateTripInput
+) {
   await new Promise(resolve => setTimeout(resolve, 800));
 
-  // generate new incremental id (like DB auto-increment)
-  const newTripNumber = tripsMock.length + 1;
+  /* --------------------------------------------------
+   * 1️⃣ Generate next tripId safely
+   * -------------------------------------------------- */
+
+  const highestTripNumber = tripsMock.reduce((max, trip) => {
+    const num = Number(trip.tripId.split('_')[1]);
+    return num > max ? num : max;
+  }, 0);
+
+  const newTripNumber = highestTripNumber + 1;
   const tripId = `trip_${newTripNumber.toString().padStart(3, '0')}`;
+  const preferenceId = `pref_${newTripNumber.toString().padStart(3, '0')}`;
 
-  // simulate backend selecting places (random 3)
-  const generatedPlaces = [...placesMock]
-    .sort(() => Math.random() - 0.5)
-    .slice(0, 3);
+  /* --------------------------------------------------
+   * 2️⃣ Filter by area (if selected)
+   * -------------------------------------------------- */
 
-  // create trip record
+  let filteredPlaces = placesMock.filter(place => place.isActive);
+
+  if (preferences.area) {
+    filteredPlaces = filteredPlaces.filter(
+      place => place.location.area === preferences.area
+    );
+  }
+
+  /* --------------------------------------------------
+   * 3️⃣ Filter by vibes (if selected)
+   * -------------------------------------------------- */
+
+  if (preferences.vibes && preferences.vibes.length > 0) {
+    filteredPlaces = filteredPlaces.filter(place =>
+      preferences.vibes!.some(vibe => place.vibe.includes(vibe))
+    );
+  }
+
+  /* --------------------------------------------------
+   * 4️⃣ Fallback safety (if too few matches)
+   * -------------------------------------------------- */
+
+  if (filteredPlaces.length < 2) {
+    // relax vibe constraint but keep area
+    filteredPlaces = placesMock.filter(place => {
+      const areaMatch = preferences.area
+        ? place.location.area === preferences.area
+        : true;
+      return place.isActive && areaMatch;
+    });
+  }
+
+  /* --------------------------------------------------
+   * 5️⃣ Randomly pick 2–3 places
+   * -------------------------------------------------- */
+
+  const shuffled = [...filteredPlaces].sort(() => Math.random() - 0.5);
+
+  const numberOfPlaces =
+    preferences.numberOfPlaces && shuffled.length >= preferences.numberOfPlaces
+      ? preferences.numberOfPlaces
+      : Math.min(3, shuffled.length);
+
+  const generatedPlaces = shuffled.slice(0, numberOfPlaces);
+
+  /* --------------------------------------------------
+   * 6️⃣ Create trip record
+   * -------------------------------------------------- */
+
   tripsMock.push({
     tripId,
     userId,
-    tripName: 'Generated Trip',
-    preferenceId: `pref_${Date.now()}`,
+    tripName: preferences.itineraryName ?? 'Generated Trip',
+    preferenceId,
     status: 'DRAFT',
     doneDate: null,
     totalPlaces: generatedPlaces.length,
@@ -30,16 +96,25 @@ export async function generateTrip(userId: string) {
     createdAt: new Date().toISOString()
   });
 
-  // create tripPlaces records
+  /* --------------------------------------------------
+   * 7️⃣ Generate tripPlace records
+   * -------------------------------------------------- */
+
+  let highestTripPlaceNumber = tripPlacesMock.reduce((max, tp) => {
+    const num = Number(tp.tripPlaceId.split('_')[1]);
+    return num > max ? num : max;
+  }, 0);
+
   generatedPlaces.forEach((place, index) => {
+    highestTripPlaceNumber += 1;
+
     tripPlacesMock.push({
-      tripPlaceId: `tp_${Date.now()}_${index}`,
+      tripPlaceId: `tp_${highestTripPlaceNumber.toString().padStart(3, '0')}`,
       tripId,
       placeId: place.placeId,
       order: index + 1
     });
   });
 
-  // simulate backend response
   return tripId;
 }
