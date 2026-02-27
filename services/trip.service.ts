@@ -7,7 +7,7 @@ type GenerateTripInput = {
   vibes?: string[];
   numberOfPlaces?: number;
   itineraryName?: string;
-  budgetLevel?: number;
+  budgetLevel?: number; // 1–4
   durationHours?: number;
   numberOfPeople?: number;
 };
@@ -32,56 +32,104 @@ export async function generateTrip(
   const preferenceId = `pref_${newTripNumber.toString().padStart(3, '0')}`;
 
   /* --------------------------------------------------
-   * 2️⃣ Filter by area (if selected)
+   * 2️⃣ Base filtering (active + area)
    * -------------------------------------------------- */
 
-  let filteredPlaces = placesMock.filter(place => place.isActive);
+  let basePlaces = placesMock.filter(place => place.isActive);
 
   if (preferences.area) {
-    filteredPlaces = filteredPlaces.filter(
+    basePlaces = basePlaces.filter(
       place => place.location.area === preferences.area
     );
   }
 
   /* --------------------------------------------------
-   * 3️⃣ Filter by vibes (if selected)
+   * 3️⃣ Budget-aware filtering (soft influence)
    * -------------------------------------------------- */
 
-  if (preferences.vibes && preferences.vibes.length > 0) {
-    filteredPlaces = filteredPlaces.filter(place =>
-      preferences.vibes!.some(vibe => place.vibe.includes(vibe))
+  if (preferences.budgetLevel) {
+    const allowedPriceLevels = ['$', '$$', '$$$', '$$$$'].slice(
+      0,
+      preferences.budgetLevel
     );
+
+    const budgetFiltered = basePlaces.filter(place =>
+      allowedPriceLevels.includes(place.priceRange)
+    );
+
+    if (budgetFiltered.length >= 2) {
+      basePlaces = budgetFiltered;
+    }
   }
 
   /* --------------------------------------------------
-   * 4️⃣ Fallback safety (if too few matches)
+   * 4️⃣ Score by vibe matches
    * -------------------------------------------------- */
 
-  if (filteredPlaces.length < 2) {
-    // relax vibe constraint but keep area
-    filteredPlaces = placesMock.filter(place => {
-      const areaMatch = preferences.area
-        ? place.location.area === preferences.area
-        : true;
-      return place.isActive && areaMatch;
-    });
+  const scoredPlaces = basePlaces
+    .map(place => {
+      const vibeScore =
+        preferences.vibes?.filter(v => place.vibe.includes(v)).length ?? 0;
+
+      return { place, score: vibeScore };
+    })
+    .sort((a, b) => b.score - a.score);
+
+  /* --------------------------------------------------
+   * 5️⃣ Determine number of places
+   * -------------------------------------------------- */
+
+  const requested = preferences.numberOfPlaces ?? 3;
+  const numberOfPlaces = Math.min(requested, scoredPlaces.length);
+
+  /* --------------------------------------------------
+   * 6️⃣ Pick top scored, slight shuffle inside same score
+   * -------------------------------------------------- */
+
+  const groupedByScore = scoredPlaces.reduce(
+    (acc, item) => {
+      if (!acc[item.score]) acc[item.score] = [];
+      acc[item.score].push(item.place);
+      return acc;
+    },
+    {} as Record<number, typeof basePlaces>
+  );
+
+  const sortedScores = Object.keys(groupedByScore)
+    .map(Number)
+    .sort((a, b) => b - a);
+
+  let selected: typeof basePlaces = [];
+
+  for (const score of sortedScores) {
+    const group = groupedByScore[score].sort(() => Math.random() - 0.5);
+
+    for (const place of group) {
+      if (selected.length < numberOfPlaces) {
+        selected.push(place);
+      }
+    }
   }
 
   /* --------------------------------------------------
-   * 5️⃣ Randomly pick 2–3 places
+   * 7️⃣ Estimate budget
    * -------------------------------------------------- */
 
-  const shuffled = [...filteredPlaces].sort(() => Math.random() - 0.5);
+  const baseCostPerPlace = {
+    $: 500,
+    $$: 1000,
+    $$$: 2000,
+    $$$$: 4000
+  };
 
-  const numberOfPlaces =
-    preferences.numberOfPlaces && shuffled.length >= preferences.numberOfPlaces
-      ? preferences.numberOfPlaces
-      : Math.min(3, shuffled.length);
-
-  const generatedPlaces = shuffled.slice(0, numberOfPlaces);
+  const estimatedBudget =
+    selected.reduce(
+      (total, place) => total + baseCostPerPlace[place.priceRange],
+      0
+    ) * (preferences.numberOfPeople ?? 1);
 
   /* --------------------------------------------------
-   * 6️⃣ Create trip record
+   * 8️⃣ Create trip record
    * -------------------------------------------------- */
 
   tripsMock.push({
@@ -91,13 +139,13 @@ export async function generateTrip(
     preferenceId,
     status: 'DRAFT',
     doneDate: null,
-    totalPlaces: generatedPlaces.length,
-    estimatedBudget: null,
+    totalPlaces: selected.length,
+    estimatedBudget,
     createdAt: new Date().toISOString()
   });
 
   /* --------------------------------------------------
-   * 7️⃣ Generate tripPlace records
+   * 9️⃣ Generate tripPlace records
    * -------------------------------------------------- */
 
   let highestTripPlaceNumber = tripPlacesMock.reduce((max, tp) => {
@@ -105,7 +153,7 @@ export async function generateTrip(
     return num > max ? num : max;
   }, 0);
 
-  generatedPlaces.forEach((place, index) => {
+  selected.forEach((place, index) => {
     highestTripPlaceNumber += 1;
 
     tripPlacesMock.push({

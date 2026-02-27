@@ -25,7 +25,7 @@ export const placesMock: Place[] = [
     openingHours: defaultHours,
     isActive: true,
     typicalTimeSpent: '1–2 hours',
-    vibe: ['Spiritual & Temples', 'Scenic Viewpoints', 'Heritage Walk'],
+    vibe: ['spiritual', 'viewpoint', 'heritage'],
     specialFacilities: ['Panoramic valley view'],
     contactNumber: null,
     socialMedia: {
@@ -46,7 +46,7 @@ export const placesMock: Place[] = [
     openingHours: defaultHours,
     isActive: true,
     typicalTimeSpent: '1–2 hours',
-    vibe: ['Spiritual & Temples', 'Heritage Walk'],
+    vibe: ['spiritual', 'heritage'],
     specialFacilities: ['Prayer wheels'],
     contactNumber: null,
     socialMedia: {
@@ -66,7 +66,7 @@ export const placesMock: Place[] = [
     openingHours: defaultHours,
     isActive: true,
     typicalTimeSpent: '2 hours',
-    vibe: ['Local Food Hunt'],
+    vibe: ['foodie'],
     specialFacilities: ['Local guide'],
     contactNumber: null,
     socialMedia: {
@@ -86,7 +86,7 @@ export const placesMock: Place[] = [
     openingHours: defaultHours,
     isActive: true,
     typicalTimeSpent: '3–4 hours',
-    vibe: ['Trekking Trails', 'Mountain Adventure', 'Scenic Viewpoints'],
+    vibe: ['trekking', 'mountain', 'viewpoint'],
     specialFacilities: ['Forest trail'],
     contactNumber: null,
     socialMedia: {}
@@ -104,7 +104,7 @@ export const placesMock: Place[] = [
     openingHours: defaultHours,
     isActive: true,
     typicalTimeSpent: '4–5 hours',
-    vibe: ['Trekking Trails', 'Mountain Adventure'],
+    vibe: ['trekking', 'mountain'],
     specialFacilities: ['Nature reserve'],
     contactNumber: null,
     socialMedia: {}
@@ -124,7 +124,7 @@ export const placesMock: Place[] = [
     openingHours: defaultHours,
     isActive: true,
     typicalTimeSpent: '2–3 hours',
-    vibe: ['Lakeside Chill', 'Scenic Viewpoints'],
+    vibe: ['lakeside', 'viewpoint'],
     specialFacilities: ['Boat rental'],
     contactNumber: null,
     socialMedia: {}
@@ -142,7 +142,7 @@ export const placesMock: Place[] = [
     openingHours: defaultHours,
     isActive: true,
     typicalTimeSpent: '1 hour',
-    vibe: ['Mountain Adventure', 'Scenic Viewpoints'],
+    vibe: ['mountain', 'viewpoint'],
     specialFacilities: ['Certified pilots'],
     contactNumber: null,
     socialMedia: {}
@@ -160,7 +160,7 @@ export const placesMock: Place[] = [
     openingHours: defaultHours,
     isActive: true,
     typicalTimeSpent: '2 hours',
-    vibe: ['Spiritual & Temples', 'Scenic Viewpoints'],
+    vibe: ['spiritual', 'viewpoint'],
     specialFacilities: ['Hilltop view'],
     contactNumber: null,
     socialMedia: {}
@@ -178,7 +178,7 @@ export const placesMock: Place[] = [
     openingHours: defaultHours,
     isActive: true,
     typicalTimeSpent: '3 hours',
-    vibe: ['Lakeside Chill', 'Scenic Viewpoints'],
+    vibe: ['lakeside', 'viewpoint'],
     specialFacilities: ['Quiet lake'],
     contactNumber: null,
     socialMedia: {}
@@ -196,7 +196,7 @@ export const placesMock: Place[] = [
     openingHours: defaultHours,
     isActive: true,
     typicalTimeSpent: '1–2 hours',
-    vibe: ['Mountain Adventure'],
+    vibe: ['mountain'],
     specialFacilities: ['Guided cave walk'],
     contactNumber: null,
     socialMedia: {}
@@ -216,7 +216,7 @@ export const placesMock: Place[] = [
     openingHours: defaultHours,
     isActive: true,
     typicalTimeSpent: '2–3 hours',
-    vibe: ['Heritage Walk', 'Spiritual & Temples'],
+    vibe: ['heritage', 'spiritual'],
     specialFacilities: ['Ancient palace complex'],
     contactNumber: null,
     socialMedia: {}
@@ -234,7 +234,7 @@ export const placesMock: Place[] = [
     openingHours: defaultHours,
     isActive: true,
     typicalTimeSpent: '1–2 hours',
-    vibe: ['Scenic Viewpoints', 'Mountain Adventure'],
+    vibe: ['viewpoint', 'mountain'],
     specialFacilities: ['Sunrise panorama'],
     contactNumber: null,
     socialMedia: {}
@@ -254,7 +254,7 @@ export const placesMock: Place[] = [
     openingHours: defaultHours,
     isActive: true,
     typicalTimeSpent: '2–3 hours',
-    vibe: ['Heritage Walk', 'Spiritual & Temples'],
+    vibe: ['heritage', 'spiritual'],
     specialFacilities: ['Museum access'],
     contactNumber: null,
     socialMedia: {}
@@ -272,7 +272,7 @@ export const placesMock: Place[] = [
     openingHours: defaultHours,
     isActive: true,
     typicalTimeSpent: '2 hours',
-    vibe: ['Local Food Hunt'],
+    vibe: ['foodie'],
     specialFacilities: ['Traditional cuisine'],
     contactNumber: null,
     socialMedia: {}
