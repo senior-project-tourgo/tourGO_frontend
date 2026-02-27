@@ -88,7 +88,14 @@ export default function ReviewTripDetails() {
         backbg={true}
       />
 
-      <Map region={region} />
+      <Map
+        region={region}
+        markers={places.map(item => ({
+          latitude: Number(item.place.location.lat),
+          longitude: Number(item.place.location.lng),
+          title: item.place.placeName
+        }))}
+      />
 
       <View className="absolute bottom-6 z-10 gap-4">
         <ScrollView
