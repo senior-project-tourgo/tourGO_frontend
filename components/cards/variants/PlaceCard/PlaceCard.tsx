@@ -7,6 +7,7 @@ import { BaseCardProps } from '../../BaseCard';
 import { ImageWithFallback } from './ImageWithFallback';
 import { getPlaceOpeningStatus } from '@/utils/openingHours';
 import { Badge } from '@/components/Badge';
+import { mockVibes } from '@/mock/vibes.mock';
 
 interface PlaceCardProps extends BaseCardProps {
   place: Place;
@@ -76,11 +77,13 @@ export function PlaceCard({
           </AppText>
 
           <View className="flex-row flex-wrap gap-2">
-            {place.vibe.map(vibe => (
-              <View key={vibe}>
-                <Badge label={vibe} />
-              </View>
-            ))}
+            {place.vibe
+              .map(id => mockVibes.find(v => v.id === id)?.title)
+              .map((title, index) => (
+                <View key={place.vibe[index]}>
+                  <Badge label={title as string} />
+                </View>
+              ))}
           </View>
         </View>
 

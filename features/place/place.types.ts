@@ -14,7 +14,7 @@ export type Place = {
   typicalTimeSpent: string;
   vibe: string[];
   specialFacilities: string[];
-  contactNumber: string;
+  contactNumber: string | null;
   socialMedia: SocialMedia;
 };
 
@@ -34,8 +34,7 @@ export type TimeRange = {
 };
 
 export type PlaceLocation = {
-  area: string;
-  city: string;
+  area: 'Kathmandu' | 'Pokhara' | 'Bhaktapur' | 'Lalitpur';
   lat: number;
   lng: number;
 };

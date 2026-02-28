@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FlatList } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 
 import { Screen } from '@/components/Screen';
 import { HeaderWithBack } from '@/components/PageHeader';
@@ -13,6 +13,7 @@ export default function VibeSelectorScreen() {
   const router = useRouter();
   const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const params = useLocalSearchParams();
 
   const toggleVibe = (id: string) => {
     setSelectedVibes(prev =>
@@ -24,10 +25,20 @@ export default function VibeSelectorScreen() {
     try {
       setIsLoading(true);
 
-      // 1️⃣ Call simulated backend
-      const tripId = await generateTrip('usr_001');
+      const tripId = await generateTrip('usr_001', {
+        area: params.travelingArea as
+          | 'Kathmandu'
+          | 'Pokhara'
+          | 'Bhaktapur'
+          | 'Lalitpur',
+        vibes: selectedVibes,
+        numberOfPlaces: Number(params.numberOfPlaces),
+        itineraryName: params.itineraryName as string,
+        budgetLevel: Number(params.budgetLevel),
+        durationHours: Number(params.durationHours),
+        numberOfPeople: Number(params.numberOfPeople)
+      });
 
-      // 2️⃣ Navigate to review page
       router.push({
         pathname: '/review-trip/[id]',
         params: { id: tripId }
