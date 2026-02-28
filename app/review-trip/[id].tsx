@@ -85,7 +85,7 @@ export default function ReviewTripDetails() {
       <HeaderWithBack
         title="Review Your Trip"
         className="absolute z-10 bg-transparent pl-6 pt-16"
-        backbg={true}
+        backBg={true}
       />
 
       <Map
