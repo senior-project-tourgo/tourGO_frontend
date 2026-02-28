@@ -7,24 +7,33 @@ import { BaseCardProps } from '../../BaseCard';
 import { ImageWithFallback } from './ImageWithFallback';
 import { getPlaceOpeningStatus } from '@/utils/openingHours';
 import { Badge } from '@/components/Badge';
+import { mockVibes } from '@/mock/vibes.mock';
 
 interface PlaceCardProps extends BaseCardProps {
   place: Place;
   onPress?: (place: Place) => void;
+  showCross?: boolean;
+  onPressCross?: (place: Place) => void;
 }
 
-export function PlaceCard({ place, onPress }: PlaceCardProps) {
+export function PlaceCard({
+  place,
+  onPress,
+  showCross = false,
+  onPressCross
+}: PlaceCardProps) {
   const openingHours = getPlaceOpeningStatus(place.openingHours);
 
   return (
-    <Pressable onPress={() => onPress?.(place)}>
-      <View className="h-40 flex-row gap-4 rounded-2xl bg-white p-4 shadow-sm">
+    <Pressable onPress={() => onPress?.(place)} className="w-[345px]">
+      <View className="relative h-60 flex-row gap-4 rounded-2xl bg-white p-4 shadow-sm">
         <ImageWithFallback
           primaryImageUrl={place.image}
-          className="aspect-square h-full rounded-xl"
+          className="h-52 w-32 rounded-xl"
+          resizeMode="cover"
         />
 
-        <View className="gap-1">
+        <View className="flex-1 gap-1">
           <AppText variant="subtitle">{place.placeName}</AppText>
           <AppText variant="muted">
             <Ionicons name="star" color={colors.brand.primary} /> {''}
@@ -67,14 +76,28 @@ export function PlaceCard({ place, onPress }: PlaceCardProps) {
             </AppText>
           </AppText>
 
-          <View className="flex-row gap-2">
-            {place.vibe.map(vibe => (
-              <View key={vibe}>
-                <Badge label={vibe} />
-              </View>
-            ))}
+          <View className="flex-row flex-wrap gap-2">
+            {place.vibe
+              .map(id => mockVibes.find(v => v.id === id)?.title)
+              .map((title, index) => (
+                <View key={place.vibe[index]}>
+                  <Badge label={title as string} />
+                </View>
+              ))}
           </View>
         </View>
+
+        {/* Remove Button */}
+        {showCross && (
+          <Pressable
+            onPress={() => {
+              onPressCross?.(place);
+            }}
+            className="absolute right-3 top-3 z-10 bg-white p-1"
+          >
+            <Ionicons name="close" size={18} color={colors.text.DEFAULT[600]} />
+          </Pressable>
+        )}
       </View>
     </Pressable>
   );

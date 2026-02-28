@@ -6,8 +6,10 @@ import { useRouter, useSegments } from 'expo-router';
 interface HeaderWithBackProps {
   title: string;
   subtitle?: string;
+  className?: string;
   center?: boolean;
   showBack?: boolean; // Allows callers to disable rendering the back button when it would normally be shown.
+  backBg?: boolean;
 }
 
 /** Only hide back on actual tab roots: (tabs)/home, (tabs)/trip, etc. */
@@ -18,8 +20,10 @@ function isTabRoot(segments: string[]): boolean {
 export function HeaderWithBack({
   title,
   subtitle,
+  className,
   center = false,
-  showBack = true
+  showBack = true,
+  backBg = false
 }: HeaderWithBackProps) {
   const router = useRouter();
   const segments = useSegments();
@@ -28,13 +32,13 @@ export function HeaderWithBack({
 
   return (
     <View
-      className={`mb-4 ${shouldShowBack ? 'flex-row items-center gap-3' : ''}`}
+      className={`mb-4 ${shouldShowBack ? 'flex-row items-center gap-3' : ''} ${className ?? ''}`}
     >
       {shouldShowBack && (
         <TouchableOpacity
           onPress={router.back}
           activeOpacity={0.7}
-          className="h-10 w-10 items-center justify-center rounded-full bg-colors-surface-background"
+          className={`h-10 w-10 items-center justify-center rounded-full ${backBg ? 'bg-colors-surface-background' : ''}`}
         >
           <Ionicons name="chevron-back" size={22} color="#111" />
         </TouchableOpacity>
