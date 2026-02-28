@@ -17,7 +17,8 @@ export const placesMock: Place[] = [
     placeId: 'plc_001',
     placeName: 'Swayambhunath Stupa',
     promotions: [],
-    image: 'https://example.com/swayambhu.jpg',
+    image:
+      'https://images.unsplash.com/photo-1672338127087-d46c9ecd48f9?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     location: { area: 'Kathmandu', lat: 27.7149, lng: 85.29 },
     mapsLinkKey: 'swayambhu_key',
     averageRating: 4.8,
@@ -38,7 +39,8 @@ export const placesMock: Place[] = [
     placeId: 'plc_002',
     placeName: 'Boudhanath Stupa',
     promotions: [],
-    image: 'https://example.com/boudha.jpg',
+    image:
+      'https://images.unsplash.com/photo-1671888923932-d53a99498c27?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     location: { area: 'Kathmandu', lat: 27.7215, lng: 85.362 },
     mapsLinkKey: 'boudha_key',
     averageRating: 4.9,
@@ -58,7 +60,8 @@ export const placesMock: Place[] = [
     placeId: 'plc_003',
     placeName: 'Kathmandu Street Food Crawl',
     promotions: [],
-    image: 'https://example.com/streetfood.jpg',
+    image:
+      'https://images.unsplash.com/photo-1761124740110-8989d68fafab?q=80&w=927&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     location: { area: 'Kathmandu', lat: 27.717, lng: 85.324 },
     mapsLinkKey: 'streetfood_key',
     averageRating: 4.6,
@@ -78,7 +81,8 @@ export const placesMock: Place[] = [
     placeId: 'plc_004',
     placeName: 'Champadevi Hiking Trail',
     promotions: [],
-    image: 'https://example.com/champadevi.jpg',
+    image:
+      'https://images.unsplash.com/photo-1742311312069-ceb2afe8bda9?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     location: { area: 'Kathmandu', lat: 27.6588, lng: 85.277 },
     mapsLinkKey: 'champadevi_key',
     averageRating: 4.7,
@@ -96,7 +100,8 @@ export const placesMock: Place[] = [
     placeId: 'plc_005',
     placeName: 'Shivapuri National Park Hike',
     promotions: [],
-    image: 'https://example.com/shivapuri.jpg',
+    image:
+      'https://images.unsplash.com/photo-1621910038795-50fc31d3c491?q=80&w=1035&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     location: { area: 'Kathmandu', lat: 27.8, lng: 85.4 },
     mapsLinkKey: 'shivapuri_key',
     averageRating: 4.8,
@@ -116,7 +121,8 @@ export const placesMock: Place[] = [
     placeId: 'plc_006',
     placeName: 'Phewa Lake Boating',
     promotions: [],
-    image: 'https://example.com/phewa.jpg',
+    image:
+      'https://images.unsplash.com/photo-1576948187290-457c015b3bff?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     location: { area: 'Pokhara', lat: 28.2096, lng: 83.9596 },
     mapsLinkKey: 'phewa_key',
     averageRating: 4.8,
@@ -134,7 +140,8 @@ export const placesMock: Place[] = [
     placeId: 'plc_007',
     placeName: 'Sarangkot Paragliding',
     promotions: [],
-    image: 'https://example.com/sarangkot.jpg',
+    image:
+      'https://images.unsplash.com/photo-1704870873380-64148f2b611d?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     location: { area: 'Pokhara', lat: 28.242, lng: 83.949 },
     mapsLinkKey: 'sarangkot_key',
     averageRating: 4.9,
@@ -152,7 +159,8 @@ export const placesMock: Place[] = [
     placeId: 'plc_008',
     placeName: 'World Peace Pagoda',
     promotions: [],
-    image: 'https://example.com/peacepagoda.jpg',
+    image:
+      'https://images.unsplash.com/photo-1522376382758-57cc8c505cdb?q=80&w=2445&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     location: { area: 'Pokhara', lat: 28.2, lng: 83.944 },
     mapsLinkKey: 'peace_pagoda_key',
     averageRating: 4.8,
@@ -170,7 +178,8 @@ export const placesMock: Place[] = [
     placeId: 'plc_009',
     placeName: 'Begnas Lake Retreat',
     promotions: [],
-    image: 'https://example.com/begnas.jpg',
+    image:
+      'https://images.unsplash.com/photo-1691885770413-7cba2e97c779?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     location: { area: 'Pokhara', lat: 28.173, lng: 84.1 },
     mapsLinkKey: 'begnas_key',
     averageRating: 4.7,
@@ -208,7 +217,8 @@ export const placesMock: Place[] = [
     placeId: 'plc_011',
     placeName: 'Bhaktapur Durbar Square',
     promotions: [],
-    image: 'https://example.com/bhaktapur.jpg',
+    image:
+      'https://images.unsplash.com/photo-1618851142562-ff30d09313a9?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     location: { area: 'Bhaktapur', lat: 27.671, lng: 85.4298 },
     mapsLinkKey: 'bhaktapur_key',
     averageRating: 4.9,
@@ -226,7 +236,8 @@ export const placesMock: Place[] = [
     placeId: 'plc_012',
     placeName: 'Nagarkot Sunrise Viewpoint',
     promotions: [],
-    image: 'https://example.com/nagarkot.jpg',
+    image:
+      'https://images.unsplash.com/photo-1631968494896-2c12666aa224?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     location: { area: 'Bhaktapur', lat: 27.7154, lng: 85.5208 },
     mapsLinkKey: 'nagarkot_key',
     averageRating: 4.7,
@@ -246,7 +257,8 @@ export const placesMock: Place[] = [
     placeId: 'plc_013',
     placeName: 'Patan Durbar Square',
     promotions: [],
-    image: 'https://example.com/patan.jpg',
+    image:
+      'https://images.unsplash.com/photo-1609898793184-7d1496532e84?q=80&w=1985&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     location: { area: 'Lalitpur', lat: 27.673, lng: 85.325 },
     mapsLinkKey: 'patan_key',
     averageRating: 4.9,
@@ -264,7 +276,8 @@ export const placesMock: Place[] = [
     placeId: 'plc_014',
     placeName: 'Newari Food Experience',
     promotions: [],
-    image: 'https://example.com/newari.jpg',
+    image:
+      'https://images.unsplash.com/photo-1593252719532-53f183016149?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     location: { area: 'Lalitpur', lat: 27.6735, lng: 85.3245 },
     mapsLinkKey: 'newari_key',
     averageRating: 4.7,
