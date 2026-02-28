@@ -73,14 +73,12 @@ export default function PlaceDetails() {
               asChild
             >
               <Pressable className="mt-3 rounded-xl border p-4">
-                <AppText className="font-semibold">
-                  {promo.promotionName}
-                </AppText>
+                <AppText className="font-semibold">{promo.name}</AppText>
                 <AppText className="text-muted-foreground mt-1 text-sm">
-                  {promo.promotionDescription}
+                  {promo.description}
                 </AppText>
                 <AppText className="text-muted-foreground mt-2 text-xs">
-                  Expires: {promo.expirationDate}
+                  Expires: {promo.endDate}
                 </AppText>
               </Pressable>
             </Link>
