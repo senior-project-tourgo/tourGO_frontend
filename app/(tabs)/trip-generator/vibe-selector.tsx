@@ -8,14 +8,16 @@ import { Button } from '@/components/Button';
 import { VibeCard } from '@/components/cards/variants/VibeCard';
 import { mockVibes } from '@/mock/vibes.mock';
 import { generateTrip } from '@/services/trip.service';
+import type { VibeId } from '@/features/vibe/vibe.types';
 
 export default function VibeSelectorScreen() {
   const router = useRouter();
-  const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const params = useLocalSearchParams();
 
-  const toggleVibe = (id: string) => {
+  const [selectedVibes, setSelectedVibes] = useState<VibeId[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const toggleVibe = (id: VibeId) => {
     setSelectedVibes(prev =>
       prev.includes(id) ? prev.filter(v => v !== id) : [...prev, id]
     );

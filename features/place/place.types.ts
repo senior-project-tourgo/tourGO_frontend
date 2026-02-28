@@ -1,22 +1,45 @@
-// features/place/place.types.ts
+import type { VibeId } from '../vibe/vibe.types';
+
+/* --------------------------------------------------
+ * ID Types
+ * -------------------------------------------------- */
+
+export type PlaceId = `plc_${string}`;
+export type PromotionId = `promo_${string}`;
+
+/* --------------------------------------------------
+ * Core Entity
+ * -------------------------------------------------- */
 
 export type Place = {
-  placeId: string;
+  placeId: PlaceId;
   placeName: string;
-  promotions: string[]; // promo IDs from your DB
+
+  promotions: PromotionId[]; // strongly typed promo IDs
+
   image: string;
   location: PlaceLocation;
+
   mapsLinkKey: string; // key to resolve Google Maps link
-  averageRating: number; // numeric average rating value (e.g. 4.3)
+
+  averageRating: number; // e.g. 4.3
   priceRange: PriceRange;
+
   openingHours: OpeningHours;
   isActive: boolean;
+
   typicalTimeSpent: string;
-  vibe: string[];
-  specialFacilities: string[];
+
+  vibe: VibeId[]; // ✅ no more string[]
+  specialFacilities: SpecialFacility[];
+
   contactNumber: string | null;
   socialMedia: SocialMedia;
 };
+
+/* --------------------------------------------------
+ * Supporting Types
+ * -------------------------------------------------- */
 
 export type OpeningHours = {
   monday: TimeRange[];
@@ -53,3 +76,15 @@ export type SocialPlatform = {
 };
 
 export type PriceRange = '$' | '$$' | '$$$' | '$$$$';
+
+/* --------------------------------------------------
+ * Special Facilities (typed, not string[])
+ * -------------------------------------------------- */
+
+export type SpecialFacility =
+  | 'wheelchair-accessibility'
+  | 'kids-friendly'
+  | 'parking'
+  | 'pet-friendly'
+  | 'toilet'
+  | 'no-reservations-required';

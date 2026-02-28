@@ -2,9 +2,12 @@ import { tripsMock } from '@/mock/trips.mock';
 import { tripPlacesMock } from '@/mock/tripplaces.mock';
 import { placesMock } from '@/mock/places.mock';
 
+import type { TripId, TripPlaceId } from '@/features/place/trip-place.types';
+import type { VibeId } from '@/features/vibe/vibe.types';
+
 type GenerateTripInput = {
   area?: 'Kathmandu' | 'Pokhara' | 'Bhaktapur' | 'Lalitpur';
-  vibes?: string[];
+  vibes?: VibeId[];
   numberOfPlaces?: number;
   itineraryName?: string;
   budgetLevel?: number; // 1–4
@@ -15,26 +18,24 @@ type GenerateTripInput = {
 export async function generateTrip(
   userId: string,
   preferences: GenerateTripInput
-) {
+): Promise<TripId> {
   await new Promise(resolve => setTimeout(resolve, 800));
 
   /* --------------------------------------------------
-   * 1️⃣ Generate next tripId safely
+   * 1️⃣ Generate next tripId safely (typed)
    * -------------------------------------------------- */
 
   const highestTripNumber = tripsMock.reduce((max, trip) => {
-    const match =
-      typeof trip.tripId === 'string'
-        ? trip.tripId.match(/^trip_(\d+)$/)
-        : null;
-
+    const match = trip.tripId.match(/^trip_(\d+)$/);
     const num = match ? Number(match[1]) : 0;
-    return Number.isFinite(num) && num > max ? num : max;
+    return num > max ? num : max;
   }, 0);
 
   const newTripNumber = highestTripNumber + 1;
-  const tripId = `trip_${newTripNumber.toString().padStart(3, '0')}`;
-  const preferenceId = `pref_${newTripNumber.toString().padStart(3, '0')}`;
+  const padded = newTripNumber.toString().padStart(3, '0');
+
+  const tripId = `trip_${padded}` as TripId;
+  const preferenceId = `pref_${padded}`;
 
   /* --------------------------------------------------
    * 2️⃣ Base filtering (active + area)
@@ -68,7 +69,7 @@ export async function generateTrip(
   }
 
   /* --------------------------------------------------
-   * 4️⃣ Score by vibe
+   * 4️⃣ Score by vibe (typed VibeId)
    * -------------------------------------------------- */
 
   const scoredPlaces = basePlaces
@@ -85,18 +86,14 @@ export async function generateTrip(
   const requested = preferences.numberOfPlaces ?? 3;
   const numberOfPlaces = Math.min(requested, scoredPlaces.length);
 
-  /* --------------------------------------------------
-   * 6️⃣ Select places
-   * -------------------------------------------------- */
-
-  let selected = scoredPlaces.slice(0, numberOfPlaces).map(x => x.place);
+  const selected = scoredPlaces.slice(0, numberOfPlaces).map(x => x.place);
 
   if (selected.length === 0) {
     throw new Error('No places available at the moment.');
   }
 
   /* --------------------------------------------------
-   * 7️⃣ Create trip record (NEW STRUCTURE)
+   * 6️⃣ Create trip record
    * -------------------------------------------------- */
 
   tripsMock.push({
@@ -113,24 +110,23 @@ export async function generateTrip(
   });
 
   /* --------------------------------------------------
-   * 8️⃣ Generate tripPlace records
+   * 7️⃣ Generate tripPlace records (typed IDs)
    * -------------------------------------------------- */
 
   let highestTripPlaceNumber = tripPlacesMock.reduce((max, tp) => {
-    const match =
-      typeof tp.tripPlaceId === 'string'
-        ? tp.tripPlaceId.match(/^tp_(\d+)$/)
-        : null;
-
+    const match = tp.tripPlaceId.match(/^tp_(\d+)$/);
     const num = match ? Number(match[1]) : 0;
-    return Number.isFinite(num) && num > max ? num : max;
+    return num > max ? num : max;
   }, 0);
 
   selected.forEach((place, index) => {
     highestTripPlaceNumber += 1;
 
+    const tripPlaceId =
+      `tp_${highestTripPlaceNumber.toString().padStart(3, '0')}` as TripPlaceId;
+
     tripPlacesMock.push({
-      tripPlaceId: `tp_${highestTripPlaceNumber.toString().padStart(3, '0')}`,
+      tripPlaceId,
       tripId,
       placeId: place.placeId,
       order: index + 1
