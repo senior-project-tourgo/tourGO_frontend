@@ -23,7 +23,15 @@ export async function generateTrip(
    * -------------------------------------------------- */
 
   const highestTripNumber = tripsMock.reduce((max, trip) => {
-    const num = Number(trip.tripId.split('_')[1]);
+    const id = typeof trip.tripId === 'string' ? trip.tripId : '';
+    const match = id.match(/^trip_(\d+)$/);
+    if (!match) {
+      return max;
+    }
+    const num = Number(match[1]);
+    if (!Number.isFinite(num) || num < 0) {
+      return max;
+    }
     return num > max ? num : max;
   }, 0);
 
@@ -149,8 +157,12 @@ export async function generateTrip(
    * -------------------------------------------------- */
 
   let highestTripPlaceNumber = tripPlacesMock.reduce((max, tp) => {
-    const num = Number(tp.tripPlaceId.split('_')[1]);
-    return num > max ? num : max;
+    const match =
+      typeof tp.tripPlaceId === 'string'
+        ? tp.tripPlaceId.match(/^tp_(\d+)$/)
+        : null;
+    const num = match ? Number(match[1]) : 0;
+    return Number.isFinite(num) && num > max ? num : max;
   }, 0);
 
   selected.forEach((place, index) => {

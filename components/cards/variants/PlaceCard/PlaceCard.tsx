@@ -23,9 +23,6 @@ export function PlaceCard({
   onPressCross
 }: PlaceCardProps) {
   const openingHours = getPlaceOpeningStatus(place.openingHours);
-  const vibeTitles = place.vibe.map(
-    id => mockVibes.find(v => v.id === id)?.title
-  );
 
   return (
     <Pressable onPress={() => onPress?.(place)} className="w-[345px]">
@@ -82,8 +79,8 @@ export function PlaceCard({
           <View className="flex-row flex-wrap gap-2">
             {place.vibe
               .map(id => mockVibes.find(v => v.id === id)?.title)
-              .map(title => (
-                <View key={title}>
+              .map((title, index) => (
+                <View key={place.vibe[index]}>
                   <Badge label={title as string} />
                 </View>
               ))}
