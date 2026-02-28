@@ -23,16 +23,13 @@ export async function generateTrip(
    * -------------------------------------------------- */
 
   const highestTripNumber = tripsMock.reduce((max, trip) => {
-    const id = typeof trip.tripId === 'string' ? trip.tripId : '';
-    const match = id.match(/^trip_(\d+)$/);
-    if (!match) {
-      return max;
-    }
-    const num = Number(match[1]);
-    if (!Number.isFinite(num) || num < 0) {
-      return max;
-    }
-    return num > max ? num : max;
+    const match =
+      typeof trip.tripId === 'string'
+        ? trip.tripId.match(/^trip_(\d+)$/)
+        : null;
+
+    const num = match ? Number(match[1]) : 0;
+    return Number.isFinite(num) && num > max ? num : max;
   }, 0);
 
   const newTripNumber = highestTripNumber + 1;
@@ -52,7 +49,7 @@ export async function generateTrip(
   }
 
   /* --------------------------------------------------
-   * 3️⃣ Budget-aware filtering (soft influence)
+   * 3️⃣ Budget soft filtering
    * -------------------------------------------------- */
 
   if (preferences.budgetLevel) {
@@ -71,16 +68,14 @@ export async function generateTrip(
   }
 
   /* --------------------------------------------------
-   * 4️⃣ Score by vibe matches
+   * 4️⃣ Score by vibe
    * -------------------------------------------------- */
 
   const scoredPlaces = basePlaces
-    .map(place => {
-      const vibeScore =
-        preferences.vibes?.filter(v => place.vibe.includes(v)).length ?? 0;
-
-      return { place, score: vibeScore };
-    })
+    .map(place => ({
+      place,
+      score: preferences.vibes?.filter(v => place.vibe.includes(v)).length ?? 0
+    }))
     .sort((a, b) => b.score - a.score);
 
   /* --------------------------------------------------
@@ -91,72 +86,17 @@ export async function generateTrip(
   const numberOfPlaces = Math.min(requested, scoredPlaces.length);
 
   /* --------------------------------------------------
-   * 6️⃣ Pick top scored, slight shuffle inside same score
+   * 6️⃣ Select places
    * -------------------------------------------------- */
 
-  const groupedByScore = scoredPlaces.reduce(
-    (acc, item) => {
-      if (!acc[item.score]) acc[item.score] = [];
-      acc[item.score].push(item.place);
-      return acc;
-    },
-    {} as Record<number, typeof basePlaces>
-  );
-
-  const sortedScores = Object.keys(groupedByScore)
-    .map(Number)
-    .sort((a, b) => b - a);
-
-  let selected: typeof basePlaces = [];
-
-  for (const score of sortedScores) {
-    const group = groupedByScore[score].sort(() => Math.random() - 0.5);
-
-    for (const place of group) {
-      if (selected.length < numberOfPlaces) {
-        selected.push(place);
-      }
-    }
-  }
-
-  if (selected.length === 0) {
-    // fallback: ignore budget
-    basePlaces = placesMock.filter(place => place.isActive);
-
-    const fallbackScored = basePlaces
-      .map(place => ({
-        place,
-        score:
-          preferences.vibes?.filter(v => place.vibe.includes(v)).length ?? 0
-      }))
-      .sort((a, b) => b.score - a.score);
-
-    selected = fallbackScored.slice(0, requested).map(x => x.place);
-  }
+  let selected = scoredPlaces.slice(0, numberOfPlaces).map(x => x.place);
 
   if (selected.length === 0) {
     throw new Error('No places available at the moment.');
   }
 
   /* --------------------------------------------------
-   * 7️⃣ Estimate budget
-   * -------------------------------------------------- */
-
-  const baseCostPerPlace = {
-    $: 500,
-    $$: 1000,
-    $$$: 2000,
-    $$$$: 4000
-  };
-
-  const estimatedBudget =
-    selected.reduce(
-      (total, place) => total + baseCostPerPlace[place.priceRange],
-      0
-    ) * (preferences.numberOfPeople ?? 1);
-
-  /* --------------------------------------------------
-   * 8️⃣ Create trip record
+   * 7️⃣ Create trip record (NEW STRUCTURE)
    * -------------------------------------------------- */
 
   tripsMock.push({
@@ -164,15 +104,16 @@ export async function generateTrip(
     userId,
     tripName: preferences.itineraryName ?? 'Generated Trip',
     preferenceId,
-    status: 'DRAFT',
-    doneDate: null,
-    totalPlaces: selected.length,
-    estimatedBudget,
-    createdAt: new Date().toISOString()
+    status: 'NOT_STARTED',
+    createdAt: new Date().toISOString(),
+    startedAt: null,
+    pausedAt: null,
+    completedAt: null,
+    totalDuration: null
   });
 
   /* --------------------------------------------------
-   * 9️⃣ Generate tripPlace records
+   * 8️⃣ Generate tripPlace records
    * -------------------------------------------------- */
 
   let highestTripPlaceNumber = tripPlacesMock.reduce((max, tp) => {
@@ -180,6 +121,7 @@ export async function generateTrip(
       typeof tp.tripPlaceId === 'string'
         ? tp.tripPlaceId.match(/^tp_(\d+)$/)
         : null;
+
     const num = match ? Number(match[1]) : 0;
     return Number.isFinite(num) && num > max ? num : max;
   }, 0);
