@@ -1,8 +1,4 @@
-export interface Vibe {
-  id: string;
-  title: string;
-  image: string;
-}
+import type { Vibe } from '@/features/vibe/vibe.types';
 
 export const mockVibes: Vibe[] = [
   {

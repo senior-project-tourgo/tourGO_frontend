@@ -1,4 +1,6 @@
-export const tripPlacesMock = [
+import type { TripPlace } from '@/features/place/trip-place.types';
+
+export const tripPlacesMock: TripPlace[] = [
   // trip_001
   { tripPlaceId: 'tp_001', tripId: 'trip_001', placeId: 'plc_001', order: 1 },
   { tripPlaceId: 'tp_002', tripId: 'trip_001', placeId: 'plc_003', order: 2 },
