@@ -8,8 +8,9 @@ import { Button } from '@/components/Button';
 import { Screen } from '@/components/Screen';
 import { HeaderWithBack } from '@/components/PageHeader';
 import { Dropdown } from '@/components/Dropdown';
-import { SliderField } from '@/components/SliderField';
+// import { SliderField } from '@/components/SliderField';
 import { OptionSelector } from '@/components/OptionSelector';
+import { DropdownCalendar } from '@/components/Calendar';
 
 export default function TripGeneratorScreen() {
   const router = useRouter();
@@ -18,11 +19,11 @@ export default function TripGeneratorScreen() {
   const [area, setArea] = useState('Kathmandu');
   const [people, setPeople] = useState<number>(1);
   const [budget, setBudget] = useState<number>(1);
-  const [duration, setDuration] = useState<number>(4);
+  // const [duration, setDuration] = useState<number>(4);
   const [placesCount, setPlacesCount] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
   const [submitted, setSubmitted] = useState(false);
+  const [date, setDate] = useState(new Date());
 
   const areaOptions = ['Kathmandu', 'Pokhara', 'Bhaktapur', 'Lalitpur'];
 
@@ -42,7 +43,7 @@ export default function TripGeneratorScreen() {
       travelingArea: area,
       numberOfPeople: people,
       budgetLevel: budget,
-      durationHours: duration,
+      // durationHours: duration,
       numberOfPlaces: Number(placesCount)
     };
 
@@ -74,6 +75,8 @@ export default function TripGeneratorScreen() {
           required
           error={isItineraryInvalid ? 'Itinerary name is required' : undefined}
         />
+
+        <DropdownCalendar value={date} onChange={setDate} />
 
         {/* Number of Places */}
         <AppTextInput
@@ -129,7 +132,7 @@ export default function TripGeneratorScreen() {
         />
 
         {/* Duration */}
-        <SliderField
+        {/* <SliderField
           label="Duration"
           value={duration}
           onChange={setDuration}
@@ -137,7 +140,7 @@ export default function TripGeneratorScreen() {
           maximumValue={12}
           step={1}
           unit="hours"
-        />
+        /> */}
 
         {/* Continue Button */}
         <Button
