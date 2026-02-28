@@ -16,7 +16,7 @@ export const placesMock: Place[] = [
   {
     placeId: 'plc_001',
     placeName: 'Swayambhunath Stupa',
-    promotions: [],
+    promotions: ['promo_102', 'promo_103'],
     image:
       'https://images.unsplash.com/photo-1672338127087-d46c9ecd48f9?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     location: { area: 'Kathmandu', lat: 27.7149, lng: 85.29 },
@@ -38,7 +38,7 @@ export const placesMock: Place[] = [
   {
     placeId: 'plc_002',
     placeName: 'Boudhanath Stupa',
-    promotions: [],
+    promotions: ['promo_103', 'promo_104'],
     image:
       'https://images.unsplash.com/photo-1671888923932-d53a99498c27?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     location: { area: 'Kathmandu', lat: 27.7215, lng: 85.362 },
@@ -256,7 +256,7 @@ export const placesMock: Place[] = [
   {
     placeId: 'plc_013',
     placeName: 'Patan Durbar Square',
-    promotions: [],
+    promotions: ['promo_101', 'promo_102'],
     image:
       'https://images.unsplash.com/photo-1609898793184-7d1496532e84?q=80&w=1985&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     location: { area: 'Lalitpur', lat: 27.673, lng: 85.325 },
@@ -275,7 +275,7 @@ export const placesMock: Place[] = [
   {
     placeId: 'plc_014',
     placeName: 'Newari Food Experience',
-    promotions: [],
+    promotions: ['promo_101', 'promo_104'],
     image:
       'https://images.unsplash.com/photo-1593252719532-53f183016149?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     location: { area: 'Lalitpur', lat: 27.6735, lng: 85.3245 },
