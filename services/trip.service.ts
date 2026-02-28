@@ -119,6 +119,25 @@ export async function generateTrip(
     }
   }
 
+  if (selected.length === 0) {
+    // fallback: ignore budget
+    basePlaces = placesMock.filter(place => place.isActive);
+
+    const fallbackScored = basePlaces
+      .map(place => ({
+        place,
+        score:
+          preferences.vibes?.filter(v => place.vibe.includes(v)).length ?? 0
+      }))
+      .sort((a, b) => b.score - a.score);
+
+    selected = fallbackScored.slice(0, requested).map(x => x.place);
+  }
+
+  if (selected.length === 0) {
+    throw new Error('No places available at the moment.');
+  }
+
   /* --------------------------------------------------
    * 7️⃣ Estimate budget
    * -------------------------------------------------- */
