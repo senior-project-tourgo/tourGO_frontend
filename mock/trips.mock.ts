@@ -54,7 +54,7 @@ export const tripsMock = [
     preferenceId: 'pref_005',
     status: 'DRAFT',
     doneDate: null,
-    totalPlaces: 0,
+    totalPlaces: 2,
     estimatedBudget: null,
     createdAt: '2025-01-21T08:10:00.000Z'
   }

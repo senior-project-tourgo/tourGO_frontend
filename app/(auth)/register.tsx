@@ -1,265 +1,175 @@
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
-    ActivityIndicator,
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableOpacity,
+  View
 } from 'react-native';
+
 import { useAuth } from '../../context/AuthContext';
+import { BaseCard } from '@/components/cards/BaseCard';
+import { Button } from '@/components/Button';
+import { AppText } from '@/components/AppText';
+import { AppTextInput } from '@/components/AppTextInput';
 
-/**
- * Registration Screen Component
- * Allows users to create a new account with email or phone number
- */
-const RegisterScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
-    const { register } = useAuth();
-    const router = useRouter();
+export default function RegisterScreen() {
+  const { register } = useAuth();
+  const router = useRouter();
 
-    // Form state
-    const [name, setName] = useState('');
-    const [username, setUsername] = useState('');
-    const [identifier, setIdentifier] = useState(''); // Email or phone
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
+  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
+  const [identifier, setIdentifier] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
-    // UI state
-    const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
-    /**
-     * Handle registration form submission
-     */
-    const handleRegister = async () => {
-        // Validation
-        if (!name.trim()) {
-            Alert.alert('Error', 'Please enter your name');
-            return;
-        }
+  const isNameInvalid = submitted && !name.trim();
+  const isUsernameInvalid =
+    submitted && (!username.trim() || username.length < 3);
+  const isIdentifierInvalid = submitted && !identifier.trim();
+  const isPasswordInvalid = submitted && (!password || password.length < 6);
+  const isConfirmPasswordInvalid = submitted && password !== confirmPassword;
 
-        if (!username.trim()) {
-            Alert.alert('Error', 'Please enter a username');
-            return;
-        }
+  const handleRegister = async () => {
+    setSubmitted(true);
 
-        if (username.length < 3) {
-            Alert.alert('Error', 'Username must be at least 3 characters');
-            return;
-        }
+    if (
+      !name.trim() ||
+      !username.trim() ||
+      username.length < 3 ||
+      !identifier.trim() ||
+      !password ||
+      password.length < 6 ||
+      password !== confirmPassword
+    ) {
+      return;
+    }
 
-        if (!identifier.trim()) {
-            Alert.alert('Error', 'Please enter your email or phone number');
-            return;
-        }
+    setIsLoading(true);
+    try {
+      await register(name.trim(), username.trim(), identifier.trim(), password);
 
-        if (!password) {
-            Alert.alert('Error', 'Please enter a password');
-            return;
-        }
+      router.replace('/(auth)/login');
+    } catch (error: any) {
+      Alert.alert('Registration Failed', error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-        if (password.length < 6) {
-            Alert.alert('Error', 'Password must be at least 6 characters');
-            return;
-        }
+  return (
+    <KeyboardAvoidingView
+      className="flex-1 bg-colors-brand-secondary"
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <View className="flex-grow justify-end">
+        <BaseCard className="w-full rounded-t-[40px] px-8 py-16">
+          <AppText className="mb-2" variant="title">
+            Create Account
+          </AppText>
 
-        if (password !== confirmPassword) {
-            Alert.alert('Error', 'Passwords do not match');
-            return;
-        }
+          <AppText className="mb-8" variant="muted">
+            Sign up to continue!
+          </AppText>
 
-        // Attempt registration
-        setIsLoading(true);
-        try {
-            await register(name.trim(), username.trim(), identifier.trim(), password);
+          <View className="gap-5">
+            <AppTextInput
+              label="Full Name"
+              placeholder="Enter your full name"
+              value={name}
+              onChangeText={setName}
+              autoCapitalize="words"
+              editable={!isLoading}
+              required
+              error={isNameInvalid ? 'Full name is required' : undefined}
+            />
 
-            Alert.alert('Success', 'Account created successfully!');
-            // Navigation will be handled by AuthContext state change
-            router.replace('/(auth)/login');
-        } catch (error: any) {
-            Alert.alert('Registration Failed', error.message);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+            <AppTextInput
+              label="Username"
+              placeholder="Enter a username"
+              value={username}
+              onChangeText={setUsername}
+              autoCapitalize="none"
+              editable={!isLoading}
+              required
+              error={
+                isUsernameInvalid
+                  ? username.length < 3 && username.length > 0
+                    ? 'Username must be at least 3 characters'
+                    : 'Username is required'
+                  : undefined
+              }
+            />
 
-    return (
-        <KeyboardAvoidingView
-            style={styles.container}
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        >
-            <ScrollView contentContainerStyle={styles.scrollContainer}>
-                <View style={styles.formContainer}>
-                    <Text style={styles.title}>Create Account</Text>
-                    <Text style={styles.subtitle}>Sign up to get started</Text>
+            <AppTextInput
+              label="Email or Phone"
+              placeholder="Enter your email or phone"
+              value={identifier}
+              onChangeText={setIdentifier}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              editable={!isLoading}
+              required
+              error={
+                isIdentifierInvalid ? 'Email or phone is required' : undefined
+              }
+            />
 
-                    {/* Name Input */}
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Full Name"
-                        placeholderTextColor="#999"
-                        value={name}
-                        onChangeText={setName}
-                        autoCapitalize="words"
-                        editable={!isLoading}
-                    />
+            <AppTextInput
+              label="Password"
+              placeholder="Enter a password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              editable={!isLoading}
+              required
+              error={
+                isPasswordInvalid
+                  ? password.length < 6 && password.length > 0
+                    ? 'Password must be at least 6 characters'
+                    : 'Password is required'
+                  : undefined
+              }
+            />
 
-                    {/* Username Input */}
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Username"
-                        placeholderTextColor="#999"
-                        value={username}
-                        onChangeText={setUsername}
-                        autoCapitalize="none"
-                        editable={!isLoading}
-                    />
+            <AppTextInput
+              label="Confirm Password"
+              placeholder="Re-enter your password"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry
+              editable={!isLoading}
+              required
+              error={
+                isConfirmPasswordInvalid ? 'Passwords do not match' : undefined
+              }
+            />
 
-                    {/* Email or Phone Input */}
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Email or Phone Number"
-                        placeholderTextColor="#999"
-                        value={identifier}
-                        onChangeText={setIdentifier}
-                        autoCapitalize="none"
-                        keyboardType="email-address"
-                        editable={!isLoading}
-                    />
+            <Button
+              title="Register"
+              onPress={handleRegister}
+              isLoading={isLoading}
+            />
+          </View>
 
-                    {/* Password Input */}
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Password"
-                        placeholderTextColor="#999"
-                        value={password}
-                        onChangeText={setPassword}
-                        secureTextEntry
-                        editable={!isLoading}
-                    />
-
-                    {/* Confirm Password Input */}
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Confirm Password"
-                        placeholderTextColor="#999"
-                        value={confirmPassword}
-                        onChangeText={setConfirmPassword}
-                        secureTextEntry
-                        editable={!isLoading}
-                    />
-
-                    {/* Register Button */}
-                    <TouchableOpacity
-                        style={[styles.button, isLoading && styles.buttonDisabled]}
-                        onPress={handleRegister}
-                        disabled={isLoading}
-                    >
-                        {isLoading ? (
-                            <ActivityIndicator color="#fff" />
-                        ) : (
-                            <Text style={styles.buttonText}>Register</Text>
-                        )}
-                    </TouchableOpacity>
-
-                    {/* Login Link */}
-                    <TouchableOpacity
-                        style={styles.linkContainer}
-                        onPress={() => router.replace('/(auth)/login')}
-                        disabled={isLoading}
-                    >
-                        <Text style={styles.linkText}>
-                            Already have an account? <Text style={styles.linkBold}>Login</Text>
-                        </Text>
-                    </TouchableOpacity>
-                </View>
-            </ScrollView>
-        </KeyboardAvoidingView>
-    );
-};
-
-/**
- * Stylesheet for RegisterScreen
- * Clean and modern design with good spacing
- */
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#f5f5f5',
-    },
-    scrollContainer: {
-        flexGrow: 1,
-        justifyContent: 'center',
-        padding: 20,
-    },
-    formContainer: {
-        backgroundColor: '#fff',
-        borderRadius: 10,
-        padding: 20,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 5,
-    },
-    title: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: '#333',
-        textAlign: 'center',
-        marginBottom: 8,
-    },
-    subtitle: {
-        fontSize: 16,
-        color: '#666',
-        textAlign: 'center',
-        marginBottom: 30,
-    },
-    input: {
-        backgroundColor: '#f9f9f9',
-        borderWidth: 1,
-        borderColor: '#ddd',
-        borderRadius: 8,
-        padding: 15,
-        fontSize: 16,
-        marginBottom: 15,
-        color: '#333',
-    },
-    button: {
-        backgroundColor: '#007AFF',
-        borderRadius: 8,
-        padding: 15,
-        alignItems: 'center',
-        marginTop: 10,
-        marginBottom: 15,
-    },
-    buttonDisabled: {
-        backgroundColor: '#99c5ff',
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 18,
-        fontWeight: '600',
-    },
-    linkContainer: {
-        alignItems: 'center',
-        padding: 10,
-    },
-    linkText: {
-        color: '#666',
-        fontSize: 14,
-    },
-    linkBold: {
-        color: '#007AFF',
-        fontWeight: '600',
-    },
-});
-
-export default RegisterScreen;
+          <TouchableOpacity
+            className="items-center py-2"
+            onPress={() => router.replace('/(auth)/login')}
+            disabled={isLoading}
+          >
+            <AppText className="text-sm text-gray-500">
+              Already have an account?{' '}
+              <AppText className="font-semibold text-colors-brand-primary">
+                Login
+              </AppText>
+            </AppText>
+          </TouchableOpacity>
+        </BaseCard>
+      </View>
+    </KeyboardAvoidingView>
+  );
+}

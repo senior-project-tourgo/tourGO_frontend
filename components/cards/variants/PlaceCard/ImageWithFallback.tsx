@@ -32,7 +32,7 @@ export function ImageWithFallback({
     <View>
       <Image
         source={imageSource}
-        className={`h-40 w-full ${className ?? ''}`}
+        className={className ?? ''}
         resizeMode={resizeMode}
         onError={() => {
           if (!imageError) setImageError(true);

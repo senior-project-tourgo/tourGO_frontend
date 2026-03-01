@@ -7,15 +7,19 @@ import { router } from 'expo-router';
 import { View } from 'react-native';
 import { useAuth } from '../../../context/AuthContext';
 
-
 export default function HomeScreen() {
   const activePlaces = placesMock.filter(place => place.isActive).slice(0, 3);
   const { user } = useAuth();
 
+  const username = user?.username ?? '';
+  const formattedUsername =
+    username.charAt(0).toUpperCase() + username.slice(1);
+
   return (
     <Screen>
-      <View className="flex-1 gap-4">
-        <AppText className="font-inter-bold text-xl">Namaste! {user?.username} </AppText>
+      <AppText variant="title">Namaste! {formattedUsername}</AppText>
+      <AppText variant="subtitle">How are you doing today?</AppText>
+      <View className="gap-6 pt-6">
         <Button
           title="Curate New Trip"
           onPress={() => router.push('/(tabs)/trip-generator')}
@@ -30,12 +34,12 @@ export default function HomeScreen() {
               onPress={() => router.push(`/places/${place.placeId}`)}
             />
           ))}
-
-          <Button
-            title="Go to Gems"
-            onPress={() => router.push('/(tabs)/home/gems')}
-          />
         </View>
+
+        <Button
+          title="Go to Gems"
+          onPress={() => router.push('/(tabs)/home/gems')}
+        />
       </View>
     </Screen>
   );

@@ -9,7 +9,7 @@ type TodayOpeningStatus = {
 };
 
 export function getPlaceOpeningStatus(
-  openingHours: Place['openingHours'],
+  openingHours?: Place['openingHours'],
   now: Date = new Date()
 ): TodayOpeningStatus {
   const days = [
@@ -23,10 +23,36 @@ export function getPlaceOpeningStatus(
   ] as const;
 
   const todayIndex = now.getDay();
-  let isOpenNow = false;
   let nextTime: TodayOpeningStatus['nextTime'] = null;
 
-  // Check today first
+  const yesterdayIndex = (todayIndex + 6) % 7;
+  const yesterdayKey = days[yesterdayIndex];
+  const yesterdayRanges = openingHours?.[yesterdayKey] ?? [];
+
+  for (const { open, close } of yesterdayRanges) {
+    const [openH, openM] = open.split(':').map(Number);
+    const [closeH, closeM] = close.split(':').map(Number);
+
+    // Only consider overnight ranges
+    if (closeH < openH || (closeH === openH && closeM < openM)) {
+      const openTime = new Date(now);
+      openTime.setDate(openTime.getDate() - 1);
+      openTime.setHours(openH, openM, 0, 0);
+
+      const closeTime = new Date(openTime);
+      closeTime.setDate(closeTime.getDate() + 1);
+      closeTime.setHours(closeH, closeM, 0, 0);
+
+      if (now >= openTime && now < closeTime) {
+        return {
+          isOpenNow: true,
+          nextTime: { type: 'close', time: closeTime }
+        };
+      }
+    }
+  }
+
+  // Check today’s opening hours
   const todayKey = days[todayIndex];
   const todayRanges = openingHours?.[todayKey] ?? [];
 
@@ -46,9 +72,10 @@ export function getPlaceOpeningStatus(
     }
 
     if (now >= openTime && now < closeTime) {
-      isOpenNow = true;
-      nextTime = { type: 'close', time: closeTime };
-      return { isOpenNow, nextTime };
+      return {
+        isOpenNow: true,
+        nextTime: { type: 'close', time: closeTime }
+      };
     }
 
     if (now < openTime) {
@@ -77,5 +104,8 @@ export function getPlaceOpeningStatus(
     }
   }
 
-  return { isOpenNow, nextTime };
+  return {
+    isOpenNow: false,
+    nextTime
+  };
 }
