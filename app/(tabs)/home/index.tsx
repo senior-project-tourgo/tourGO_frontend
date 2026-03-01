@@ -7,7 +7,6 @@ import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { useAuth } from '../../../context/AuthContext';
-import api from '@/config/api';
 
 export default function HomeScreen() {
   const [activePlaces, setActivePlaces] = useState<Place[]>([]);
@@ -15,28 +14,27 @@ export default function HomeScreen() {
   const { user } = useAuth();
 
   useEffect(() => {
-    const abortController = new AbortController();
-
     const fetchPlaces = async () => {
       try {
-        const response = await api.get<Place[]>('/places?active=true&limit=3', {
-          signal: abortController.signal
-        });
-        setActivePlaces(response.data);
-      } catch (error) {
-        if (error instanceof Error && error.name !== 'CanceledError') {
-          console.error('Failed to fetch places:', error);
+        const response = await fetch(
+          `${process.env.EXPO_PUBLIC_API_URL}/places?active=true&limit=3`
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch places');
         }
+
+        const data: Place[] = await response.json();
+
+        setActivePlaces(data);
+      } catch (error) {
+        console.error('Failed to fetch places:', error);
       } finally {
         setLoading(false);
       }
     };
 
     fetchPlaces();
-
-    return () => {
-      abortController.abort();
-    };
   }, []);
 
   const username = user?.username ?? '';

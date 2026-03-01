@@ -1,12 +1,13 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { FlatList } from 'react-native';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 
+import { Screen } from '@/components/Screen';
+import { HeaderWithBack } from '@/components/PageHeader';
 import { Button } from '@/components/Button';
 import { VibeCard } from '@/components/cards/variants/VibeCard';
-import { HeaderWithBack } from '@/components/PageHeader';
-import { Screen } from '@/components/Screen';
 import { mockVibes } from '@/mock/vibes.mock';
+import { generateTrip } from '@/services/trip.service';
 
 export default function VibeSelectorScreen() {
   const router = useRouter();
@@ -24,24 +25,26 @@ export default function VibeSelectorScreen() {
     try {
       setIsLoading(true);
 
-      const data = await generateRecommendation({
-        area: params.travelingArea,
+      const tripId = await generateTrip('usr_001', {
+        area: params.travelingArea as
+          | 'Kathmandu'
+          | 'Pokhara'
+          | 'Bhaktapur'
+          | 'Lalitpur',
         vibes: selectedVibes,
-        numberOfPlaces: Number(params.numberOfPlaces)
+        numberOfPlaces: Number(params.numberOfPlaces),
+        itineraryName: params.itineraryName as string,
+        budgetLevel: Number(params.budgetLevel),
+        durationHours: Number(params.durationHours),
+        numberOfPeople: Number(params.numberOfPeople)
       });
 
       router.push({
-        pathname: '/review-trip',
-        params: {
-          recommendation: JSON.stringify(data),
-          itineraryName: params.itineraryName,
-          durationHours: params.durationHours,
-          numberOfPeople: params.numberOfPeople,
-          area: params.travelingArea
-        }
+        pathname: '/review-trip/[id]',
+        params: { id: tripId }
       });
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      console.error('Failed to generate trip:', error);
     } finally {
       setIsLoading(false);
     }
