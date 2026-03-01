@@ -25,7 +25,6 @@ export default function HomeScreen() {
         }
 
         const data: Place[] = await response.json();
-        console.log(data);
 
         setActivePlaces(data);
       } catch (error) {
