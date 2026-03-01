@@ -1,5 +1,5 @@
-import { useState } from 'react';
 import { Place } from '@/features/place/place.types';
+import { useState } from 'react';
 
 export type EditableTripPlace = {
   place: Place;
@@ -8,6 +8,11 @@ export type EditableTripPlace = {
 
 export function useEditableTrip(initialPlaces: EditableTripPlace[]) {
   const [places, setPlaces] = useState<EditableTripPlace[]>(initialPlaces);
+
+  // ✅ Used when loading from router / backend
+  const setInitialPlaces = (newPlaces: EditableTripPlace[]) => {
+    setPlaces(newPlaces);
+  };
 
   const addPlace = (place: Place) => {
     setPlaces(prev => {
@@ -37,6 +42,7 @@ export function useEditableTrip(initialPlaces: EditableTripPlace[]) {
   return {
     places,
     addPlace,
-    removePlace
+    removePlace,
+    setInitialPlaces
   };
 }

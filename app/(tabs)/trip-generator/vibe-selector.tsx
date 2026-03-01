@@ -7,7 +7,7 @@ import { HeaderWithBack } from '@/components/PageHeader';
 import { Button } from '@/components/Button';
 import { VibeCard } from '@/components/cards/variants/VibeCard';
 import { mockVibes } from '@/mock/vibes.mock';
-import { generateTrip } from '@/services/trip.service';
+import { generateRecommendation } from '@/services/trip.service';
 
 export default function VibeSelectorScreen() {
   const router = useRouter();
@@ -25,26 +25,24 @@ export default function VibeSelectorScreen() {
     try {
       setIsLoading(true);
 
-      const tripId = await generateTrip('usr_001', {
-        area: params.travelingArea as
-          | 'Kathmandu'
-          | 'Pokhara'
-          | 'Bhaktapur'
-          | 'Lalitpur',
+      const result = await generateRecommendation({
+        area: params.travelingArea as any,
         vibes: selectedVibes,
         numberOfPlaces: Number(params.numberOfPlaces),
         itineraryName: params.itineraryName as string,
-        budgetLevel: Number(params.budgetLevel),
         durationHours: Number(params.durationHours),
         numberOfPeople: Number(params.numberOfPeople)
       });
 
       router.push({
-        pathname: '/review-trip/[id]',
-        params: { id: tripId }
+        pathname: '/review-trip/reviewtrip',
+        params: {
+          places: JSON.stringify(result.recommendedPlaces),
+          itineraryName: params.itineraryName
+        }
       });
     } catch (error) {
-      console.error('Failed to generate trip:', error);
+      console.error(error);
     } finally {
       setIsLoading(false);
     }
