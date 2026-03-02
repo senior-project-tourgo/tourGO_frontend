@@ -1,13 +1,15 @@
 import { Place } from './place.types';
-
+import api from '../../config/api';
 export async function fetchActivePlaces(limit?: number): Promise<Place[]> {
-  const response = await fetch(
-    `${process.env.EXPO_PUBLIC_API_URL}/places?active=true&limit=${limit}`
-  );
-
-  if (!response.ok) {
-    throw new Error('Failed to fetch places');
+  try {
+    const response = await api.get<Place[]>('/places', {
+      params: {
+        active: true,
+        limit
+      }
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error('Failed to fetch places', { cause: error });
   }
-
-  return response.json();
 }

@@ -8,10 +8,25 @@ export function useActivePlaces(limit?: number) {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
+    let ignore = false;
+    setLoading(true);
+    setError(null);
     fetchActivePlaces(limit)
-      .then(setData)
-      .catch(setError)
-      .finally(() => setLoading(false));
+      .then(places => {
+        if (ignore) return;
+        setData(places);
+      })
+      .catch((err: Error) => {
+        if (ignore) return;
+        setError(err);
+      })
+      .finally(() => {
+        if (ignore) return;
+        setLoading(false);
+      });
+    return () => {
+      ignore = true;
+    };
   }, [limit]);
 
   return { data, loading, error };
