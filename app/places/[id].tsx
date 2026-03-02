@@ -1,20 +1,43 @@
-import { Pressable, View } from 'react-native';
+import { ActivityIndicator, Pressable, View } from 'react-native';
 import { useLocalSearchParams, Stack, Link } from 'expo-router';
 import { promotionsMock } from '@/mock/promotions.mock';
-import { placesMock } from '@/mock/places.mock';
 import { AppText } from '@/components/AppText';
 import { getPlaceOpeningStatus } from '@/utils/openingHours';
 import { Screen } from '@/components/Screen';
 import { HeaderWithBack } from '@/components/PageHeader';
+import { useActivePlaces } from '@/features/place/useActivePlaces';
 
 export default function PlaceDetails() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const placeId = typeof id === 'string' ? id : undefined;
+  const { data: places, loading, error } = useActivePlaces(undefined);
 
-  const place = placesMock.find(p => p.placeId === id);
+  if (loading) {
+    return <ActivityIndicator size="large" />;
+  }
+
+  if (error) {
+    return (
+      <View className="bg-background flex-1 items-center justify-center">
+        <AppText className="text-lg font-semibold">
+          Something went wrong
+        </AppText>
+        <AppText className="text-muted-foreground mt-2 text-center text-sm">
+          {error?.message}
+        </AppText>
+      </View>
+    );
+  }
+
+  const place = places.find(p => p.placeId === placeId);
+
   if (!place) {
     return (
       <View className="bg-background flex-1 items-center justify-center">
-        <AppText className="text-lg font-semibold">Place not found 😢</AppText>
+        <AppText className="text-lg font-semibold">Place not found</AppText>
+        <AppText className="text-muted-foreground mt-2 text-center text-sm">
+          Place not found
+        </AppText>
       </View>
     );
   }
@@ -56,7 +79,7 @@ export default function PlaceDetails() {
       </AppText>
 
       <AppText className="mt-2 text-sm">
-        🎧 Vibe: {place.vibe.join(', ')}
+        🎧 Vibe: {place.vibe?.length ? place.vibe.join(', ') : '—'}
       </AppText>
 
       {/* Promotions */}
