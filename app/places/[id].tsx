@@ -1,4 +1,4 @@
-import { ActivityIndicator, Pressable, View } from 'react-native';
+import { ActivityIndicator, Pressable } from 'react-native';
 import { useLocalSearchParams, Stack, Link } from 'expo-router';
 import { promotionsMock } from '@/mock/promotions.mock';
 import { AppText } from '@/components/AppText';
@@ -13,19 +13,23 @@ export default function PlaceDetails() {
   const { data: places, loading, error } = useActivePlaces(undefined);
 
   if (loading) {
-    return <ActivityIndicator size="large" />;
+    return (
+      <Screen scroll={false}>
+        <ActivityIndicator size="large" />
+      </Screen>
+    );
   }
 
   if (error) {
     return (
-      <View className="bg-background flex-1 items-center justify-center">
+      <Screen scroll={false}>
         <AppText className="text-lg font-semibold">
           Something went wrong
         </AppText>
         <AppText className="text-muted-foreground mt-2 text-center text-sm">
           {error?.message}
         </AppText>
-      </View>
+      </Screen>
     );
   }
 
@@ -33,12 +37,12 @@ export default function PlaceDetails() {
 
   if (!place) {
     return (
-      <View className="bg-background flex-1 items-center justify-center">
-        <AppText className="text-lg font-semibold">Place not found</AppText>
+      <Screen scroll={false}>
+        <AppText className="text-lg font-semibold">Page not found.</AppText>
         <AppText className="text-muted-foreground mt-2 text-center text-sm">
-          Place not found
+          The place may have been removed or is temporarily unavailable.
         </AppText>
-      </View>
+      </Screen>
     );
   }
 
