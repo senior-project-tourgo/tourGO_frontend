@@ -2,42 +2,15 @@ import { AppText } from '@/components/AppText';
 import { Button } from '@/components/Button';
 import { PlaceCard } from '@/components/cards/variants/PlaceCard/PlaceCard';
 import { Screen } from '@/components/Screen';
-import { Place } from '@/features/place/place.types';
 import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { useAuth } from '../../../context/AuthContext';
-import api from '@/config/api';
+import { useActivePlaces } from '@/features/place/useActivePlaces';
 
 export default function HomeScreen() {
-  const [activePlaces, setActivePlaces] = useState<Place[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: activePlaces, loading } = useActivePlaces(3);
+
   const { user } = useAuth();
-
-  useEffect(() => {
-    const abortController = new AbortController();
-
-    const fetchPlaces = async () => {
-      try {
-        const response = await api.get<Place[]>('/places?active=true&limit=3', {
-          signal: abortController.signal
-        });
-        setActivePlaces(response.data);
-      } catch (error) {
-        if (error instanceof Error && error.name !== 'CanceledError') {
-          console.error('Failed to fetch places:', error);
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPlaces();
-
-    return () => {
-      abortController.abort();
-    };
-  }, []);
 
   const username = user?.username ?? '';
   const formattedUsername =
