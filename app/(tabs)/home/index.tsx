@@ -8,13 +8,26 @@ import { useAuth } from '../../../context/AuthContext';
 import { useActivePlaces } from '@/features/place/useActivePlaces';
 
 export default function HomeScreen() {
-  const { data: activePlaces, loading } = useActivePlaces(3);
+  const { data: activePlaces, loading, error } = useActivePlaces(3);
 
   const { user } = useAuth();
 
   const username = user?.username ?? '';
   const formattedUsername =
     username.charAt(0).toUpperCase() + username.slice(1);
+
+  if (error) {
+    return (
+      <View className="bg-background flex-1 items-center justify-center">
+        <AppText className="text-lg font-semibold">
+          Something went wrong
+        </AppText>
+        <AppText className="text-muted-foreground mt-2 text-center text-sm">
+          {error?.message}
+        </AppText>
+      </View>
+    );
+  }
 
   return (
     <Screen>
