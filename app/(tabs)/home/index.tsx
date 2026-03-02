@@ -13,19 +13,18 @@ export default function HomeScreen() {
   const { user } = useAuth();
 
   const username = user?.username ?? '';
-  const formattedUsername =
-    username.charAt(0).toUpperCase() + username.slice(1);
+  const formattedUsername = username[0].toUpperCase() + username.slice(1);
 
   if (error) {
     return (
-      <View className="bg-background flex-1 items-center justify-center">
+      <Screen scroll={false}>
         <AppText className="text-lg font-semibold">
           Something went wrong
         </AppText>
         <AppText className="text-muted-foreground mt-2 text-center text-sm">
-          {error?.message}
+          {error.message}
         </AppText>
-      </View>
+      </Screen>
     );
   }
 
@@ -45,7 +44,7 @@ export default function HomeScreen() {
           {loading ? (
             <ActivityIndicator size="large" />
           ) : (
-            activePlaces.map(place => (
+            activePlaces?.map(place => (
               <PlaceCard
                 key={place.placeId}
                 place={place}

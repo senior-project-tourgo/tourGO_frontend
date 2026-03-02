@@ -11,14 +11,14 @@ export default function CommunityGemsScreen() {
 
   if (error) {
     return (
-      <View className="bg-background flex-1 items-center justify-center">
+      <Screen scroll={false}>
         <AppText className="text-lg font-semibold">
           Something went wrong
         </AppText>
         <AppText className="text-muted-foreground mt-2 text-center text-sm">
-          {error?.message}
+          {error.message}
         </AppText>
-      </View>
+      </Screen>
     );
   }
 
