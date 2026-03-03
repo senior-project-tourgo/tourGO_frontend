@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { View } from 'react-native';
 import MapView, { Marker, Region } from 'react-native-maps';
 
@@ -19,7 +19,10 @@ export function Map({ region, markers }: Props) {
   const mapRef = useRef<MapView>(null);
 
   useEffect(() => {
-    if (markers && markers.length > 1 && mapRef.current) {
+    // Always adjust the viewport to include every provided marker.
+    // The parent-supplied `region` is treated as a starting point only;
+    // once markers exist the map will reframe itself automatically.
+    if (markers && markers.length > 0 && mapRef.current) {
       mapRef.current.fitToCoordinates(markers, {
         edgePadding: { top: 80, right: 40, bottom: 220, left: 40 },
         animated: true

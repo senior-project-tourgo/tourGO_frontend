@@ -63,9 +63,23 @@ export default function ReviewTripScreen() {
 
   /* -------------------------------------------------- */
   /* 2️⃣ Initialize map region                         */
-  /* -------------------------------------------------- */
+  /*
+   * We use a single effect, but it has two responsibilities:
+   * 1. immediately center on the first place when any are available
+   * 2. otherwise fall back to the user's current location
+   *
+   * The original implementation triggered a race between the
+   * async location request and a later update to editablePlaces.
+   * if the permission call resolved after the place list arrived,
+   * it would overwrite the region and the map would zoom to the
+   * wrong spot until a manual refresh. The fix uses a cancellation
+   * flag so only the _latest_ invocation may update state.
+   */
   useEffect(() => {
+    let active = true;
+
     async function initializeRegion() {
+      // if we already have at least one place, center on the first marker
       if (editablePlaces.length > 0) {
         setRegion({
           latitude: Number(editablePlaces[0].place.location.lat),
@@ -77,28 +91,39 @@ export default function ReviewTripScreen() {
       }
 
       const { status } = await Location.requestForegroundPermissionsAsync();
+      if (!active) return; // cancelled by cleanup
 
       if (status !== 'granted') {
-        setRegion({
-          latitude: 0,
-          longitude: 0,
-          latitudeDelta: 60,
-          longitudeDelta: 60
-        });
+        if (active) {
+          setRegion({
+            latitude: 0,
+            longitude: 0,
+            latitudeDelta: 60,
+            longitudeDelta: 60
+          });
+        }
         return;
       }
 
       const location = await Location.getCurrentPositionAsync({});
+      if (!active) return;
 
-      setRegion({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01
-      });
+      // only apply the user location when there still aren't any places
+      if (editablePlaces.length === 0 && active) {
+        setRegion({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01
+        });
+      }
     }
 
     initializeRegion();
+
+    return () => {
+      active = false;
+    };
   }, [editablePlaces]);
 
   /* -------------------------------------------------- */
