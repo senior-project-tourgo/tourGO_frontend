@@ -29,7 +29,7 @@ export async function createTrip(payload: {
   status: 'saved' | 'current';
 }) {
   try {
-    const response = await api.post('/trips', payload);
+    const response = await api.post('/trips/create-trip', payload);
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || 'Trip creation failed');
