@@ -17,6 +17,21 @@ export default function ReviewTripScreen() {
     places: string;
     itineraryName: string;
   }>();
+
+  /** normalize router string param (handles string | string[] | undefined) */
+  const normalizeStringParam = (
+    param: string | string[] | undefined
+  ): string => {
+    const value = Array.isArray(param) ? param[0] : param;
+    return value || '';
+  };
+
+  const cleanedItineraryName = normalizeStringParam(itineraryName);
+  const defaultItineraryName = 'My Trip';
+  // if the provided name is empty use a fallback
+  const finalItineraryName =
+    cleanedItineraryName.trim() || defaultItineraryName;
+
   const [region, setRegion] = useState<MapRegion | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -95,11 +110,14 @@ export default function ReviewTripScreen() {
       return;
     }
 
+    // use default name if none provided
+    const itineraryToSave = finalItineraryName;
+
     try {
       setLoading(true);
 
       await createTrip({
-        itineraryName: itineraryName,
+        itineraryName: itineraryToSave,
         places: editablePlaces.map(p => ({
           placeId: p.place.placeId, // ✅ correct id
           order: p.order

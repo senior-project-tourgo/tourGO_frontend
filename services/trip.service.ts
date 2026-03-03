@@ -2,8 +2,6 @@
 
 import api from '@/config/api'; // your axios instance
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL;
-
 export type GenerateTripInput = {
   area: 'Kathmandu' | 'Pokhara' | 'Bhaktapur' | 'Lalitpur';
   vibes: string[];

@@ -2,6 +2,7 @@ import { AppText } from '@/components/AppText';
 import { Button } from '@/components/Button';
 import { PlaceCard } from '@/components/cards/variants/PlaceCard/PlaceCard';
 import { Screen } from '@/components/Screen';
+import api from '@/config/api';
 import { Place } from '@/features/place/place.types';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -16,18 +17,11 @@ export default function HomeScreen() {
   useEffect(() => {
     const fetchPlaces = async () => {
       try {
-        const response = await fetch(
-          `${process.env.EXPO_PUBLIC_API_URL}/places?active=true&limit=3`
-        );
+        const response = await api.get<Place[]>('/places', {
+          params: { active: true, limit: 3 }
+        });
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch places');
-        }
-
-        const data: Place[] = await response.json();
-        console.log(data);
-
-        setActivePlaces(data);
+        setActivePlaces(response.data);
       } catch (error) {
         console.error('Failed to fetch places:', error);
       } finally {

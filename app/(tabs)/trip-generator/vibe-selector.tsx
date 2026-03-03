@@ -1,11 +1,11 @@
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { FlatList } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
 
-import { Screen } from '@/components/Screen';
-import { HeaderWithBack } from '@/components/PageHeader';
 import { Button } from '@/components/Button';
 import { VibeCard } from '@/components/cards/variants/VibeCard';
+import { HeaderWithBack } from '@/components/PageHeader';
+import { Screen } from '@/components/Screen';
 import { mockVibes } from '@/mock/vibes.mock';
 import { generateRecommendation } from '@/services/trip.service';
 
@@ -21,17 +21,56 @@ export default function VibeSelectorScreen() {
     );
   };
 
+  /**
+   * Normalize expo-router params which can be string | string[]
+   * Returns a finite number or throws an error
+   */
+  const normalizeNumberParam = (
+    param: string | string[] | undefined,
+    name: string
+  ): number => {
+    const value = Array.isArray(param) ? param[0] : param;
+    const num = Number(value);
+
+    if (!Number.isFinite(num)) {
+      throw new Error(
+        `Invalid param "${name}": expected a valid number, got "${value}"`
+      );
+    }
+
+    return num;
+  };
+
+  /**
+   * Normalize string param from expo-router
+   */
+  const normalizeStringParam = (
+    param: string | string[] | undefined
+  ): string => {
+    const value = Array.isArray(param) ? param[0] : param;
+    return value || '';
+  };
+
   const handleContinue = async () => {
     try {
       setIsLoading(true);
 
       const result = await generateRecommendation({
-        area: params.travelingArea as any,
+        area: normalizeStringParam(params.travelingArea) as any,
         vibes: selectedVibes,
-        numberOfPlaces: Number(params.numberOfPlaces),
-        itineraryName: params.itineraryName as string,
-        durationHours: Number(params.durationHours),
-        numberOfPeople: Number(params.numberOfPeople)
+        numberOfPlaces: normalizeNumberParam(
+          params.numberOfPlaces,
+          'numberOfPlaces'
+        ),
+        itineraryName: normalizeStringParam(params.itineraryName),
+        durationHours: normalizeNumberParam(
+          params.durationHours,
+          'durationHours'
+        ),
+        numberOfPeople: normalizeNumberParam(
+          params.numberOfPeople,
+          'numberOfPeople'
+        )
       });
 
       router.push({
