@@ -2,39 +2,31 @@ import { AppText } from '@/components/AppText';
 import { Button } from '@/components/Button';
 import { PlaceCard } from '@/components/cards/variants/PlaceCard/PlaceCard';
 import { Screen } from '@/components/Screen';
-import api from '@/config/api';
-import { Place } from '@/features/place/place.types';
 import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { useAuth } from '../../../context/AuthContext';
+import { useActivePlaces } from '@/features/place/useActivePlaces';
 
 export default function HomeScreen() {
-  const [activePlaces, setActivePlaces] = useState<Place[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: activePlaces, loading, error } = useActivePlaces(3);
+
   const { user } = useAuth();
 
-  useEffect(() => {
-    const fetchPlaces = async () => {
-      try {
-        const response = await api.get<Place[]>('/places', {
-          params: { active: true, limit: 3 }
-        });
-
-        setActivePlaces(response.data);
-      } catch (error) {
-        console.error('Failed to fetch places:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPlaces();
-  }, []);
-
   const username = user?.username ?? '';
-  const formattedUsername =
-    username.charAt(0).toUpperCase() + username.slice(1);
+  const formattedUsername = username[0].toUpperCase() + username.slice(1);
+
+  if (error) {
+    return (
+      <Screen scroll={false}>
+        <AppText className="text-lg font-semibold">
+          Something went wrong
+        </AppText>
+        <AppText className="text-muted-foreground mt-2 text-center text-sm">
+          {error.message}
+        </AppText>
+      </Screen>
+    );
+  }
 
   return (
     <Screen>
@@ -52,7 +44,7 @@ export default function HomeScreen() {
           {loading ? (
             <ActivityIndicator size="large" />
           ) : (
-            activePlaces.map(place => (
+            activePlaces?.map(place => (
               <PlaceCard
                 key={place.placeId}
                 place={place}
