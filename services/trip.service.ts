@@ -1,6 +1,7 @@
 // services/trip.service.ts
 
-import api from '@/config/api'; // your axios instance
+import api from '@/config/api';
+import { Place } from '@/features/place/place.types';
 
 export type GenerateTripInput = {
   area: 'Kathmandu' | 'Pokhara' | 'Bhaktapur' | 'Lalitpur';
@@ -12,9 +13,19 @@ export type GenerateTripInput = {
   numberOfPeople?: number;
 };
 
-export async function generateRecommendation(preferences: GenerateTripInput) {
+export type GenerateRecommendationResult = {
+  recommendedPlaces: Place[];
+  itineraryId?: string;
+};
+
+export async function generateRecommendation(
+  preferences: GenerateTripInput
+): Promise<GenerateRecommendationResult> {
   try {
-    const response = await api.post('/recommend', preferences);
+    const response = await api.post<GenerateRecommendationResult>(
+      '/recommend',
+      preferences
+    );
     return response.data;
   } catch (error: any) {
     throw new Error(
