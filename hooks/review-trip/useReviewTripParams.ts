@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import { Place } from '@/features/place/place.types';
+import { getPlacesByIds } from '@/features/place/placeById.api';
 
 interface UseReviewTripParamsProps {
   setInitialPlaces: (places: { place: Place; order: number }[]) => void;
@@ -11,8 +12,8 @@ interface UseReviewTripParamsProps {
 export function useReviewTripParams({
   setInitialPlaces
 }: UseReviewTripParamsProps) {
-  const { places, itineraryName } = useLocalSearchParams<{
-    places: string;
+  const { placeIds, itineraryName } = useLocalSearchParams<{
+    placeIds: string;
     itineraryName: string;
   }>();
 
@@ -29,21 +30,28 @@ export function useReviewTripParams({
     cleanedItineraryName.trim() || defaultItineraryName;
 
   useEffect(() => {
-    if (!places) return;
+    const idsParam = normalizeStringParam(placeIds);
+    if (!idsParam) return;
 
-    try {
-      const parsed: Place[] = JSON.parse(places as string);
+    const ids = idsParam.split(',').filter(Boolean);
 
-      const formatted = parsed.map((place, index) => ({
-        place,
-        order: index + 1
-      }));
+    async function loadPlaces() {
+      try {
+        const places = await getPlacesByIds(ids);
 
-      setInitialPlaces(formatted);
-    } catch (error) {
-      console.error('Failed to parse places:', error);
+        const formatted = places.map((place, index) => ({
+          place,
+          order: index + 1
+        }));
+
+        setInitialPlaces(formatted);
+      } catch (error) {
+        console.error('Failed to load places:', error);
+      }
     }
-  }, [places]);
+
+    loadPlaces();
+  }, [placeIds, setInitialPlaces]);
 
   return { finalItineraryName };
 }

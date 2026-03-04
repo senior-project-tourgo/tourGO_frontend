@@ -1,13 +1,14 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { FlatList } from 'react-native';
-
 import { Button } from '@/components/Button';
 import { VibeCard } from '@/components/cards/variants/VibeCard';
 import { HeaderWithBack } from '@/components/PageHeader';
 import { Screen } from '@/components/Screen';
 import { mockVibes } from '@/mock/vibes.mock';
 import { generateRecommendation } from '@/services/trip.service';
+import { PlaceLocation } from '@/features/place/place.types';
+import { AxiosError } from 'axios';
 
 export default function VibeSelectorScreen() {
   const router = useRouter();
@@ -56,7 +57,9 @@ export default function VibeSelectorScreen() {
       setIsLoading(true);
 
       const result = await generateRecommendation({
-        area: normalizeStringParam(params.travelingArea) as any,
+        area: normalizeStringParam(
+          params.travelingArea
+        ) as PlaceLocation['area'],
         vibes: selectedVibes,
         numberOfPlaces: normalizeNumberParam(
           params.numberOfPlaces,
@@ -74,16 +77,18 @@ export default function VibeSelectorScreen() {
       });
 
       router.push({
-        pathname: '/review-trip/reviewtrip',
+        pathname: '/review-trip',
         params: {
-          places: JSON.stringify(result.recommendedPlaces),
+          placeIds: result.recommendedPlaces.map(p => p.placeId).join(','),
           itineraryName: params.itineraryName
         }
       });
     } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false);
+      const axiosError = error as AxiosError<{ message?: string }>;
+      throw new Error(
+        axiosError.response?.data?.message ||
+          'Failed to generate recommendation'
+      );
     }
   };
 
