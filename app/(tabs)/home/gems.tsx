@@ -1,10 +1,10 @@
-import { HeaderWithBack } from '@/components/PageHeader';
+import { AppText } from '@/components/AppText';
 import { PlaceCard } from '@/components/cards/variants/PlaceCard/PlaceCard';
+import { HeaderWithBack } from '@/components/PageHeader';
 import { Screen } from '@/components/Screen';
+import { useActivePlaces } from '@/hooks/review-trip/useActivePlaces';
 import { router } from 'expo-router';
 import { ActivityIndicator, View } from 'react-native';
-import { useActivePlaces } from '@/features/place/useActivePlaces';
-import { AppText } from '@/components/AppText';
 
 export default function CommunityGemsScreen() {
   const { data: activePlaces, loading, error } = useActivePlaces(undefined);
