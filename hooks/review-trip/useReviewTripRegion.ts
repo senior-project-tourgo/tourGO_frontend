@@ -13,6 +13,13 @@ interface EditablePlace {
   };
 }
 
+const FALLBACK_REGION: MapRegion = {
+  latitude: 13.7563,
+  longitude: 100.5018,
+  latitudeDelta: 0.5,
+  longitudeDelta: 0.5
+};
+
 export function useReviewTripRegion(editablePlaces: EditablePlace[]) {
   const [region, setRegion] = useState<MapRegion | null>(null);
 
@@ -20,41 +27,43 @@ export function useReviewTripRegion(editablePlaces: EditablePlace[]) {
     let active = true;
 
     async function initializeRegion() {
-      if (editablePlaces.length > 0) {
-        setRegion({
-          latitude: Number(editablePlaces[0].place.location.lat),
-          longitude: Number(editablePlaces[0].place.location.lng),
-          latitudeDelta: 0.05,
-          longitudeDelta: 0.05
-        });
-        return;
-      }
+      try {
+        // If places already exist → use first place
+        if (editablePlaces.length > 0) {
+          setRegion({
+            latitude: Number(editablePlaces[0].place.location.lat),
+            longitude: Number(editablePlaces[0].place.location.lng),
+            latitudeDelta: 0.05,
+            longitudeDelta: 0.05
+          });
+          return;
+        }
 
-      const { status } = await Location.requestForegroundPermissionsAsync();
+        const { status } = await Location.requestForegroundPermissionsAsync();
 
-      if (!active) return;
+        if (!active) return;
 
-      if (status !== 'granted') {
-        setRegion({
-          latitude: 0,
-          longitude: 0,
-          latitudeDelta: 60,
-          longitudeDelta: 60
-        });
-        return;
-      }
+        if (status !== 'granted') {
+          setRegion(FALLBACK_REGION);
+          return;
+        }
 
-      const location = await Location.getCurrentPositionAsync({});
+        const location = await Location.getCurrentPositionAsync({});
 
-      if (!active) return;
+        if (!active) return;
 
-      if (editablePlaces.length === 0) {
         setRegion({
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
           latitudeDelta: 0.01,
           longitudeDelta: 0.01
         });
+      } catch (error) {
+        console.error('Failed to initialize region:', error);
+
+        if (active) {
+          setRegion(FALLBACK_REGION);
+        }
       }
     }
 
