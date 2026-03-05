@@ -3,7 +3,7 @@ import { Place } from './place.types';
 
 export async function getPlaceById(placeId: string): Promise<Place> {
   try {
-    const response = await api.get<Place>(`/api/get-places/${placeId}`);
+    const response = await api.get<Place>(`/places/get-places/${placeId}`);
     return response.data;
   } catch (error) {
     throw new Error(`Failed to fetch place with id: ${placeId}`, {
@@ -14,13 +14,11 @@ export async function getPlaceById(placeId: string): Promise<Place> {
 
 export async function getPlacesByIds(placeIds: string[]): Promise<Place[]> {
   try {
-    const response = await api.get<Place[]>('/api/get-places', {
-      params: {
-        ids: placeIds.join(',') // matches your router param
-      }
-    });
+    const results = await Promise.all(
+      placeIds.map(placeId => api.get<Place>(`/places/get-places/${placeId}`))
+    );
 
-    return response.data;
+    return results.map(res => res.data);
   } catch (error) {
     throw new Error('Failed to fetch places by ids', {
       cause: error
