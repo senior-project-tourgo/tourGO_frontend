@@ -1,8 +1,8 @@
-import { Place } from './place.types';
 import api from '../../config/api';
-export async function fetchActivePlaces(limit?: number): Promise<Place[]> {
+import { Place } from './place.types';
+export async function getActivePlaces(limit?: number): Promise<Place[]> {
   try {
-    const response = await api.get<Place[]>('/places', {
+    const response = await api.get<Place[]>('/places/get-all-places', {
       params: {
         active: true,
         limit

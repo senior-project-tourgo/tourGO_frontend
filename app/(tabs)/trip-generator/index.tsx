@@ -17,7 +17,6 @@ export default function TripGeneratorScreen() {
   const [itineraryName, setItineraryName] = useState('');
   const [area, setArea] = useState('Kathmandu');
   const [people, setPeople] = useState<number>(1);
-  const [budget, setBudget] = useState<number>(1);
   const [duration, setDuration] = useState<number>(4);
   const [placesCount, setPlacesCount] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -41,7 +40,6 @@ export default function TripGeneratorScreen() {
       itineraryName: itineraryName.trim(),
       travelingArea: area,
       numberOfPeople: people,
-      budgetLevel: budget,
       durationHours: duration,
       numberOfPlaces: Number(placesCount)
     };
@@ -108,23 +106,6 @@ export default function TripGeneratorScreen() {
           }}
           renderOption={(option, selected) => (
             <AppText className={selected ? 'text-white' : ''}>{option}</AppText>
-          )}
-        />
-
-        {/* Budget */}
-        <OptionSelector
-          label="Budget"
-          options={[1, 2, 3, 4]}
-          value={budget}
-          onChange={setBudget}
-          renderOption={(level, selected) => (
-            <AppText
-              className={`text-2xl ${
-                budget >= level ? 'opacity-100' : 'opacity-30'
-              }`}
-            >
-              {'रु '.repeat(level).trim()}
-            </AppText>
           )}
         />
 

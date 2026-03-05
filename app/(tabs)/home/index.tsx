@@ -2,10 +2,10 @@ import { AppText } from '@/components/AppText';
 import { Button } from '@/components/Button';
 import { PlaceCard } from '@/components/cards/variants/PlaceCard/PlaceCard';
 import { Screen } from '@/components/Screen';
+import { useActivePlaces } from '@/hooks/review-trip/useActivePlaces';
 import { router } from 'expo-router';
 import { ActivityIndicator, View } from 'react-native';
 import { useAuth } from '../../../context/AuthContext';
-import { useActivePlaces } from '@/features/place/useActivePlaces';
 
 export default function HomeScreen() {
   const { data: activePlaces, loading, error } = useActivePlaces(3);

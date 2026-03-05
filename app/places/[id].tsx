@@ -1,11 +1,11 @@
-import { ActivityIndicator, Pressable } from 'react-native';
-import { useLocalSearchParams, Stack, Link } from 'expo-router';
-import { promotionsMock } from '@/mock/promotions.mock';
 import { AppText } from '@/components/AppText';
-import { getPlaceOpeningStatus } from '@/utils/openingHours';
-import { Screen } from '@/components/Screen';
 import { HeaderWithBack } from '@/components/PageHeader';
-import { useActivePlaces } from '@/features/place/useActivePlaces';
+import { Screen } from '@/components/Screen';
+import { useActivePlaces } from '@/hooks/review-trip/useActivePlaces';
+import { promotionsMock } from '@/mock/promotions.mock';
+import { getPlaceOpeningStatus } from '@/utils/openingHours';
+import { Link, Stack, useLocalSearchParams } from 'expo-router';
+import { ActivityIndicator, Pressable } from 'react-native';
 
 export default function PlaceDetails() {
   const { id } = useLocalSearchParams<{ id: string }>();

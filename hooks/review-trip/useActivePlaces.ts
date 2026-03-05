@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Place } from './place.types';
-import { fetchActivePlaces } from './place.api';
+import { getActivePlaces } from '../../features/place/place.api';
+import { Place } from '../../features/place/place.types';
 
 export function useActivePlaces(limit?: number) {
   const [data, setData] = useState<Place[]>([]);
@@ -11,7 +11,7 @@ export function useActivePlaces(limit?: number) {
     let ignore = false;
     setLoading(true);
     setError(null);
-    fetchActivePlaces(limit)
+    getActivePlaces(limit)
       .then(places => {
         if (ignore) return;
         setData(places);

@@ -1,13 +1,14 @@
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { FlatList } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
-
-import { Screen } from '@/components/Screen';
-import { HeaderWithBack } from '@/components/PageHeader';
 import { Button } from '@/components/Button';
 import { VibeCard } from '@/components/cards/variants/VibeCard';
+import { HeaderWithBack } from '@/components/PageHeader';
+import { Screen } from '@/components/Screen';
 import { mockVibes } from '@/mock/vibes.mock';
-import { generateTrip } from '@/services/trip.service';
+import { generateRecommendation } from '@/services/trip.service';
+import { PlaceLocation } from '@/features/place/place.types';
+import { AxiosError } from 'axios';
 
 export default function VibeSelectorScreen() {
   const router = useRouter();
@@ -21,32 +22,73 @@ export default function VibeSelectorScreen() {
     );
   };
 
+  /**
+   * Normalize expo-router params which can be string | string[]
+   * Returns a finite number or throws an error
+   */
+  const normalizeNumberParam = (
+    param: string | string[] | undefined,
+    name: string
+  ): number => {
+    const value = Array.isArray(param) ? param[0] : param;
+    const num = Number(value);
+
+    if (!Number.isFinite(num)) {
+      throw new Error(
+        `Invalid param "${name}": expected a valid number, got "${value}"`
+      );
+    }
+
+    return num;
+  };
+
+  /**
+   * Normalize string param from expo-router
+   */
+  const normalizeStringParam = (
+    param: string | string[] | undefined
+  ): string => {
+    const value = Array.isArray(param) ? param[0] : param;
+    return value || '';
+  };
+
   const handleContinue = async () => {
     try {
       setIsLoading(true);
 
-      const tripId = await generateTrip('usr_001', {
-        area: params.travelingArea as
-          | 'Kathmandu'
-          | 'Pokhara'
-          | 'Bhaktapur'
-          | 'Lalitpur',
+      const result = await generateRecommendation({
+        area: normalizeStringParam(
+          params.travelingArea
+        ) as PlaceLocation['area'],
         vibes: selectedVibes,
-        numberOfPlaces: Number(params.numberOfPlaces),
-        itineraryName: params.itineraryName as string,
-        budgetLevel: Number(params.budgetLevel),
-        durationHours: Number(params.durationHours),
-        numberOfPeople: Number(params.numberOfPeople)
+        numberOfPlaces: normalizeNumberParam(
+          params.numberOfPlaces,
+          'numberOfPlaces'
+        ),
+        itineraryName: normalizeStringParam(params.itineraryName),
+        durationHours: normalizeNumberParam(
+          params.durationHours,
+          'durationHours'
+        ),
+        numberOfPeople: normalizeNumberParam(
+          params.numberOfPeople,
+          'numberOfPeople'
+        )
       });
 
       router.push({
-        pathname: '/review-trip/[id]',
-        params: { id: tripId }
+        pathname: '/review-trip',
+        params: {
+          placeIds: result.recommendedPlaces.map(p => p.placeId).join(','),
+          itineraryName: params.itineraryName
+        }
       });
     } catch (error) {
-      console.error('Failed to generate trip:', error);
-    } finally {
-      setIsLoading(false);
+      const axiosError = error as AxiosError<{ message?: string }>;
+      throw new Error(
+        axiosError.response?.data?.message ||
+          'Failed to generate recommendation'
+      );
     }
   };
 
