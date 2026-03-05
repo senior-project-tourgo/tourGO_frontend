@@ -1,15 +1,16 @@
-import { useState } from 'react';
-import { View, Alert } from 'react-native';
-import { useRouter } from 'expo-router';
-
 import { AppText } from '@/components/AppText';
-import { AppTextInput } from '@/components/AppTextInput';
 import { Button } from '@/components/Button';
-import { Screen } from '@/components/Screen';
-import { HeaderWithBack } from '@/components/PageHeader';
+import DatePickerBar from '@/components/DatePickerBar';
 import { Dropdown } from '@/components/Dropdown';
-import { SliderField } from '@/components/SliderField';
+import { AppTextInput } from '@/components/AppTextInput';
 import { OptionSelector } from '@/components/OptionSelector';
+import { HeaderWithBack } from '@/components/PageHeader';
+import { Screen } from '@/components/Screen';
+import { SliderField } from '@/components/SliderField';
+import { TimePickerBar } from '@/components/TimePickerBar';
+import { useRouter } from 'expo-router';
+import { useState } from 'react';
+import { Alert, View } from 'react-native';
 
 export default function TripGeneratorScreen() {
   const router = useRouter();
@@ -20,8 +21,11 @@ export default function TripGeneratorScreen() {
   const [duration, setDuration] = useState<number>(4);
   const [placesCount, setPlacesCount] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
   const [submitted, setSubmitted] = useState(false);
+
+  const [tripDate, setTripDate] = useState<string | null>(null);
+  const [startTime, setStartTime] = useState<Date | null>(null);
+  const [endTime, setEndTime] = useState<Date | null>(null);
 
   const areaOptions = ['Kathmandu', 'Pokhara', 'Bhaktapur', 'Lalitpur'];
 
@@ -73,23 +77,31 @@ export default function TripGeneratorScreen() {
           error={isItineraryInvalid ? 'Itinerary name is required' : undefined}
         />
 
-        {/* Number of Places */}
-        <AppTextInput
-          label="Number of Places"
-          placeholder="e.g. 4"
-          value={placesCount}
-          onChangeText={setPlacesCount}
-          keyboardType="numeric"
-          required
-          error={isPlacesInvalid ? 'Please enter a valid number' : undefined}
-        />
-
         {/* Traveling Area */}
         <Dropdown
           label="Traveling Area"
           options={areaOptions}
           value={area}
           onChange={setArea}
+        />
+
+        {/* Trip Date */}
+        <View className="gap-2">
+          <DatePickerBar onChange={setTripDate} />
+        </View>
+
+        {/* Start Time */}
+        <TimePickerBar
+          label="Start Time"
+          value={startTime ?? undefined}
+          onChange={setStartTime}
+        />
+
+        {/* End Time */}
+        <TimePickerBar
+          label="End Time"
+          value={endTime ?? undefined}
+          onChange={setEndTime}
         />
 
         {/* Number of People */}
@@ -118,6 +130,17 @@ export default function TripGeneratorScreen() {
           maximumValue={12}
           step={1}
           unit="hours"
+        />
+
+        {/* Number of Places */}
+        <AppTextInput
+          label="Number of Places"
+          placeholder="e.g. 4"
+          value={placesCount}
+          onChangeText={setPlacesCount}
+          keyboardType="numeric"
+          required
+          error={isPlacesInvalid ? 'Please enter a valid number' : undefined}
         />
 
         {/* Continue Button */}

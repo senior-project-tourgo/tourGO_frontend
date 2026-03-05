@@ -8,11 +8,11 @@ import {
   View
 } from 'react-native';
 
-import { useAuth } from '../../context/AuthContext';
-import { BaseCard } from '@/components/cards/BaseCard';
-import { Button } from '@/components/Button';
 import { AppText } from '@/components/AppText';
+import { Button } from '@/components/Button';
+import { BaseCard } from '@/components/cards/BaseCard';
 import { AppTextInput } from '@/components/AppTextInput';
+import { useAuth } from '../../context/AuthContext';
 
 export default function RegisterScreen() {
   const { register } = useAuth();
