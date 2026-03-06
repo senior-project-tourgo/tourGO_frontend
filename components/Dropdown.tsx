@@ -64,7 +64,7 @@ export function Dropdown({
           className="flex-1 items-center justify-center bg-black/30"
           onPress={() => setOpen(false)}
         >
-          <View className="w-72 rounded-2xl bg-white p-2">
+          <View className="w-72 rounded-2xl bg-colors-surface-background p-2">
             {sortedOptions.map(option => (
               <Pressable
                 key={option}

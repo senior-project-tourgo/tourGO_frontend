@@ -100,8 +100,12 @@ export default function TripGeneratorScreen() {
               label="Start Time"
               value={startTime ?? undefined}
               onChange={date => {
-                if (endTime && date > endTime) setEndTime(date);
                 setStartTime(date);
+
+                // keep endTime valid if startTime moves forward
+                if (endTime && date > endTime) {
+                  setEndTime(date);
+                }
               }}
             />
           </View>
@@ -110,7 +114,8 @@ export default function TripGeneratorScreen() {
             <TimePickerBar
               label="End Time"
               value={endTime ?? undefined}
-              onChange={date => setEndTime(date)}
+              onChange={setEndTime}
+              minimumDate={startTime ?? undefined}
             />
           </View>
         </View>

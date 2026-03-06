@@ -12,6 +12,8 @@ type Props = {
   required?: boolean;
   error?: string;
   className?: string;
+  minimumDate?: Date;
+  maximumDate?: Date;
 };
 
 export function TimePickerBar({
@@ -20,7 +22,9 @@ export function TimePickerBar({
   onChange,
   required,
   error,
-  className
+  className,
+  minimumDate,
+  maximumDate
 }: Props) {
   const [open, setOpen] = useState(false);
 
@@ -61,13 +65,11 @@ export function TimePickerBar({
 
       <Modal visible={open} transparent animationType="fade">
         <View className="flex-1 justify-center bg-black/30 p-6">
-          {/* background close */}
           <Pressable
             className="absolute inset-0"
             onPress={() => setOpen(false)}
           />
 
-          {/* picker container */}
           <View className="rounded-3xl bg-white p-4">
             <DateTimePicker
               value={value ?? new Date()}
@@ -75,6 +77,8 @@ export function TimePickerBar({
               is24Hour={false}
               display={Platform.OS === 'ios' ? 'spinner' : 'clock'}
               onChange={handleTimeChange}
+              minimumDate={minimumDate}
+              maximumDate={maximumDate}
             />
 
             {Platform.OS === 'ios' && (
