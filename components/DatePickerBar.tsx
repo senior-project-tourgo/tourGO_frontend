@@ -15,6 +15,7 @@ type Props = {
   onChange?: (date: string) => void;
   required?: boolean;
   error?: string;
+  className?: string;
 };
 
 export default function DatePickerBar({
@@ -22,7 +23,8 @@ export default function DatePickerBar({
   value,
   onChange,
   required,
-  error
+  error,
+  className
 }: Props) {
   const today = new Date().toISOString().split('T')[0];
 
@@ -38,7 +40,7 @@ export default function DatePickerBar({
   const hasValue = !!selectedDate;
 
   return (
-    <View className="w-full">
+    <View className={className}>
       <FormField
         label={label ?? 'Trip Date'}
         required={required}
@@ -61,13 +63,16 @@ export default function DatePickerBar({
         </Pressable>
       </FormField>
 
-      {/* CALENDAR MODAL */}
-      <Modal visible={open} animationType="slide" transparent>
-        <Pressable
-          className="flex-1 justify-end bg-black/30"
-          onPress={() => setOpen(false)}
-        >
-          <Pressable className="rounded-t-3xl bg-white p-4" onPress={() => {}}>
+      <Modal visible={open} transparent animationType="fade">
+        <View className="flex-1 justify-end bg-black/30">
+          {/* tap outside to close */}
+          <Pressable
+            className="absolute inset-0"
+            onPress={() => setOpen(false)}
+          />
+
+          {/* bottom sheet */}
+          <View className="rounded-t-3xl bg-white p-4">
             <Calendar
               current={selectedDate}
               onDayPress={handleSelect}
@@ -82,8 +87,8 @@ export default function DatePickerBar({
                 arrowColor: '#000'
               }}
             />
-          </Pressable>
-        </Pressable>
+          </View>
+        </View>
       </Modal>
     </View>
   );

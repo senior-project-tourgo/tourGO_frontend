@@ -1,16 +1,17 @@
-import { useState } from 'react';
-import { View, Pressable, Platform } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-
+import { useState } from 'react';
+import { Modal, Platform, Pressable, View } from 'react-native';
 import { AppText } from '@/components/AppText';
 import { FormField } from './FormField';
+import { Button } from './Button';
 
 type Props = {
   label?: string;
   value?: Date;
-  onChange: (time: Date) => void;
+  onChange: (date: Date) => void;
   required?: boolean;
   error?: string;
+  className?: string;
 };
 
 export function TimePickerBar({
@@ -18,16 +19,10 @@ export function TimePickerBar({
   value,
   onChange,
   required,
-  error
+  error,
+  className
 }: Props) {
-  const [show, setShow] = useState(false);
-
-  const selected = value ?? new Date();
-
-  const handleChange = (_: any, date?: Date) => {
-    setShow(false);
-    if (date) onChange(date);
-  };
+  const [open, setOpen] = useState(false);
 
   const formatTime = (date: Date) =>
     date.toLocaleTimeString([], {
@@ -37,8 +32,17 @@ export function TimePickerBar({
 
   const hasValue = !!value;
 
+  const handleTimeChange = (event: any, date?: Date) => {
+    if (Platform.OS === 'android') {
+      setOpen(false);
+    }
+
+    if (!date) return;
+    onChange(date);
+  };
+
   return (
-    <View className="w-full">
+    <View className={className}>
       <FormField
         label={label}
         required={required}
@@ -46,24 +50,41 @@ export function TimePickerBar({
         hasValue={hasValue}
       >
         <Pressable
-          onPress={() => setShow(true)}
+          onPress={() => setOpen(true)}
           className="flex-row items-center justify-between"
         >
           <AppText className={value ? '' : 'text-gray-400'}>
-            {value ? formatTime(selected) : 'Select time'}
+            {value ? formatTime(value) : 'Select time'}
           </AppText>
         </Pressable>
       </FormField>
 
-      {show && (
-        <DateTimePicker
-          value={selected}
-          mode="time"
-          is24Hour={false}
-          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-          onChange={handleChange}
-        />
-      )}
+      <Modal visible={open} transparent animationType="fade">
+        <View className="flex-1 justify-end bg-black/30">
+          {/* background close */}
+          <Pressable
+            className="absolute inset-0"
+            onPress={() => setOpen(false)}
+          />
+
+          {/* picker container */}
+          <View className="rounded-t-3xl bg-white p-4">
+            <DateTimePicker
+              value={value ?? new Date()}
+              mode="time"
+              is24Hour={false}
+              display={Platform.OS === 'ios' ? 'spinner' : 'clock'}
+              onChange={handleTimeChange}
+            />
+
+            {Platform.OS === 'ios' && (
+              <View className="pt-3">
+                <Button title="Done" onPress={() => setOpen(false)} />
+              </View>
+            )}
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }

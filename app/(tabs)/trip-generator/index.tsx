@@ -45,7 +45,10 @@ export default function TripGeneratorScreen() {
       travelingArea: area,
       numberOfPeople: people,
       durationHours: duration,
-      numberOfPlaces: Number(placesCount)
+      numberOfPlaces: Number(placesCount),
+      tripDate,
+      startTime: startTime ? startTime.toISOString() : null,
+      endTime: endTime ? endTime.toISOString() : null
     };
 
     try {
@@ -90,19 +93,27 @@ export default function TripGeneratorScreen() {
           <DatePickerBar onChange={setTripDate} />
         </View>
 
-        {/* Start Time */}
-        <TimePickerBar
-          label="Start Time"
-          value={startTime ?? undefined}
-          onChange={setStartTime}
-        />
+        {/* Time Row */}
+        <View className="flex-row gap-2">
+          <View className="flex-1">
+            <TimePickerBar
+              label="Start Time"
+              value={startTime ?? undefined}
+              onChange={date => {
+                if (endTime && date > endTime) setEndTime(date);
+                setStartTime(date);
+              }}
+            />
+          </View>
 
-        {/* End Time */}
-        <TimePickerBar
-          label="End Time"
-          value={endTime ?? undefined}
-          onChange={setEndTime}
-        />
+          <View className="flex-1">
+            <TimePickerBar
+              label="End Time"
+              value={endTime ?? undefined}
+              onChange={date => setEndTime(date)}
+            />
+          </View>
+        </View>
 
         {/* Number of People */}
         <OptionSelector
