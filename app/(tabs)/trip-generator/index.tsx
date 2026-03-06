@@ -10,6 +10,8 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert, View, KeyboardAvoidingView, Platform } from 'react-native';
 import { Stepper } from '@/components/Stepper';
+import { PaceSelector } from '@/components/PaceSelector';
+import { PACE_OPTIONS } from '@/constants/tripOptions';
 
 export default function TripGeneratorScreen() {
   const router = useRouter();
@@ -26,6 +28,7 @@ export default function TripGeneratorScreen() {
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [endTime, setEndTime] = useState<Date | null>(null);
 
+  const [pace, setPace] = useState('balanced');
   const areaOptions = ['Kathmandu', 'Pokhara', 'Bhaktapur', 'Lalitpur'];
 
   const isItineraryInvalid = submitted && !itineraryName.trim();
@@ -123,6 +126,14 @@ export default function TripGeneratorScreen() {
               />
             </View>
           </View>
+
+          {/* Number of Places */}
+          <PaceSelector
+            label="Trip Pace"
+            value={pace}
+            options={PACE_OPTIONS}
+            onChange={setPace}
+          />
 
           {/* Number of People */}
           <Stepper
