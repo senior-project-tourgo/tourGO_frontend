@@ -4,6 +4,8 @@ import { Modal, Platform, Pressable, View } from 'react-native';
 import { AppText } from '@/components/AppText';
 import { FormField } from './FormField';
 import { Button } from './Button';
+import { Ionicons } from '@expo/vector-icons';
+import colors from '@/theme/colors';
 
 type Props = {
   label?: string;
@@ -60,6 +62,12 @@ export function TimePickerBar({
           <AppText className={value ? '' : 'text-gray-400'}>
             {value ? formatTime(value) : 'Select time'}
           </AppText>
+
+          <Ionicons
+            name={open ? 'chevron-up' : 'chevron-down'}
+            size={18}
+            color={colors.text.DEFAULT}
+          />
         </Pressable>
       </FormField>
 

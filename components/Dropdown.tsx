@@ -50,7 +50,11 @@ export function Dropdown({
             {value || 'Select option'}
           </AppText>
 
-          <Ionicons name="chevron-down" size={18} color={colors.text.DEFAULT} />
+          <Ionicons
+            name={open ? 'chevron-up' : 'chevron-down'}
+            size={18}
+            color={colors.text.DEFAULT}
+          />
         </Pressable>
       </FormField>
 
