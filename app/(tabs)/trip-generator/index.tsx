@@ -10,7 +10,7 @@ import { SliderField } from '@/components/SliderField';
 import { TimePickerBar } from '@/components/TimePickerBar';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Alert, View } from 'react-native';
+import { Alert, View, KeyboardAvoidingView, Platform } from 'react-native';
 
 export default function TripGeneratorScreen() {
   const router = useRouter();
@@ -66,106 +66,114 @@ export default function TripGeneratorScreen() {
   };
 
   return (
-    <Screen>
-      <HeaderWithBack title="Create New Itinerary" />
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <Screen>
+        <HeaderWithBack title="Create New Itinerary" />
 
-      <View className="gap-6">
-        {/* Itinerary Name */}
-        <AppTextInput
-          label="Itinerary Name"
-          placeholder="e.g. Weekend in Pokhara"
-          value={itineraryName}
-          onChangeText={setItineraryName}
-          required
-          error={isItineraryInvalid ? 'Itinerary name is required' : undefined}
-        />
-
-        {/* Traveling Area */}
-        <Dropdown
-          label="Traveling Area"
-          options={areaOptions}
-          value={area}
-          onChange={setArea}
-        />
-
-        {/* Trip Date */}
-        <View className="gap-2">
-          <DatePickerBar onChange={setTripDate} />
-        </View>
-
-        {/* Time Row */}
-        <View className="flex-row gap-2">
-          <View className="flex-1">
-            <TimePickerBar
-              label="Start Time"
-              value={startTime ?? undefined}
-              onChange={date => {
-                setStartTime(date);
-
-                // keep endTime valid if startTime moves forward
-                if (endTime && date > endTime) {
-                  setEndTime(date);
-                }
-              }}
-            />
-          </View>
-
-          <View className="flex-1">
-            <TimePickerBar
-              label="End Time"
-              value={endTime ?? undefined}
-              onChange={setEndTime}
-              minimumDate={startTime ?? undefined}
-            />
-          </View>
-        </View>
-
-        {/* Number of People */}
-        <OptionSelector
-          label="Number of People"
-          options={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, '>10']}
-          value={people > 10 ? '>10' : people}
-          onChange={val => {
-            if (val === '>10') {
-              setPeople(11);
-            } else {
-              setPeople(Number(val));
+        <View className="gap-6">
+          {/* Itinerary Name */}
+          <AppTextInput
+            label="Itinerary Name"
+            placeholder="e.g. Weekend in Pokhara"
+            value={itineraryName}
+            onChangeText={setItineraryName}
+            required
+            error={
+              isItineraryInvalid ? 'Itinerary name is required' : undefined
             }
-          }}
-          renderOption={(option, selected) => (
-            <AppText className={selected ? 'text-white' : ''}>{option}</AppText>
-          )}
-        />
+          />
 
-        {/* Duration */}
-        <SliderField
-          label="Duration"
-          value={duration}
-          onChange={setDuration}
-          minimumValue={1}
-          maximumValue={12}
-          step={1}
-          unit="hours"
-        />
+          {/* Traveling Area */}
+          <Dropdown
+            label="Traveling Area"
+            options={areaOptions}
+            value={area}
+            onChange={setArea}
+          />
 
-        {/* Number of Places */}
-        <AppTextInput
-          label="Number of Places"
-          placeholder="e.g. 4"
-          value={placesCount}
-          onChangeText={setPlacesCount}
-          keyboardType="numeric"
-          required
-          error={isPlacesInvalid ? 'Please enter a valid number' : undefined}
-        />
+          {/* Trip Date */}
+          <View className="gap-2">
+            <DatePickerBar onChange={setTripDate} />
+          </View>
 
-        {/* Continue Button */}
-        <Button
-          title="Continue to Select Vibes"
-          onPress={handleContinue}
-          isLoading={isLoading}
-        />
-      </View>
-    </Screen>
+          {/* Time Row */}
+          <View className="flex-row gap-2">
+            <View className="flex-1">
+              <TimePickerBar
+                label="Start Time"
+                value={startTime ?? undefined}
+                onChange={date => {
+                  setStartTime(date);
+
+                  // keep endTime valid if startTime moves forward
+                  if (endTime && date > endTime) {
+                    setEndTime(date);
+                  }
+                }}
+              />
+            </View>
+
+            <View className="flex-1">
+              <TimePickerBar
+                label="End Time"
+                value={endTime ?? undefined}
+                onChange={setEndTime}
+                minimumDate={startTime ?? undefined}
+              />
+            </View>
+          </View>
+
+          {/* Number of People */}
+          <OptionSelector
+            label="Number of People"
+            options={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, '>10']}
+            value={people > 10 ? '>10' : people}
+            onChange={val => {
+              if (val === '>10') {
+                setPeople(11);
+              } else {
+                setPeople(Number(val));
+              }
+            }}
+            renderOption={(option, selected) => (
+              <AppText className={selected ? 'text-white' : ''}>
+                {option}
+              </AppText>
+            )}
+          />
+
+          {/* Duration */}
+          <SliderField
+            label="Duration"
+            value={duration}
+            onChange={setDuration}
+            minimumValue={1}
+            maximumValue={12}
+            step={1}
+            unit="hours"
+          />
+
+          {/* Number of Places */}
+          <AppTextInput
+            label="Number of Places"
+            placeholder="e.g. 4"
+            value={placesCount}
+            onChangeText={setPlacesCount}
+            keyboardType="numeric"
+            required
+            error={isPlacesInvalid ? 'Please enter a valid number' : undefined}
+          />
+
+          {/* Continue Button */}
+          <Button
+            title="Continue to Select Vibes"
+            onPress={handleContinue}
+            isLoading={isLoading}
+          />
+        </View>
+      </Screen>
+    </KeyboardAvoidingView>
   );
 }
