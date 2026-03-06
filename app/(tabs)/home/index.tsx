@@ -13,7 +13,8 @@ export default function HomeScreen() {
   const { user } = useAuth();
 
   const username = user?.username ?? '';
-  const formattedUsername = username[0].toUpperCase() + username.slice(1);
+  const formattedUsername =
+    username.charAt(0).toUpperCase() + username.slice(1);
 
   if (error) {
     return (
