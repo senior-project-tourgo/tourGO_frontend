@@ -1,9 +1,7 @@
-import { AppText } from '@/components/AppText';
 import { Button } from '@/components/Button';
 import DatePickerBar from '@/components/DatePickerBar';
 import { Dropdown } from '@/components/Dropdown';
 import { AppTextInput } from '@/components/AppTextInput';
-import { OptionSelector } from '@/components/OptionSelector';
 import { HeaderWithBack } from '@/components/PageHeader';
 import { Screen } from '@/components/Screen';
 import { SliderField } from '@/components/SliderField';
@@ -11,6 +9,7 @@ import { TimePickerBar } from '@/components/TimePickerBar';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert, View, KeyboardAvoidingView, Platform } from 'react-native';
+import { Stepper } from '@/components/Stepper';
 
 export default function TripGeneratorScreen() {
   const router = useRouter();
@@ -126,22 +125,12 @@ export default function TripGeneratorScreen() {
           </View>
 
           {/* Number of People */}
-          <OptionSelector
+          <Stepper
             label="Number of People"
-            options={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, '>10']}
-            value={people > 10 ? '>10' : people}
-            onChange={val => {
-              if (val === '>10') {
-                setPeople(11);
-              } else {
-                setPeople(Number(val));
-              }
-            }}
-            renderOption={(option, selected) => (
-              <AppText className={selected ? 'text-white' : ''}>
-                {option}
-              </AppText>
-            )}
+            value={people}
+            onChange={setPeople}
+            min={1}
+            max={10}
           />
 
           {/* Duration */}
