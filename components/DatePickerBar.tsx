@@ -3,7 +3,6 @@ import { View, Pressable, Modal } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { format } from 'date-fns';
 import { Ionicons } from '@expo/vector-icons';
-
 import { AppText } from './AppText';
 import { FormField } from './FormField';
 
@@ -64,7 +63,7 @@ export default function DatePickerBar({
       </FormField>
 
       <Modal visible={open} transparent animationType="fade">
-        <View className="flex-1 justify-end bg-black/30">
+        <View className="flex-1 justify-center bg-black/30 p-6">
           {/* tap outside to close */}
           <Pressable
             className="absolute inset-0"
@@ -72,19 +71,19 @@ export default function DatePickerBar({
           />
 
           {/* bottom sheet */}
-          <View className="rounded-t-3xl bg-white p-4">
+          <View className="rounded-3xl bg-colors-surface-background p-4">
             <Calendar
               current={selectedDate}
               onDayPress={handleSelect}
               markedDates={{
                 [selectedDate]: {
                   selected: true,
-                  selectedColor: '#000'
+                  selectedColor: colors.brand.primary
                 }
               }}
               theme={{
-                todayTextColor: '#000',
-                arrowColor: '#000'
+                todayTextColor: colors.text.DEFAULT,
+                arrowColor: colors.text.DEFAULT
               }}
             />
           </View>

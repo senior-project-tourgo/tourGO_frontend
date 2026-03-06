@@ -60,7 +60,7 @@ export function TimePickerBar({
       </FormField>
 
       <Modal visible={open} transparent animationType="fade">
-        <View className="flex-1 justify-end bg-black/30">
+        <View className="flex-1 justify-center bg-black/30 p-6">
           {/* background close */}
           <Pressable
             className="absolute inset-0"
@@ -68,7 +68,7 @@ export function TimePickerBar({
           />
 
           {/* picker container */}
-          <View className="rounded-t-3xl bg-white p-4">
+          <View className="rounded-3xl bg-white p-4">
             <DateTimePicker
               value={value ?? new Date()}
               mode="time"

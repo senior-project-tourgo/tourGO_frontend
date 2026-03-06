@@ -1,7 +1,7 @@
 // components/ui/Dropdown.tsx
 
 import { useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { Pressable, View, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { AppText } from './AppText';
@@ -43,37 +43,43 @@ export function Dropdown({
         hasValue={hasValue}
       >
         <Pressable
-          onPress={() => setOpen(prev => !prev)}
+          onPress={() => setOpen(true)}
           className="flex-row items-center justify-between"
         >
           <AppText className={value ? '' : 'text-gray-400'}>
             {value || 'Select option'}
           </AppText>
 
-          <Ionicons
-            name={open ? 'chevron-up' : 'chevron-down'}
-            size={18}
-            color={colors.text.DEFAULT}
-          />
+          <Ionicons name="chevron-down" size={18} color={colors.text.DEFAULT} />
         </Pressable>
       </FormField>
 
-      {open && (
-        <View className="mt-2 rounded-lg border border-gray-200 bg-white">
-          {sortedOptions.map(option => (
-            <Pressable
-              key={option}
-              onPress={() => {
-                onChange(option);
-                setOpen(false);
-              }}
-              className="px-4 py-3"
-            >
-              <AppText>{option}</AppText>
-            </Pressable>
-          ))}
-        </View>
-      )}
+      <Modal
+        visible={open}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setOpen(false)}
+      >
+        <Pressable
+          className="flex-1 items-center justify-center bg-black/30"
+          onPress={() => setOpen(false)}
+        >
+          <View className="w-72 rounded-2xl bg-white p-2">
+            {sortedOptions.map(option => (
+              <Pressable
+                key={option}
+                onPress={() => {
+                  onChange(option);
+                  setOpen(false);
+                }}
+                className="px-4 py-3"
+              >
+                <AppText>{option}</AppText>
+              </Pressable>
+            ))}
+          </View>
+        </Pressable>
+      </Modal>
     </View>
   );
 }
