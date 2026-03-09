@@ -35,7 +35,7 @@ export function PaceSelector({
             <Pressable
               key={option.value}
               onPress={() => onChange(option.value)}
-              className={`flex-row items-center gap-3 rounded-xl border px-4 py-3 ${
+              className={`flex-row items-center gap-3 rounded-full border px-4 py-3 ${
                 selected
                   ? 'border-colors-brand-primary bg-colors-brand-primary/10'
                   : 'border-gray-300'
@@ -45,7 +45,7 @@ export function PaceSelector({
                 <Ionicons
                   name={option.icon}
                   size={20}
-                  color={selected ? colors.brand.primary : colors.text.inverse}
+                  color={selected ? colors.brand.primary : colors.text.DEFAULT}
                 />
               )}
 
