@@ -88,6 +88,10 @@ export default function TripGeneratorScreen() {
             options={areaOptions}
             value={area}
             onChange={setArea}
+            required
+            error={
+              isItineraryInvalid ? 'Traveling area is required' : undefined
+            }
           />
 
           {/* Trip Date */}
