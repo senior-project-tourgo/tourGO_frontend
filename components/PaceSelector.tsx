@@ -24,7 +24,7 @@ export function PaceSelector({
   onChange
 }: PaceSelectorProps) {
   return (
-    <View className="gap-3">
+    <View className="gap-2">
       {label && <AppText className="text-base font-medium">{label}</AppText>}
 
       <View className="gap-2">
