@@ -22,6 +22,7 @@ export function OptionSelector<T extends string>({
   error
 }: SelectorProps<T>) {
   const hasError = !!error;
+  const hasSelection = value !== undefined && value !== null;
 
   return (
     <View className="gap-2">
@@ -36,17 +37,19 @@ export function OptionSelector<T extends string>({
         {options.map(option => {
           const selected = option.value === value;
 
+          const containerStyle = selected
+            ? 'border-colors-brand-primary bg-colors-brand-primary/10'
+            : hasError
+              ? 'border-red-400 bg-red-50'
+              : !hasSelection
+                ? 'border-gray-300 bg-gray-100' // none selected
+                : 'border-gray-300 bg-white'; // others when one is selected
+
           return (
             <Pressable
               key={option.value}
               onPress={() => onChange(option.value)}
-              className={`flex-row items-center gap-3 rounded-full border px-4 py-3 ${
-                selected
-                  ? 'border-colors-brand-primary bg-colors-brand-primary/10'
-                  : hasError
-                    ? 'border-red-400 bg-red-50'
-                    : 'border-gray-300 bg-gray-100'
-              }`}
+              className={`flex-row items-center gap-3 rounded-full border px-4 py-3 ${containerStyle}`}
             >
               {option.icon && (
                 <Ionicons
