@@ -3,7 +3,7 @@ import { Button } from '@/components/Button';
 import DatePickerBar from '@/components/DatePickerBar';
 import { HeaderWithBack } from '@/components/PageHeader';
 import { Screen } from '@/components/Screen';
-import { PaceSelector } from '@/components/SelectorOptions';
+import { OptionSelector } from '@/components/SelectorOptions';
 import { Stepper } from '@/components/Stepper';
 import { TimePickerBar } from '@/components/TimePickerBar';
 import { useRouter } from 'expo-router';
@@ -125,7 +125,7 @@ export default function TripGeneratorScreen() {
           />
 
           {/* Traveling Area */}
-          <PaceSelector
+          <OptionSelector
             label="Where are you going?"
             value={area ?? undefined}
             options={AREA_OPTIONS}
@@ -150,7 +150,7 @@ export default function TripGeneratorScreen() {
           />
 
           {/* Time Window Preset */}
-          <PaceSelector
+          <OptionSelector
             label="What time of day?"
             value={timeWindow ?? undefined}
             options={TIME_WINDOW_OPTIONS}
@@ -187,7 +187,7 @@ export default function TripGeneratorScreen() {
           </View>
 
           {/* Trip Pace */}
-          <PaceSelector
+          <OptionSelector
             label="How packed should your trip be?"
             value={pace}
             options={PACE_OPTIONS}

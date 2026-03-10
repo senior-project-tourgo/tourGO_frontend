@@ -1,11 +1,9 @@
 import { SelectorOption } from './selectorOptions';
 import { Area } from '@/features/place/place.types';
 
-export type AreaOption = SelectorOption & {
-  value: Area;
-};
+export type AreaOption = SelectorOption<Area>;
 
-export const AREA_OPTIONS: AreaOption[] = [
+export const AREA_OPTIONS = [
   {
     value: 'Kathmandu',
     label: 'Kathmandu',
@@ -30,4 +28,4 @@ export const AREA_OPTIONS: AreaOption[] = [
     description: 'Known for art and craftsmanship',
     icon: 'color-palette-outline'
   }
-];
+] as const satisfies readonly SelectorOption<Area>[];

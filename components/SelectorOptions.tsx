@@ -7,13 +7,13 @@ import { Pressable, View } from 'react-native';
 type SelectorProps<T extends string> = {
   label?: string;
   value?: T;
-  options: SelectorOption<T>[];
+  options: readonly SelectorOption<T>[];
   onChange: (value: T) => void;
   required?: boolean;
   error?: string;
 };
 
-export function PaceSelector<T extends string>({
+export function OptionSelector<T extends string>({
   label,
   value,
   options,
@@ -25,10 +25,12 @@ export function PaceSelector<T extends string>({
 
   return (
     <View className="gap-2">
-      <AppText className="text-base font-medium">
-        {label}
-        {required && <AppText className="text-red-500"> *</AppText>}
-      </AppText>
+      {label && (
+        <AppText className="text-base font-medium">
+          {label}
+          {required && <AppText className="text-red-500"> *</AppText>}
+        </AppText>
+      )}
 
       <View className="gap-2">
         {options.map(option => {
@@ -37,9 +39,7 @@ export function PaceSelector<T extends string>({
           return (
             <Pressable
               key={option.value}
-              onPress={() => {
-                onChange(option.value);
-              }}
+              onPress={() => onChange(option.value)}
               className={`flex-row items-center gap-3 rounded-full border px-4 py-3 ${
                 selected
                   ? 'border-colors-brand-primary bg-colors-brand-primary/10'
@@ -82,6 +82,7 @@ export function PaceSelector<T extends string>({
             </Pressable>
           );
         })}
+
         {hasError && (
           <AppText className="text-sm text-red-500">
             {error || 'Please select an option'}

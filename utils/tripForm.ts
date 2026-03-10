@@ -1,6 +1,14 @@
 import { Area } from '@/features/place/place.types';
 import { PaceValue } from '@/constants/paceOptions';
 
+function formatDate(date: Date) {
+  return date.toISOString().split('T')[0]; // YYYY-MM-DD
+}
+
+function formatTime(date: Date) {
+  return date.toTimeString().slice(0, 5); // HH:mm
+}
+
 export function buildTripPayload({
   itineraryName,
   area,
@@ -25,9 +33,9 @@ export function buildTripPayload({
     pace
   };
 
-  if (tripDate) payload.tripDate = tripDate.toISOString();
-  if (startTime) payload.startTime = startTime.toISOString();
-  if (endTime) payload.endTime = endTime.toISOString();
+  if (tripDate) payload.tripDate = formatDate(tripDate);
+  if (startTime) payload.startTime = formatTime(startTime);
+  if (endTime) payload.endTime = formatTime(endTime);
 
   return payload;
 }

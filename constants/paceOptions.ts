@@ -1,6 +1,6 @@
 import { SelectorOption } from './selectorOptions';
 
-export const PACE_OPTIONS: SelectorOption[] = [
+export const PACE_OPTIONS = [
   {
     value: 'relaxed',
     label: 'Relaxed',
@@ -19,6 +19,6 @@ export const PACE_OPTIONS: SelectorOption[] = [
     description: 'Fit in as many highlights as possible',
     icon: 'flash-outline'
   }
-];
+] as const satisfies readonly SelectorOption[];
 
 export type PaceValue = (typeof PACE_OPTIONS)[number]['value'];
