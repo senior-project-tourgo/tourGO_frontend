@@ -4,19 +4,19 @@ export const PACE_OPTIONS: PaceOption[] = [
   {
     value: 'relaxed',
     label: 'Relaxed',
-    description: '1–2 places per day',
+    description: 'Take it slow and enjoy each place',
     icon: 'leaf-outline'
   },
   {
     value: 'balanced',
     label: 'Balanced',
-    description: '3–4 places per day',
+    description: 'A comfortable mix of exploring and relaxing',
     icon: 'walk-outline'
   },
   {
     value: 'packed',
     label: 'Packed',
-    description: '5+ places per day',
+    description: 'Fit in as many highlights as possible',
     icon: 'flash-outline'
   }
 ];
