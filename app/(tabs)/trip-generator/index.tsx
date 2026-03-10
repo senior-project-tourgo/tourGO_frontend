@@ -10,7 +10,7 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert, View, KeyboardAvoidingView, Platform } from 'react-native';
 import { Stepper } from '@/components/Stepper';
-import { PaceSelector } from '@/components/PaceSelector';
+import { PaceOption, PaceSelector } from '@/components/PaceSelector';
 import { PACE_OPTIONS } from '@/constants/tripOptions';
 
 export default function TripGeneratorScreen() {
@@ -20,7 +20,6 @@ export default function TripGeneratorScreen() {
   const [area, setArea] = useState('Kathmandu');
   const [people, setPeople] = useState<number>(1);
   const [duration, setDuration] = useState<number>(4);
-  const [placesCount, setPlacesCount] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -28,17 +27,15 @@ export default function TripGeneratorScreen() {
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [endTime, setEndTime] = useState<Date | null>(null);
 
-  const [pace, setPace] = useState('balanced');
+  const [pace, setPace] = useState<PaceOption['value']>('balanced');
   const areaOptions = ['Kathmandu', 'Pokhara', 'Bhaktapur', 'Lalitpur'];
 
   const isItineraryInvalid = submitted && !itineraryName.trim();
-  const isPlacesInvalid =
-    submitted && (!placesCount || isNaN(Number(placesCount)));
 
   const handleContinue = async () => {
     setSubmitted(true);
 
-    if (!itineraryName.trim() || !placesCount || isNaN(Number(placesCount))) {
+    if (!itineraryName.trim()) {
       return;
     }
 
@@ -47,7 +44,7 @@ export default function TripGeneratorScreen() {
       travelingArea: area,
       numberOfPeople: people,
       durationHours: duration,
-      numberOfPlaces: Number(placesCount),
+      pace: pace,
       tripDate,
       startTime: startTime ? startTime.toISOString() : null,
       endTime: endTime ? endTime.toISOString() : null
@@ -153,17 +150,6 @@ export default function TripGeneratorScreen() {
             maximumValue={12}
             step={1}
             unit="hours"
-          />
-
-          {/* Number of Places */}
-          <AppTextInput
-            label="Number of Places"
-            placeholder="e.g. 4"
-            value={placesCount}
-            onChangeText={setPlacesCount}
-            keyboardType="numeric"
-            required
-            error={isPlacesInvalid ? 'Please enter a valid number' : undefined}
           />
 
           {/* Continue Button */}

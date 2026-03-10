@@ -61,10 +61,7 @@ export default function VibeSelectorScreen() {
           params.travelingArea
         ) as PlaceLocation['area'],
         vibes: selectedVibes,
-        numberOfPlaces: normalizeNumberParam(
-          params.numberOfPlaces,
-          'numberOfPlaces'
-        ),
+        pace: normalizeStringParam(params.pace),
         itineraryName: normalizeStringParam(params.itineraryName),
         durationHours: normalizeNumberParam(
           params.durationHours,

@@ -1,12 +1,13 @@
 // services/trip.service.ts
 
+import { PaceOption } from '@/components/PaceSelector';
 import api from '@/config/api';
 import { Place } from '@/features/place/place.types';
 
 export type GenerateTripInput = {
   area: 'Kathmandu' | 'Pokhara' | 'Bhaktapur' | 'Lalitpur';
   vibes: string[];
-  numberOfPlaces: number;
+  pace: PaceOption['value'];
   itineraryName?: string;
   budgetLevel?: number;
   durationHours?: number;
