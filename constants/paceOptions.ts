@@ -1,13 +1,6 @@
-import { Ionicons } from '@expo/vector-icons';
+import { SelectorOption } from './selectorOptions';
 
-export type PaceOption = {
-  value: string;
-  label: string;
-  description?: string;
-  icon?: keyof typeof Ionicons.glyphMap;
-};
-
-export const PACE_OPTIONS: PaceOption[] = [
+export const PACE_OPTIONS: SelectorOption[] = [
   {
     value: 'relaxed',
     label: 'Relaxed',
@@ -27,3 +20,5 @@ export const PACE_OPTIONS: PaceOption[] = [
     icon: 'flash-outline'
   }
 ];
+
+export type PaceValue = (typeof PACE_OPTIONS)[number]['value'];

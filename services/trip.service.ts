@@ -1,13 +1,13 @@
 // services/trip.service.ts
 
-import { PaceOption } from '@/constants/tripOptions';
 import api from '@/config/api';
+import { SelectorOption } from '@/constants/selectorOptions';
 import { Place } from '@/features/place/place.types';
 
 export type GenerateTripInput = {
   area: 'Kathmandu' | 'Pokhara' | 'Bhaktapur' | 'Lalitpur';
   vibes: string[];
-  pace: PaceOption['value'];
+  pace: SelectorOption['value'];
   tripDate: string;
   startTime: string;
   endTime: string;

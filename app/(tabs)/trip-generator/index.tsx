@@ -1,23 +1,24 @@
+import { AppTextInput } from '@/components/AppTextInput';
 import { Button } from '@/components/Button';
 import DatePickerBar from '@/components/DatePickerBar';
-import { Dropdown } from '@/components/Dropdown';
-import { AppTextInput } from '@/components/AppTextInput';
 import { HeaderWithBack } from '@/components/PageHeader';
 import { Screen } from '@/components/Screen';
-// import { SliderField } from '@/components/SliderField';
+import { PaceSelector } from '@/components/SelectorOptions';
+import { Stepper } from '@/components/Stepper';
 import { TimePickerBar } from '@/components/TimePickerBar';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Alert, View, KeyboardAvoidingView, Platform } from 'react-native';
-import { Stepper } from '@/components/Stepper';
-import { PaceOption, PaceSelector } from '@/components/PaceSelector';
-import { PACE_OPTIONS } from '@/constants/tripOptions';
+import { Alert, KeyboardAvoidingView, Platform, View } from 'react-native';
+
+import { PACE_OPTIONS, PaceValue } from '@/constants/paceOptions';
+import { AREA_OPTIONS } from '@/constants/areaOptions';
+import { Area } from '@/features/place/place.types';
 
 export default function TripGeneratorScreen() {
   const router = useRouter();
 
   const [itineraryName, setItineraryName] = useState('');
-  const [area, setArea] = useState('Kathmandu');
+  const [area, setArea] = useState<Area | null>(null);
   const [people, setPeople] = useState<number>(1);
   const [isLoading, setIsLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -26,15 +27,15 @@ export default function TripGeneratorScreen() {
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [endTime, setEndTime] = useState<Date | null>(null);
 
-  const [pace, setPace] = useState<PaceOption['value']>('balanced');
-  const areaOptions = ['Kathmandu', 'Pokhara', 'Bhaktapur', 'Lalitpur'];
+  const [pace, setPace] = useState<PaceValue>('balanced');
 
   const isItineraryInvalid = submitted && !itineraryName.trim();
 
   const handleContinue = async () => {
     setSubmitted(true);
 
-    if (!itineraryName.trim()) {
+    if (!itineraryName.trim() || !area) {
+      Alert.alert('Missing Information', 'Please complete required fields.');
       return;
     }
 
@@ -83,15 +84,11 @@ export default function TripGeneratorScreen() {
           />
 
           {/* Traveling Area */}
-          <Dropdown
+          <PaceSelector
             label="Traveling Area"
-            options={areaOptions}
-            value={area}
+            value={area ?? undefined}
+            options={AREA_OPTIONS}
             onChange={setArea}
-            required
-            error={
-              isItineraryInvalid ? 'Traveling area is required' : undefined
-            }
           />
 
           {/* Trip Date */}

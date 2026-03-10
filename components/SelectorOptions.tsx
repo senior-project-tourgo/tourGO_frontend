@@ -1,22 +1,22 @@
-import { View, Pressable } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { AppText } from '@/components/AppText';
+import { SelectorOption } from '@/constants/selectorOptions';
 import colors from '@/theme/colors';
-import { PaceOption } from '@/constants/tripOptions';
+import { Ionicons } from '@expo/vector-icons';
+import { Pressable, View } from 'react-native';
 
-type PaceSelectorProps = {
+type SelectorProps<T extends string> = {
   label?: string;
-  value?: string;
-  options: PaceOption[];
-  onChange: (value: string) => void;
+  value?: T;
+  options: SelectorOption<T>[];
+  onChange: (value: T) => void;
 };
 
-export function PaceSelector({
+export function PaceSelector<T extends string>({
   label,
   value,
   options,
   onChange
-}: PaceSelectorProps) {
+}: SelectorProps<T>) {
   return (
     <View className="gap-2">
       {label && <AppText className="text-base font-medium">{label}</AppText>}
@@ -45,7 +45,9 @@ export function PaceSelector({
 
               <View className="flex-1">
                 <AppText
-                  className={`font-medium ${selected ? 'text-colors-brand-primary' : 'text-colors-text'}`}
+                  className={`font-medium ${
+                    selected ? 'text-colors-brand-primary' : 'text-colors-text'
+                  }`}
                 >
                   {option.label}
                 </AppText>
@@ -71,4 +73,3 @@ export function PaceSelector({
     </View>
   );
 }
-export { PaceOption };
