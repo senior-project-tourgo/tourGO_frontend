@@ -10,8 +10,8 @@ import colors from '@/theme/colors';
 
 type Props = {
   label?: string;
-  value?: string;
-  onChange?: (date: string) => void;
+  value?: Date | null;
+  onChange?: (date: Date) => void;
   required?: boolean;
   error?: string;
   className?: string;
@@ -25,18 +25,22 @@ export default function DatePickerBar({
   error,
   className
 }: Props) {
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date();
 
-  const [selectedDate, setSelectedDate] = useState(value || today);
+  const [selectedDate, setSelectedDate] = useState<Date>(value ?? today);
   const [open, setOpen] = useState(false);
 
   const handleSelect = (day: any) => {
-    setSelectedDate(day.dateString);
-    onChange?.(day.dateString);
+    const date = new Date(day.dateString);
+
+    setSelectedDate(date);
+    onChange?.(date);
     setOpen(false);
   };
 
   const hasValue = !!selectedDate;
+
+  const selectedDateString = format(selectedDate, 'yyyy-MM-dd');
 
   return (
     <View className={className}>
@@ -51,7 +55,7 @@ export default function DatePickerBar({
           className="flex-row items-center justify-between"
         >
           <AppText className="font-medium text-colors-text">
-            {format(new Date(selectedDate), 'EEEE, MMM d')}
+            {format(selectedDate, 'EEEE, MMM d')}
           </AppText>
 
           <Ionicons
@@ -64,19 +68,17 @@ export default function DatePickerBar({
 
       <Modal visible={open} transparent animationType="fade">
         <View className="flex-1 justify-center bg-black/30 p-6">
-          {/* tap outside to close */}
           <Pressable
             className="absolute inset-0"
             onPress={() => setOpen(false)}
           />
 
-          {/* bottom sheet */}
           <View className="rounded-3xl bg-colors-surface-background p-4">
             <Calendar
-              current={selectedDate}
+              current={selectedDateString}
               onDayPress={handleSelect}
               markedDates={{
-                [selectedDate]: {
+                [selectedDateString]: {
                   selected: true,
                   selectedColor: colors.brand.primary
                 }

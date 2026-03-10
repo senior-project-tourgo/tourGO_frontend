@@ -8,9 +8,11 @@ export type GenerateTripInput = {
   area: 'Kathmandu' | 'Pokhara' | 'Bhaktapur' | 'Lalitpur';
   vibes: string[];
   pace: PaceOption['value'];
+  tripDate: string;
+  openTime: string;
+  endTime: string;
   itineraryName?: string;
   budgetLevel?: number;
-  durationHours?: number;
   numberOfPeople?: number;
 };
 

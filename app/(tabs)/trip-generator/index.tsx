@@ -4,7 +4,7 @@ import { Dropdown } from '@/components/Dropdown';
 import { AppTextInput } from '@/components/AppTextInput';
 import { HeaderWithBack } from '@/components/PageHeader';
 import { Screen } from '@/components/Screen';
-import { SliderField } from '@/components/SliderField';
+// import { SliderField } from '@/components/SliderField';
 import { TimePickerBar } from '@/components/TimePickerBar';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
@@ -19,11 +19,10 @@ export default function TripGeneratorScreen() {
   const [itineraryName, setItineraryName] = useState('');
   const [area, setArea] = useState('Kathmandu');
   const [people, setPeople] = useState<number>(1);
-  const [duration, setDuration] = useState<number>(4);
   const [isLoading, setIsLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const [tripDate, setTripDate] = useState<string | null>(null);
+  const [tripDate, setTripDate] = useState<Date | null>(null);
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [endTime, setEndTime] = useState<Date | null>(null);
 
@@ -43,9 +42,8 @@ export default function TripGeneratorScreen() {
       itineraryName: itineraryName.trim(),
       travelingArea: area,
       numberOfPeople: people,
-      durationHours: duration,
       pace: pace,
-      tripDate,
+      tripDate: tripDate ? tripDate.toISOString() : null,
       startTime: startTime ? startTime.toISOString() : null,
       endTime: endTime ? endTime.toISOString() : null
     };
@@ -139,17 +137,6 @@ export default function TripGeneratorScreen() {
             onChange={setPeople}
             min={1}
             max={10}
-          />
-
-          {/* Duration */}
-          <SliderField
-            label="Duration"
-            value={duration}
-            onChange={setDuration}
-            minimumValue={1}
-            maximumValue={12}
-            step={1}
-            unit="hours"
           />
 
           {/* Continue Button */}

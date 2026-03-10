@@ -10,7 +10,7 @@ export const PACE_OPTIONS: PaceOption[] = [
   {
     value: 'balanced',
     label: 'Balanced',
-    description: 'A comfortable mix of exploring and relaxing',
+    description: 'A mix of exploring and relaxing',
     icon: 'walk-outline'
   },
   {
