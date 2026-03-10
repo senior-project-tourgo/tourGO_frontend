@@ -9,17 +9,26 @@ type SelectorProps<T extends string> = {
   value?: T;
   options: SelectorOption<T>[];
   onChange: (value: T) => void;
+  required?: boolean;
+  error?: string;
 };
 
 export function PaceSelector<T extends string>({
   label,
   value,
   options,
-  onChange
+  onChange,
+  required,
+  error
 }: SelectorProps<T>) {
+  const hasError = !!error;
+
   return (
     <View className="gap-2">
-      {label && <AppText className="text-base font-medium">{label}</AppText>}
+      <AppText className="text-base font-medium">
+        {label}
+        {required && <AppText className="text-red-500"> *</AppText>}
+      </AppText>
 
       <View className="gap-2">
         {options.map(option => {
@@ -28,11 +37,15 @@ export function PaceSelector<T extends string>({
           return (
             <Pressable
               key={option.value}
-              onPress={() => onChange(option.value)}
+              onPress={() => {
+                onChange(option.value);
+              }}
               className={`flex-row items-center gap-3 rounded-full border px-4 py-3 ${
                 selected
                   ? 'border-colors-brand-primary bg-colors-brand-primary/10'
-                  : 'border-gray-300'
+                  : hasError
+                    ? 'border-red-400 bg-red-50'
+                    : 'border-gray-300 bg-gray-100'
               }`}
             >
               {option.icon && (
@@ -53,7 +66,7 @@ export function PaceSelector<T extends string>({
                 </AppText>
 
                 {option.description && (
-                  <AppText className="text-sm text-gray-500">
+                  <AppText variant="muted" className="text-gray-500">
                     {option.description}
                   </AppText>
                 )}
@@ -69,6 +82,11 @@ export function PaceSelector<T extends string>({
             </Pressable>
           );
         })}
+        {hasError && (
+          <AppText className="text-sm text-red-500">
+            {error || 'Please select an option'}
+          </AppText>
+        )}
       </View>
     </View>
   );
