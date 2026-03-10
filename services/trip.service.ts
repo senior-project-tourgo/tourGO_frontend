@@ -1,6 +1,6 @@
 // services/trip.service.ts
 
-import { PaceOption } from '@/components/PaceSelector';
+import { PaceOption } from '@/constants/tripOptions';
 import api from '@/config/api';
 import { Place } from '@/features/place/place.types';
 
@@ -9,7 +9,7 @@ export type GenerateTripInput = {
   vibes: string[];
   pace: PaceOption['value'];
   tripDate: string;
-  openTime: string;
+  startTime: string;
   endTime: string;
   itineraryName?: string;
   budgetLevel?: number;

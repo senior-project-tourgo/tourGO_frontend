@@ -9,7 +9,7 @@ import { mockVibes } from '@/mock/vibes.mock';
 import { generateRecommendation } from '@/services/trip.service';
 import { PlaceLocation } from '@/features/place/place.types';
 import { AxiosError } from 'axios';
-import { PaceOption } from '@/components/PaceSelector';
+import { PaceOption } from '@/constants/tripOptions';
 
 export default function VibeSelectorScreen() {
   const router = useRouter();
@@ -65,7 +65,7 @@ export default function VibeSelectorScreen() {
         pace: normalizeStringParam(params.pace) as PaceOption['value'],
         itineraryName: normalizeStringParam(params.itineraryName),
         tripDate: normalizeStringParam(params.tripDate),
-        openTime: normalizeStringParam(params.startTime),
+        startTime: normalizeStringParam(params.startTime),
         endTime: normalizeStringParam(params.endTime),
         numberOfPeople: normalizeNumberParam(
           params.numberOfPeople,

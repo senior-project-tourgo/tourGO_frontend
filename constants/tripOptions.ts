@@ -1,4 +1,11 @@
-import { PaceOption } from '@/components/PaceSelector';
+import { Ionicons } from '@expo/vector-icons';
+
+export type PaceOption = {
+  value: string;
+  label: string;
+  description?: string;
+  icon?: keyof typeof Ionicons.glyphMap;
+};
 
 export const PACE_OPTIONS: PaceOption[] = [
   {

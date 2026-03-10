@@ -95,9 +95,7 @@ export default function TripGeneratorScreen() {
           />
 
           {/* Trip Date */}
-          <View className="gap-2">
-            <DatePickerBar onChange={setTripDate} />
-          </View>
+          <DatePickerBar value={tripDate} onChange={setTripDate} />
 
           {/* Time Row */}
           <View className="flex-row gap-2">
@@ -126,7 +124,7 @@ export default function TripGeneratorScreen() {
             </View>
           </View>
 
-          {/* Number of Places */}
+          {/* Trip Pace */}
           <PaceSelector
             label="Trip Pace"
             value={pace}

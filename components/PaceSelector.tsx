@@ -2,13 +2,7 @@ import { View, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText } from '@/components/AppText';
 import colors from '@/theme/colors';
-
-export type PaceOption = {
-  value: string;
-  label: string;
-  description?: string;
-  icon?: keyof typeof Ionicons.glyphMap;
-};
+import { PaceOption } from '@/constants/tripOptions';
 
 type PaceSelectorProps = {
   label?: string;
@@ -77,3 +71,4 @@ export function PaceSelector({
     </View>
   );
 }
+export { PaceOption };

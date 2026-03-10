@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View, Pressable, Modal } from 'react-native';
-import { Calendar } from 'react-native-calendars';
+import { Calendar, DateData } from 'react-native-calendars';
 import { format } from 'date-fns';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText } from './AppText';
@@ -25,22 +25,20 @@ export default function DatePickerBar({
   error,
   className
 }: Props) {
-  const today = new Date();
-
-  const [selectedDate, setSelectedDate] = useState<Date>(value ?? today);
   const [open, setOpen] = useState(false);
 
-  const handleSelect = (day: any) => {
+  const hasValue = !!value;
+
+  const today = format(new Date(), 'yyyy-MM-dd');
+
+  const selectedDateString = value ? format(value, 'yyyy-MM-dd') : undefined;
+
+  const handleSelect = (day: DateData) => {
     const date = new Date(day.dateString);
 
-    setSelectedDate(date);
     onChange?.(date);
     setOpen(false);
   };
-
-  const hasValue = !!selectedDate;
-
-  const selectedDateString = format(selectedDate, 'yyyy-MM-dd');
 
   return (
     <View className={className}>
@@ -54,8 +52,12 @@ export default function DatePickerBar({
           onPress={() => setOpen(true)}
           className="flex-row items-center justify-between"
         >
-          <AppText className="font-medium text-colors-text">
-            {format(selectedDate, 'EEEE, MMM d')}
+          <AppText
+            className={`font-medium ${
+              value ? 'text-colors-text' : 'text-colors-text-muted'
+            }`}
+          >
+            {value ? format(value, 'EEEE, MMM d') : 'Select a date'}
           </AppText>
 
           <Ionicons
@@ -76,13 +78,18 @@ export default function DatePickerBar({
           <View className="rounded-3xl bg-colors-surface-background p-4">
             <Calendar
               current={selectedDateString}
+              minDate={today}
               onDayPress={handleSelect}
-              markedDates={{
-                [selectedDateString]: {
-                  selected: true,
-                  selectedColor: colors.brand.primary
-                }
-              }}
+              markedDates={
+                selectedDateString
+                  ? {
+                      [selectedDateString]: {
+                        selected: true,
+                        selectedColor: colors.brand.primary
+                      }
+                    }
+                  : {}
+              }
               theme={{
                 todayTextColor: colors.text.DEFAULT,
                 arrowColor: colors.text.DEFAULT
