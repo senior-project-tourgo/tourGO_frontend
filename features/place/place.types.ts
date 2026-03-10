@@ -33,8 +33,10 @@ export type TimeRange = {
   close: string; // 'HH:mm'
 };
 
+export type Area = 'Kathmandu' | 'Pokhara' | 'Bhaktapur' | 'Lalitpur';
+
 export type PlaceLocation = {
-  area: 'Kathmandu' | 'Pokhara' | 'Bhaktapur' | 'Lalitpur';
+  area: Area;
   lat: number;
   lng: number;
 };

@@ -2,18 +2,18 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
   Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
-  View,
-  Image,
-  TouchableOpacity
+  TouchableOpacity,
+  View
 } from 'react-native';
 
+import { AppText } from '@/components/AppText';
+import { Button } from '@/components/Button';
 import { BaseCard } from '@/components/cards/BaseCard';
 import { AppTextInput } from '@/components/AppTextInput';
 import { useAuth } from '../../context/AuthContext';
-import { AppText } from '@/components/AppText';
-import { Button } from '@/components/Button';
 
 export default function LoginScreen() {
   const { login } = useAuth();

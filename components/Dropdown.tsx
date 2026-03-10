@@ -1,55 +1,89 @@
 // components/ui/Dropdown.tsx
+
 import { useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { Pressable, View, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
 import { AppText } from './AppText';
+import { FormField } from './FormField';
+
 import colors from '@/theme/colors';
 
 type DropdownProps = {
   label?: string;
   options: string[];
-  value: string;
+  value?: string;
   onChange: (value: string) => void;
+  required?: boolean;
+  error?: string;
 };
 
-export function Dropdown({ label, options, value, onChange }: DropdownProps) {
+export function Dropdown({
+  label,
+  options,
+  value,
+  onChange,
+  required,
+  error
+}: DropdownProps) {
   const [open, setOpen] = useState(false);
+
   const sortedOptions = [...options].sort((a, b) =>
     String(a).localeCompare(String(b))
   );
 
+  const hasValue = !!value;
+
   return (
     <View className="w-full">
-      {label && <AppText>{label}</AppText>}
-
-      <Pressable
-        onPress={() => setOpen(!open)}
-        className="flex-row items-center justify-between rounded-full border border-gray-300 bg-colors-surface-background px-4 py-3"
+      <FormField
+        label={label}
+        required={required}
+        error={error}
+        hasValue={hasValue}
       >
-        <AppText>{value}</AppText>
-        <Ionicons
-          name={open ? 'chevron-up' : 'chevron-down'}
-          size={18}
-          color={colors.text.DEFAULT}
-        />
-      </Pressable>
+        <Pressable
+          onPress={() => setOpen(true)}
+          className="flex-row items-center justify-between"
+        >
+          <AppText className={value ? '' : 'text-gray-400'}>
+            {value || 'Select option'}
+          </AppText>
 
-      {open && (
-        <View className="mt-2 rounded-lg border border-gray-200 bg-colors-surface-background">
-          {sortedOptions.map(option => (
-            <Pressable
-              key={option}
-              onPress={() => {
-                onChange(option);
-                setOpen(false);
-              }}
-              className="px-4 py-3"
-            >
-              <AppText>{option}</AppText>
-            </Pressable>
-          ))}
-        </View>
-      )}
+          <Ionicons
+            name={open ? 'chevron-up' : 'chevron-down'}
+            size={18}
+            color={colors.text.DEFAULT}
+          />
+        </Pressable>
+      </FormField>
+
+      <Modal
+        visible={open}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setOpen(false)}
+      >
+        <Pressable
+          className="flex-1 items-center justify-center bg-black/30"
+          onPress={() => setOpen(false)}
+        >
+          <View className="w-72 rounded-2xl bg-colors-surface-background p-2">
+            {sortedOptions.map(option => (
+              <Pressable
+                key={option}
+                onPress={() => {
+                  onChange(option);
+                  setOpen(false);
+                }}
+                className="px-4 py-3"
+              >
+                <AppText>{option}</AppText>
+              </Pressable>
+            ))}
+          </View>
+        </Pressable>
+      </Modal>
     </View>
   );
 }

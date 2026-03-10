@@ -1,14 +1,15 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useState } from 'react';
-import { FlatList } from 'react-native';
 import { Button } from '@/components/Button';
 import { VibeCard } from '@/components/cards/variants/VibeCard';
 import { HeaderWithBack } from '@/components/PageHeader';
 import { Screen } from '@/components/Screen';
+import { PaceValue } from '@/constants/paceOptions';
+import { Area } from '@/features/place/place.types';
 import { mockVibes } from '@/mock/vibes.mock';
 import { generateRecommendation } from '@/services/trip.service';
-import { PlaceLocation } from '@/features/place/place.types';
 import { AxiosError } from 'axios';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useState } from 'react';
+import { FlatList } from 'react-native';
 
 export default function VibeSelectorScreen() {
   const router = useRouter();
@@ -57,19 +58,13 @@ export default function VibeSelectorScreen() {
       setIsLoading(true);
 
       const result = await generateRecommendation({
-        area: normalizeStringParam(
-          params.travelingArea
-        ) as PlaceLocation['area'],
+        area: normalizeStringParam(params.travelingArea) as Area,
         vibes: selectedVibes,
-        numberOfPlaces: normalizeNumberParam(
-          params.numberOfPlaces,
-          'numberOfPlaces'
-        ),
+        pace: normalizeStringParam(params.pace) as PaceValue,
         itineraryName: normalizeStringParam(params.itineraryName),
-        durationHours: normalizeNumberParam(
-          params.durationHours,
-          'durationHours'
-        ),
+        tripDate: normalizeStringParam(params.tripDate),
+        startTime: normalizeStringParam(params.startTime),
+        endTime: normalizeStringParam(params.endTime),
         numberOfPeople: normalizeNumberParam(
           params.numberOfPeople,
           'numberOfPeople'

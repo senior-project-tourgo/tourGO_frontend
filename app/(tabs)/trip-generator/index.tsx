@@ -1,132 +1,212 @@
-import { useState } from 'react';
-import { View, Alert } from 'react-native';
-import { useRouter } from 'expo-router';
-
-import { AppText } from '@/components/AppText';
 import { AppTextInput } from '@/components/AppTextInput';
 import { Button } from '@/components/Button';
-import { Screen } from '@/components/Screen';
+import DatePickerBar from '@/components/DatePickerBar';
 import { HeaderWithBack } from '@/components/PageHeader';
-import { Dropdown } from '@/components/Dropdown';
-import { SliderField } from '@/components/SliderField';
-import { OptionSelector } from '@/components/OptionSelector';
+import { Screen } from '@/components/Screen';
+import { OptionSelector } from '@/components/SelectorOptions';
+import { Stepper } from '@/components/Stepper';
+import { TimePickerBar } from '@/components/TimePickerBar';
+import { useRouter } from 'expo-router';
+import { useState } from 'react';
+import { KeyboardAvoidingView, Platform, View } from 'react-native';
+
+import { PACE_OPTIONS, PaceValue } from '@/constants/paceOptions';
+import { AREA_OPTIONS } from '@/constants/areaOptions';
+import {
+  TIME_WINDOW_OPTIONS,
+  TimeWindowValue,
+  TIME_WINDOW_RANGES
+} from '@/constants/timeOptions';
+import { Area } from '@/features/place/place.types';
+import { buildTripPayload } from '@/utils/tripForm';
 
 export default function TripGeneratorScreen() {
   const router = useRouter();
 
   const [itineraryName, setItineraryName] = useState('');
-  const [area, setArea] = useState('Kathmandu');
-  const [people, setPeople] = useState<number>(1);
-  const [duration, setDuration] = useState<number>(4);
-  const [placesCount, setPlacesCount] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [area, setArea] = useState<Area | null>(null);
+  const [areaError, setAreaError] = useState<string | undefined>();
 
+  const [people, setPeople] = useState<number>(1);
   const [submitted, setSubmitted] = useState(false);
 
-  const areaOptions = ['Kathmandu', 'Pokhara', 'Bhaktapur', 'Lalitpur'];
+  const [tripDate, setTripDate] = useState<Date | null>(null);
+  const [tripDateError, setTripDateError] = useState<string | undefined>();
+  const [startTime, setStartTime] = useState<Date | null>(null);
+  const [endTime, setEndTime] = useState<Date | null>(null);
+
+  const [pace, setPace] = useState<PaceValue>('balanced');
+  const [timeWindow, setTimeWindow] = useState<TimeWindowValue | null>(null);
+  const [timeWindowError, setTimeWindowError] = useState<string | undefined>();
 
   const isItineraryInvalid = submitted && !itineraryName.trim();
-  const isPlacesInvalid =
-    submitted && (!placesCount || isNaN(Number(placesCount)));
+
+  const handleTimeWindowChange = (value: TimeWindowValue) => {
+    setTimeWindow(value);
+    setTimeWindowError(undefined);
+
+    const range = TIME_WINDOW_RANGES[value];
+
+    const start = new Date();
+    const end = new Date();
+
+    const [startH, startM] = range.start.split(':').map(Number);
+    const [endH, endM] = range.end.split(':').map(Number);
+
+    start.setHours(startH, startM, 0, 0);
+    end.setHours(endH, endM, 0, 0);
+
+    setStartTime(start);
+    setEndTime(end);
+  };
 
   const handleContinue = async () => {
     setSubmitted(true);
 
-    if (!itineraryName.trim() || !placesCount || isNaN(Number(placesCount))) {
+    let hasError = false;
+
+    if (!itineraryName.trim()) {
+      hasError = true;
+    }
+
+    if (!area) {
+      setAreaError('Please select a location');
+      hasError = true;
+    }
+
+    if (!tripDate) {
+      setTripDateError('Please select a trip date');
+      hasError = true;
+    }
+
+    if (!timeWindow && (!startTime || !endTime)) {
+      setTimeWindowError('Please select a time window');
+      hasError = true;
+    }
+
+    if (hasError) {
       return;
     }
 
-    const payload = {
-      itineraryName: itineraryName.trim(),
-      travelingArea: area,
-      numberOfPeople: people,
-      durationHours: duration,
-      numberOfPlaces: Number(placesCount)
-    };
+    const payload = buildTripPayload({
+      itineraryName,
+      area,
+      people,
+      pace,
+      tripDate,
+      startTime,
+      endTime
+    });
 
-    try {
-      setIsLoading(true);
-
-      router.push({
-        pathname: '/(tabs)/trip-generator/vibe-selector',
-        params: payload
-      });
-    } catch {
-      Alert.alert('Error', 'Something went wrong');
-    } finally {
-      setIsLoading(false);
-    }
+    router.push({
+      pathname: '/(tabs)/trip-generator/vibe-selector',
+      params: payload
+    });
   };
 
   return (
-    <Screen>
-      <HeaderWithBack title="Create New Itinerary" />
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <Screen>
+        <HeaderWithBack title="Plan Your Trip" />
 
-      <View className="gap-6">
-        {/* Itinerary Name */}
-        <AppTextInput
-          label="Itinerary Name"
-          placeholder="e.g. Weekend in Pokhara"
-          value={itineraryName}
-          onChangeText={setItineraryName}
-          required
-          error={isItineraryInvalid ? 'Itinerary name is required' : undefined}
-        />
-
-        {/* Number of Places */}
-        <AppTextInput
-          label="Number of Places"
-          placeholder="e.g. 4"
-          value={placesCount}
-          onChangeText={setPlacesCount}
-          keyboardType="numeric"
-          required
-          error={isPlacesInvalid ? 'Please enter a valid number' : undefined}
-        />
-
-        {/* Traveling Area */}
-        <Dropdown
-          label="Traveling Area"
-          options={areaOptions}
-          value={area}
-          onChange={setArea}
-        />
-
-        {/* Number of People */}
-        <OptionSelector
-          label="Number of People"
-          options={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, '>10']}
-          value={people > 10 ? '>10' : people}
-          onChange={val => {
-            if (val === '>10') {
-              setPeople(11);
-            } else {
-              setPeople(Number(val));
+        <View className="gap-6">
+          {/* Itinerary Name */}
+          <AppTextInput
+            label="Trip Name"
+            placeholder="e.g. Weekend in Pokhara"
+            value={itineraryName}
+            onChangeText={setItineraryName}
+            required
+            error={
+              isItineraryInvalid ? 'Itinerary name is required' : undefined
             }
-          }}
-          renderOption={(option, selected) => (
-            <AppText className={selected ? 'text-white' : ''}>{option}</AppText>
-          )}
-        />
+          />
 
-        {/* Duration */}
-        <SliderField
-          label="Duration"
-          value={duration}
-          onChange={setDuration}
-          minimumValue={1}
-          maximumValue={12}
-          step={1}
-          unit="hours"
-        />
+          {/* Traveling Area */}
+          <OptionSelector
+            label="Where are you going?"
+            value={area ?? undefined}
+            options={AREA_OPTIONS}
+            onChange={v => {
+              setArea(v);
+              setAreaError(undefined); // clear error when user selects
+            }}
+            required
+            error={areaError}
+          />
 
-        {/* Continue Button */}
-        <Button
-          title="Continue to Select Vibes"
-          onPress={handleContinue}
-          isLoading={isLoading}
-        />
-      </View>
-    </Screen>
+          {/* Trip Date */}
+          <DatePickerBar
+            label="When is your trip?"
+            value={tripDate}
+            onChange={v => {
+              setTripDate(v);
+              setTripDateError(undefined); // clear error when user selects
+            }}
+            required
+            error={tripDateError}
+          />
+
+          {/* Time Window Preset */}
+          <OptionSelector
+            label="What time of day?"
+            value={timeWindow ?? undefined}
+            options={TIME_WINDOW_OPTIONS}
+            onChange={handleTimeWindowChange}
+            required
+            error={timeWindowError}
+          />
+
+          {/* Manual Time Row */}
+          <View className="flex-row gap-2">
+            <View className="flex-1">
+              <TimePickerBar
+                label="Start exploring"
+                value={startTime ?? undefined}
+                onChange={date => {
+                  setStartTime(date);
+                  setTimeWindow(null);
+
+                  if (endTime && date > endTime) {
+                    setEndTime(date);
+                  }
+                }}
+              />
+            </View>
+
+            <View className="flex-1">
+              <TimePickerBar
+                label="Finish exploring"
+                value={endTime ?? undefined}
+                onChange={setEndTime}
+                minimumDate={startTime ?? undefined}
+              />
+            </View>
+          </View>
+
+          {/* Trip Pace */}
+          <OptionSelector
+            label="How packed should your trip be?"
+            value={pace}
+            options={PACE_OPTIONS}
+            onChange={setPace}
+          />
+
+          {/* Number of People */}
+          <Stepper
+            label="How many people?"
+            value={people}
+            onChange={setPeople}
+            min={1}
+            max={10}
+          />
+
+          {/* Continue Button */}
+          <Button title="Choose Your Vibes" onPress={handleContinue} />
+        </View>
+      </Screen>
+    </KeyboardAvoidingView>
   );
 }

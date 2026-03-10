@@ -1,15 +1,18 @@
 // services/trip.service.ts
 
 import api from '@/config/api';
+import { SelectorOption } from '@/constants/selectorOptions';
 import { Place } from '@/features/place/place.types';
 
 export type GenerateTripInput = {
   area: 'Kathmandu' | 'Pokhara' | 'Bhaktapur' | 'Lalitpur';
   vibes: string[];
-  numberOfPlaces: number;
+  pace: SelectorOption['value'];
+  tripDate: string;
+  startTime: string;
+  endTime: string;
   itineraryName?: string;
   budgetLevel?: number;
-  durationHours?: number;
   numberOfPeople?: number;
 };
 
