@@ -4,9 +4,9 @@ import { HeaderWithBack } from '@/components/PageHeader';
 import { Screen } from '@/components/Screen';
 import { useActivePlaces } from '@/hooks/review-trip/useActivePlaces';
 import { promotionsMock } from '@/mock/promotions.mock';
-import { getPlaceOpeningStatus } from '@/utils/openingHours';
-import { Link, Stack, useLocalSearchParams } from 'expo-router';
-import { ActivityIndicator, Pressable, View } from 'react-native';
+import { Stack, useLocalSearchParams } from 'expo-router';
+import { ActivityIndicator, View } from 'react-native';
+import { PlaceInfo } from '@/components/cards/variants/PlaceCard/PlaceInfoCard';
 
 export default function PlaceDetails() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -47,19 +47,6 @@ export default function PlaceDetails() {
     );
   }
 
-  const openingStatus = getPlaceOpeningStatus(place.openingHours);
-  const todayOpeningLabel = openingStatus.nextTime
-    ? openingStatus.nextTime.type === 'close'
-      ? `Closes at ${openingStatus.nextTime.time.toLocaleTimeString([], {
-          hour: '2-digit',
-          minute: '2-digit'
-        })}`
-      : `Opens at ${openingStatus.nextTime.time.toLocaleTimeString([], {
-          hour: '2-digit',
-          minute: '2-digit'
-        })}`
-    : 'Closed';
-
   const placePromotions = promotionsMock.filter(
     promo => promo.placeId === place.placeId
   );
@@ -78,66 +65,12 @@ export default function PlaceDetails() {
 
         {/* Floating Back Button */}
         <View className="absolute left-4 top-12">
-          <HeaderWithBack />
+          <HeaderWithBack backBg={true} />
         </View>
       </View>
 
       {/* Content */}
-      <View className="bg-colors-surface-background px-6 pb-20 pt-6">
-        <AppText variant="title">{place.placeName}</AppText>
-
-        <AppText className="text-muted-foreground mt-2">
-          {place.location.area}
-        </AppText>
-
-        <AppText className="mt-2">
-          {openingStatus.isOpenNow ? 'Open now' : 'Closed now'} ·{' '}
-          {todayOpeningLabel}
-        </AppText>
-
-        <AppText className="mt-2">💸 Price range: {place.priceRange}</AppText>
-
-        <AppText className="mt-2">
-          🎧 Vibe: {place.vibe?.length ? place.vibe.join(', ') : '—'}
-        </AppText>
-
-        {/* Promotions */}
-        {placePromotions.length > 0 && (
-          <>
-            <AppText className="mt-8 text-lg font-semibold">
-              Available Promotions
-            </AppText>
-
-            {placePromotions.map(promo => (
-              <Link
-                key={promo.promotionId}
-                href={`/promotions/${promo.promotionId}`}
-                asChild
-              >
-                <Pressable className="mt-3 rounded-xl border p-4">
-                  <AppText className="font-semibold">
-                    {promo.promotionName}
-                  </AppText>
-
-                  <AppText className="text-muted-foreground mt-1 text-sm">
-                    {promo.promotionDescription}
-                  </AppText>
-
-                  <AppText className="text-muted-foreground mt-2 text-xs">
-                    Expires: {promo.expirationDate}
-                  </AppText>
-                </Pressable>
-              </Link>
-            ))}
-          </>
-        )}
-
-        {placePromotions.length === 0 && (
-          <AppText className="text-muted-foreground mt-6 text-sm">
-            No promotions available right now.
-          </AppText>
-        )}
-      </View>
+      <PlaceInfo place={place} promotions={placePromotions} />
     </Screen>
   );
 }
