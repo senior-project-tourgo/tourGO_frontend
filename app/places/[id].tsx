@@ -1,11 +1,12 @@
 import { AppText } from '@/components/AppText';
+import { ImageWithFallback } from '@/components/cards/variants/PlaceCard/ImageWithFallback';
 import { HeaderWithBack } from '@/components/PageHeader';
 import { Screen } from '@/components/Screen';
 import { useActivePlaces } from '@/hooks/review-trip/useActivePlaces';
 import { promotionsMock } from '@/mock/promotions.mock';
 import { getPlaceOpeningStatus } from '@/utils/openingHours';
 import { Link, Stack, useLocalSearchParams } from 'expo-router';
-import { ActivityIndicator, Pressable } from 'react-native';
+import { ActivityIndicator, Pressable, View } from 'react-native';
 
 export default function PlaceDetails() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -64,62 +65,79 @@ export default function PlaceDetails() {
   );
 
   return (
-    <Screen>
-      <Stack.Screen options={{ title: place.placeName }} />
+    <Screen scroll padded={false}>
+      <Stack.Screen options={{ headerShown: false }} />
 
-      <HeaderWithBack title={place.placeName} />
+      {/* Hero Image */}
+      <View className="relative">
+        <ImageWithFallback
+          primaryImageUrl={place.image}
+          className="h-[283px] w-full"
+          resizeMode="cover"
+        />
 
-      <AppText className="text-muted-foreground mt-2 text-sm">
-        {place.location.area}
-      </AppText>
+        {/* Floating Back Button */}
+        <View className="absolute left-4 top-12">
+          <HeaderWithBack />
+        </View>
+      </View>
 
-      <AppText className="mt-2 text-sm">
-        {openingStatus.isOpenNow ? 'Open now' : 'Closed now'} ·{' '}
-        {todayOpeningLabel}
-      </AppText>
+      {/* Content */}
+      <View className="bg-colors-surface-background px-6 pb-20 pt-6">
+        <AppText variant="title">{place.placeName}</AppText>
 
-      <AppText className="mt-2 text-sm">
-        💸 Price range: {place.priceRange}
-      </AppText>
-
-      <AppText className="mt-2 text-sm">
-        🎧 Vibe: {place.vibe?.length ? place.vibe.join(', ') : '—'}
-      </AppText>
-
-      {/* Promotions */}
-      {placePromotions.length > 0 && (
-        <>
-          <AppText className="mt-8 text-lg font-semibold">
-            Available Promotions
-          </AppText>
-
-          {placePromotions.map(promo => (
-            <Link
-              key={promo.promotionId}
-              href={`/promotions/${promo.promotionId}`}
-              asChild
-            >
-              <Pressable className="mt-3 rounded-xl border p-4">
-                <AppText className="font-semibold">
-                  {promo.promotionName}
-                </AppText>
-                <AppText className="text-muted-foreground mt-1 text-sm">
-                  {promo.promotionDescription}
-                </AppText>
-                <AppText className="text-muted-foreground mt-2 text-xs">
-                  Expires: {promo.expirationDate}
-                </AppText>
-              </Pressable>
-            </Link>
-          ))}
-        </>
-      )}
-
-      {placePromotions.length === 0 && (
-        <AppText className="text-muted-foreground mt-6 text-sm">
-          No promotions available right now.
+        <AppText className="text-muted-foreground mt-2">
+          {place.location.area}
         </AppText>
-      )}
+
+        <AppText className="mt-2">
+          {openingStatus.isOpenNow ? 'Open now' : 'Closed now'} ·{' '}
+          {todayOpeningLabel}
+        </AppText>
+
+        <AppText className="mt-2">💸 Price range: {place.priceRange}</AppText>
+
+        <AppText className="mt-2">
+          🎧 Vibe: {place.vibe?.length ? place.vibe.join(', ') : '—'}
+        </AppText>
+
+        {/* Promotions */}
+        {placePromotions.length > 0 && (
+          <>
+            <AppText className="mt-8 text-lg font-semibold">
+              Available Promotions
+            </AppText>
+
+            {placePromotions.map(promo => (
+              <Link
+                key={promo.promotionId}
+                href={`/promotions/${promo.promotionId}`}
+                asChild
+              >
+                <Pressable className="mt-3 rounded-xl border p-4">
+                  <AppText className="font-semibold">
+                    {promo.promotionName}
+                  </AppText>
+
+                  <AppText className="text-muted-foreground mt-1 text-sm">
+                    {promo.promotionDescription}
+                  </AppText>
+
+                  <AppText className="text-muted-foreground mt-2 text-xs">
+                    Expires: {promo.expirationDate}
+                  </AppText>
+                </Pressable>
+              </Link>
+            ))}
+          </>
+        )}
+
+        {placePromotions.length === 0 && (
+          <AppText className="text-muted-foreground mt-6 text-sm">
+            No promotions available right now.
+          </AppText>
+        )}
+      </View>
     </Screen>
   );
 }
