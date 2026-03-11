@@ -3,18 +3,27 @@ import { ScrollView, View } from 'react-native';
 interface ScreenProps {
   children: React.ReactNode;
   scroll?: boolean;
+  padded?: boolean;
 }
 
-export function Screen({ children, scroll = true }: ScreenProps) {
+export function Screen({
+  children,
+  scroll = true,
+  padded = true
+}: ScreenProps) {
+  const paddingStyles = padded
+    ? {
+        paddingTop: 64,
+        paddingHorizontal: 24,
+        paddingBottom: 120
+      }
+    : {};
+
   if (!scroll) {
     return (
       <View
         className="flex-1 bg-colors-surface-background"
-        style={{
-          paddingTop: 64,
-          paddingHorizontal: 24,
-          paddingBottom: 120
-        }}
+        style={paddingStyles}
       >
         {children}
       </View>
@@ -25,11 +34,7 @@ export function Screen({ children, scroll = true }: ScreenProps) {
     <ScrollView
       className="bg-colors-surface-background"
       keyboardShouldPersistTaps="handled"
-      contentContainerStyle={{
-        paddingTop: 64,
-        paddingHorizontal: 24,
-        paddingBottom: 120
-      }}
+      contentContainerStyle={paddingStyles}
     >
       {children}
     </ScrollView>
