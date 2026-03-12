@@ -1,6 +1,6 @@
 import { AppText } from '@/components/AppText';
 import { Link } from 'expo-router';
-import { Pressable, View } from 'react-native';
+import { Pressable } from 'react-native';
 
 type Promotion = {
   promotionId: string;

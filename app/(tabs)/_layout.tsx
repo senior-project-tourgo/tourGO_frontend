@@ -1,9 +1,9 @@
-import { HapticTab } from '@/components/tabs/HapticTab';
-import BlurTabBarBackground from '@/components/tabs/TabBarBackground';
+import { HapticTab } from '@/components/main-tab/HapticTab';
+import BlurTabBarBackground from '@/components/main-tab/TabBarBackground';
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import { Platform, View } from 'react-native';
-import TabIcon from '../../components/tabs/TabIcon';
+import TabIcon from '../../components/main-tab/TabIcon';
 import colors from '../../theme/colors';
 
 export default function TabLayout() {
