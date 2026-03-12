@@ -20,19 +20,18 @@ export function PlaceInfo({ place, promotions }: PlaceInfoProps) {
       <AppText variant="title">{place.placeName}</AppText>
 
       <View className="flex-1 gap-1">
-        <AppText variant="subtitle">{place.placeName}</AppText>
-        <AppText variant="muted">
+        <AppText variant="subtitle">
           <Ionicons name="star" color={colors.brand.primary} />{' '}
           {place.averageRating}
         </AppText>
 
-        <AppText variant="muted">
+        <AppText variant="subtitle">
           {place.location.area} · {place.priceRange}
         </AppText>
 
         <AppText>
           <AppText
-            variant="muted"
+            variant="subtitle"
             className={
               openingHours.isOpenNow ? 'text-green-500' : 'text-red-500'
             }
@@ -40,7 +39,7 @@ export function PlaceInfo({ place, promotions }: PlaceInfoProps) {
             {openingHours.isOpenNow ? 'Open' : 'Closed'}
           </AppText>
 
-          <AppText variant="muted">
+          <AppText variant="subtitle">
             {' · '}
             {openingHours.nextTime
               ? openingHours.nextTime.type === 'close'
@@ -83,9 +82,11 @@ export function PlaceInfo({ place, promotions }: PlaceInfoProps) {
           <AppText className="mt-8 text-lg font-semibold">
             Available Promotions
           </AppText>
-          {promotions.map((promo: any) => (
-            <PromotionCard key={promo.promotionId} promotion={promo} />
-          ))}
+          <View className="gap-4">
+            {promotions.map((promo: any) => (
+              <PromotionCard key={promo.promotionId} promotion={promo} />
+            ))}
+          </View>
         </>
       )}
 

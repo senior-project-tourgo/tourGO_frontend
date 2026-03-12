@@ -26,7 +26,7 @@ export function PlaceCard({
 
   return (
     <Pressable onPress={() => onPress?.(place)} className="w-[345px]">
-      <View className="relative h-60 flex-row gap-4 rounded-2xl bg-white p-4 shadow-sm">
+      <View className="relative h-60 flex-row gap-4 rounded-2xl bg-colors-surface-background p-4 shadow-sm">
         <ImageWithFallback
           primaryImageUrl={place.image}
           className="h-52 w-32 rounded-xl"

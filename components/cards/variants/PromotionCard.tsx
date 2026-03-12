@@ -1,6 +1,6 @@
 import { AppText } from '@/components/AppText';
 import { Link } from 'expo-router';
-import { Pressable } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 type Promotion = {
   promotionId: string;
@@ -16,17 +16,19 @@ type PromotionCardProps = {
 export function PromotionCard({ promotion }: PromotionCardProps) {
   return (
     <Link href={`/promotions/${promotion.promotionId}`} asChild>
-      <Pressable className="mt-3 rounded-xl border p-4">
-        <AppText className="font-semibold">{promotion.promotionName}</AppText>
+      <View className="rounded-xl bg-colors-surface-background shadow-sm">
+        <Pressable className="p-4">
+          <AppText className="font-semibold">{promotion.promotionName}</AppText>
 
-        <AppText className="text-muted-foreground mt-1 text-sm">
-          {promotion.promotionDescription}
-        </AppText>
+          <AppText className="text-muted-foreground mt-1 text-sm">
+            {promotion.promotionDescription}
+          </AppText>
 
-        <AppText className="text-muted-foreground mt-2 text-xs">
-          Expires: {promotion.expirationDate}
-        </AppText>
-      </Pressable>
+          <AppText className="text-muted-foreground mt-2 text-xs">
+            Expires: {promotion.expirationDate}
+          </AppText>
+        </Pressable>
+      </View>
     </Link>
   );
 }
