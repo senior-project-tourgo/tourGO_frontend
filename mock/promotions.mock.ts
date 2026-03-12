@@ -1,4 +1,6 @@
-export const promotionsMock = [
+import { Promotion } from '@/features/promotion/promotion.types';
+
+export const promotionsMock: Promotion[] = [
   {
     promotionId: 'promo_101',
     placeId: 'plc_001',

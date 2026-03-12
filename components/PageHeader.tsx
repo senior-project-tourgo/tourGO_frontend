@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useSegments } from 'expo-router';
 
 interface HeaderWithBackProps {
-  title: string;
+  title?: string;
   subtitle?: string;
   className?: string;
   center?: boolean;
@@ -45,12 +45,14 @@ export function HeaderWithBack({
       )}
 
       <View className={shouldShowBack ? 'flex-1' : ''}>
-        <AppText
-          variant="heading24"
-          className={`font-semibold ${center ? 'text-center' : ''}`}
-        >
-          {title}
-        </AppText>
+        {title && (
+          <AppText
+            variant="heading24"
+            className={`font-semibold ${center ? 'text-center' : ''}`}
+          >
+            {title}
+          </AppText>
+        )}
 
         {subtitle && (
           <AppText
