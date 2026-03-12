@@ -6,7 +6,7 @@ import { useActivePlaces } from '@/hooks/review-trip/useActivePlaces';
 import { promotionsMock } from '@/mock/promotions.mock';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { ActivityIndicator, View } from 'react-native';
-import { PlaceInfo } from '@/components/cards/variants/PlaceCard/PlaceInfoCard';
+import { PlaceInfoCard } from '@/components/cards/variants/PlaceCard/PlaceInfoCard';
 
 export default function PlaceDetails() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -70,7 +70,7 @@ export default function PlaceDetails() {
       </View>
 
       {/* Content */}
-      <PlaceInfo place={place} promotions={placePromotions} />
+      <PlaceInfoCard place={place} promotions={placePromotions} />
     </Screen>
   );
 }

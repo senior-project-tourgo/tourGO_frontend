@@ -6,13 +6,15 @@ import colors from '@/theme/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { mockVibes } from '@/mock/vibes.mock';
 import { Badge } from '@/components/Badge';
+import { Place } from '@/features/place/place.types';
+import { Promotion } from '@/features/promotion/promotion.types';
 
 type PlaceInfoProps = {
-  place: any;
-  promotions: any[];
+  place: Place;
+  promotions: Promotion[];
 };
 
-export function PlaceInfo({ place, promotions }: PlaceInfoProps) {
+export function PlaceInfoCard({ place, promotions }: PlaceInfoProps) {
   const openingHours = getPlaceOpeningStatus(place.openingHours);
 
   return (
