@@ -1,8 +1,9 @@
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Alert,
   Image,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
@@ -21,19 +22,29 @@ export default function LoginScreen() {
 
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
-
   const [isLoading, setIsLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const show = Keyboard.addListener('keyboardDidShow', () =>
+      setKeyboardVisible(true)
+    );
+    const hide = Keyboard.addListener('keyboardDidHide', () =>
+      setKeyboardVisible(false)
+    );
+    return () => {
+      show.remove();
+      hide.remove();
+    };
+  }, []);
 
   const isIdentifierInvalid = submitted && !identifier.trim();
   const isPasswordInvalid = submitted && !password;
 
   const handleLogin = async () => {
     setSubmitted(true);
-
-    if (!identifier.trim() || !password) {
-      return;
-    }
+    if (!identifier.trim() || !password) return;
 
     setIsLoading(true);
     try {
@@ -49,18 +60,21 @@ export default function LoginScreen() {
   return (
     <KeyboardAvoidingView
       className="flex-1 bg-colors-brand-secondary"
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <View className="w-full flex-grow justify-end">
-        <View className="items-center pb-20">
-          <Image
-            source={require('@/assets/images/icon.png')}
-            className="h-64 w-64"
-            resizeMode="contain"
-          />
-        </View>
+      <View className="flex-1 justify-end">
+        {/* Logo — hidden when keyboard is open so the card stays visible */}
+        {!keyboardVisible && (
+          <View className="items-center pb-16 pt-8">
+            <Image
+              source={require('@/assets/images/icon.png')}
+              style={{ width: 200, height: 200 }}
+              resizeMode="contain"
+            />
+          </View>
+        )}
 
-        <BaseCard className="rounded-t-[40px] px-8 py-16">
+        <BaseCard className="rounded-t-[40px] px-8 py-12">
           <AppText className="mb-2 text-3xl" variant="title">
             Login
           </AppText>
@@ -99,7 +113,7 @@ export default function LoginScreen() {
           </View>
 
           <TouchableOpacity
-            className="items-center py-2"
+            className="items-center py-4"
             onPress={() => router.push('/(auth)/register')}
             disabled={isLoading}
           >

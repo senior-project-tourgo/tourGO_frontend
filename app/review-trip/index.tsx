@@ -8,12 +8,16 @@ import { useEditableTrip } from '@/hooks/review-trip/useEditableTrip';
 import { useReviewTripParams } from '@/hooks/review-trip/useReviewTripParams';
 import { useReviewTripRegion } from '@/hooks/review-trip/useReviewTripRegion';
 import { useSaveTrip } from '@/hooks/review-trip/useSaveTrip';
+import { pendingPlaceStore } from '@/stores/pendingPlaceStore';
 import { ActivityIndicator, Alert, ScrollView, View } from 'react-native';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
+
+import { useCallback } from 'react';
 
 export default function ReviewTripScreen() {
   const {
     places: editablePlaces,
+    addPlace,
     removePlace,
     setInitialPlaces
   } = useEditableTrip([]);
@@ -23,6 +27,17 @@ export default function ReviewTripScreen() {
   const { region } = useReviewTripRegion(editablePlaces);
 
   const { saveTrip, loading } = useSaveTrip(editablePlaces, finalItineraryName);
+
+  // Pick up any place selected from the add-place screen
+  useFocusEffect(
+    useCallback(() => {
+      const pending = pendingPlaceStore.get();
+      if (pending) {
+        addPlace(pending);
+        pendingPlaceStore.clear();
+      }
+    }, [addPlace])
+  );
 
   if (!region) {
     return (
@@ -43,6 +58,7 @@ export default function ReviewTripScreen() {
       <Map
         region={region}
         markers={editablePlaces.map(item => ({
+          id: item.place.placeId,
           latitude: Number(item.place.location.lat),
           longitude: Number(item.place.location.lng),
           title: item.place.placeName
@@ -87,7 +103,14 @@ export default function ReviewTripScreen() {
           <NoPlaceCard
             title="+ Add Place"
             subtitle="Find another spot"
-            onPress={() => router.push('/review-trip/add-place')}
+            onPress={() =>
+              router.push({
+                pathname: '/review-trip/add-place',
+                params: {
+                  addedIds: editablePlaces.map(p => p.place.placeId).join(',')
+                }
+              })
+            }
           />
         </ScrollView>
 
