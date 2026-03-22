@@ -9,6 +9,7 @@ import { useReviewTripParams } from '@/hooks/review-trip/useReviewTripParams';
 import { useReviewTripRegion } from '@/hooks/review-trip/useReviewTripRegion';
 import { useSaveTrip } from '@/hooks/review-trip/useSaveTrip';
 import { pendingPlaceStore } from '@/stores/pendingPlaceStore';
+import colors from '@/theme/colors';
 import { ActivityIndicator, Alert, ScrollView, View } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 
@@ -57,11 +58,12 @@ export default function ReviewTripScreen() {
 
       <Map
         region={region}
-        markers={editablePlaces.map(item => ({
+        markers={editablePlaces.map((item, index) => ({
           id: item.place.placeId,
           latitude: Number(item.place.location.lat),
           longitude: Number(item.place.location.lng),
-          title: item.place.placeName
+          title: `${index + 1}. ${item.place.placeName}`,
+          pinColor: colors.brand.primary
         }))}
       />
 

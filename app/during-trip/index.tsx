@@ -67,8 +67,7 @@ export default function DuringTripScreen() {
   );
   const [transportMode, setTransportMode] = useState<TransportMode>('driving');
   const [routeSegments, setRouteSegments] = useState<RouteSegment[]>([]);
-  const [routeLoading, setRouteLoading] = useState(false);
-  // Cache: key = `${fromPlaceId}-${toPlaceId}-${mode}` → full segment
+  // Cache: key = `${fromPlaceId}-${toPlaceId}-${mode}` → full segment (avoids re-fetching on mode switch)
   const routeCache = useRef<Record<string, RouteSegment>>({});
 
   const mapRef = useRef<MapView>(null);
@@ -190,7 +189,6 @@ export default function DuringTripScreen() {
     });
 
     const fetchAll = async () => {
-      setRouteLoading(true);
       const segments = await Promise.all(
         ordered.slice(0, -1).map(async (pd, i) => {
           const from = pd.place.location;
@@ -201,13 +199,13 @@ export default function DuringTripScreen() {
             return routeCache.current[cacheKey];
           }
 
-          const coords = await fetchRouteSegment(from, to, transportMode);
-          routeCache.current[cacheKey] = coords;
-          return coords;
+          const segment = await fetchRouteSegment(from, to, transportMode);
+          routeCache.current[cacheKey] = segment;
+          return segment;
         })
       );
+      // Only update when all segments are ready — old routes stay visible until then
       setRouteSegments(segments);
-      setRouteLoading(false);
     };
 
     fetchAll();
@@ -773,11 +771,10 @@ export default function DuringTripScreen() {
             <React.Fragment key={i}>
               <Polyline
                 coordinates={segment.coords}
-                strokeColor={routeLoading ? '#cbd5e1' : colors.brand.primary}
+                strokeColor={colors.brand.primary}
                 strokeWidth={4}
-                lineDashPattern={routeLoading ? [8, 6] : undefined}
               />
-              {segment.duration && !routeLoading && (
+              {segment.duration && (
                 <Marker
                   coordinate={{ latitude: midLat, longitude: midLng }}
                   anchor={{ x: 0.5, y: 0.5 }}

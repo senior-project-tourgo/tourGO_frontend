@@ -10,6 +10,8 @@ export type MapMarker = {
   title?: string;
   /** Optional identifier used as the React key — falls back to index */
   id?: string;
+  /** Pin colour — defaults to the platform default (red). Pass a hex string or named colour. */
+  pinColor?: string;
 };
 
 type Props = {
@@ -62,6 +64,7 @@ export function Map({ region, markers }: Props) {
               longitude: marker.longitude
             }}
             title={marker.title}
+            pinColor={marker.pinColor}
           />
         ))}
       </MapView>
