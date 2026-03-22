@@ -1,8 +1,10 @@
 import { AppText } from '@/components/AppText';
+import { Badge } from '@/components/Badge';
 import { DuringTripPlaceCard } from '@/components/cards/variants/PlaceCard/DuringTripPlaceCard';
-import type { Trip } from '@/features/trip/trip.types';
 import type { Place } from '@/features/place/place.types';
 import { getPlacesByIds } from '@/features/place/placeById.api';
+import type { Trip } from '@/features/trip/trip.types';
+import { getPlaceOpeningStatus } from '@/utils/openingHours';
 import {
   getPromotionsByPlace,
   type ApiPromotion
@@ -13,24 +15,34 @@ import {
   getTripById
 } from '@/services/trip.service';
 import colors from '@/theme/colors';
+import { mockVibes } from '@/mock/vibes.mock';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import * as Location from 'expo-location';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Animated,
+  FlatList,
   Modal,
   Pressable,
   ScrollView,
   TouchableOpacity,
   View
 } from 'react-native';
-import MapView, { Marker, Region } from 'react-native-maps';
+import MapView, { Marker, Polyline, Region } from 'react-native-maps';
 
 type PlaceWithPromos = {
   place: Place;
   promotions: ApiPromotion[];
+};
+
+type StampModalData = {
+  placeName: string;
+  visitCount: number;
+  isNew: boolean;
 };
 
 export default function DuringTripScreen() {
@@ -43,14 +55,44 @@ export default function DuringTripScreen() {
   const [checkingInId, setCheckingInId] = useState<string | null>(null);
   const [ending, setEnding] = useState(false);
   const [showEndModal, setShowEndModal] = useState(false);
+  const [stampModal, setStampModal] = useState<StampModalData | null>(null);
+  const [selectedPlace, setSelectedPlace] = useState<PlaceWithPromos | null>(
+    null
+  );
 
   const mapRef = useRef<MapView>(null);
+  const flatListRef = useRef<FlatList<PlaceWithPromos>>(null);
+  const stampScale = useRef(new Animated.Value(0.5)).current;
+  const stampOpacity = useRef(new Animated.Value(0)).current;
+  const dismissTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Load trip + places + promotions
+  // Bottom sheet animation — card slides up, overlay fades in separately
+  const sheetTranslateY = useRef(new Animated.Value(700)).current;
+  const sheetOverlayOpacity = useRef(new Animated.Value(0)).current;
+
+  // Stable refs for FlatList viewability — must not change across renders
+  const viewabilityConfig = useRef({ itemVisiblePercentThreshold: 60 }).current;
+  const onViewableItemsChanged = useRef(
+    ({ viewableItems }: { viewableItems: any[] }) => {
+      if (viewableItems.length > 0) {
+        const item = viewableItems[0].item as PlaceWithPromos;
+        mapRef.current?.animateToRegion(
+          {
+            latitude: item.place.location.lat,
+            longitude: item.place.location.lng,
+            latitudeDelta: 0.015,
+            longitudeDelta: 0.015
+          },
+          400
+        );
+      }
+    }
+  ).current;
+
   const load = useCallback(async () => {
     if (!tripId) return;
     try {
-      const [fetchedTrip, locationResult] = await Promise.all([
+      const [fetchedTrip] = await Promise.all([
         getTripById(tripId),
         Location.requestForegroundPermissionsAsync()
       ]);
@@ -63,7 +105,6 @@ export default function DuringTripScreen() {
 
       const places = await getPlacesByIds(placeIds);
 
-      // Fetch promotions for each place in parallel
       const withPromos: PlaceWithPromos[] = await Promise.all(
         places.map(async place => {
           try {
@@ -77,15 +118,7 @@ export default function DuringTripScreen() {
 
       setPlaceData(withPromos);
 
-      // Set initial region from user location or first place
-      if (locationResult.status === 'granted' && places.length > 0) {
-        setRegion({
-          latitude: places[0].location.lat,
-          longitude: places[0].location.lng,
-          latitudeDelta: 0.05,
-          longitudeDelta: 0.05
-        });
-      } else if (places.length > 0) {
+      if (places.length > 0) {
         setRegion({
           latitude: places[0].location.lat,
           longitude: places[0].location.lng,
@@ -104,12 +137,96 @@ export default function DuringTripScreen() {
     load();
   }, [load]);
 
+  useEffect(() => {
+    return () => {
+      if (dismissTimer.current) clearTimeout(dismissTimer.current);
+    };
+  }, []);
+
+  // Open bottom sheet whenever a place is selected
+  useEffect(() => {
+    if (selectedPlace) {
+      sheetTranslateY.setValue(700);
+      sheetOverlayOpacity.setValue(0);
+      Animated.parallel([
+        Animated.spring(sheetTranslateY, {
+          toValue: 0,
+          useNativeDriver: true,
+          tension: 65,
+          friction: 11
+        }),
+        Animated.timing(sheetOverlayOpacity, {
+          toValue: 1,
+          duration: 220,
+          useNativeDriver: true
+        })
+      ]).start();
+    }
+    // sheetTranslateY and sheetOverlayOpacity are stable Animated.Value refs
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedPlace]);
+
+  const closeSheet = () => {
+    Animated.parallel([
+      Animated.timing(sheetTranslateY, {
+        toValue: 700,
+        duration: 240,
+        useNativeDriver: true
+      }),
+      Animated.timing(sheetOverlayOpacity, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true
+      })
+    ]).start(() => setSelectedPlace(null));
+  };
+
+  const showStamp = (data: StampModalData) => {
+    setStampModal(data);
+    stampScale.setValue(0.5);
+    stampOpacity.setValue(0);
+    Animated.parallel([
+      Animated.spring(stampScale, {
+        toValue: 1,
+        useNativeDriver: true,
+        tension: 80,
+        friction: 6
+      }),
+      Animated.timing(stampOpacity, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: true
+      })
+    ]).start();
+
+    if (dismissTimer.current) clearTimeout(dismissTimer.current);
+    dismissTimer.current = setTimeout(() => {
+      Animated.timing(stampOpacity, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true
+      }).start(() => setStampModal(null));
+    }, 2500);
+  };
+
   const handleCheckIn = async (placeId: string) => {
     if (!trip || !tripId) return;
     try {
       setCheckingInId(placeId);
       const result = await apiCheckIn(tripId, placeId);
       setTrip(result.trip);
+
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+      const placeName =
+        placeData.find(pd => pd.place.placeId === placeId)?.place.placeName ??
+        'Place';
+
+      showStamp({
+        placeName,
+        visitCount: result.stamp?.visitCount ?? 1,
+        isNew: result.stamp?.isNew ?? true
+      });
     } catch (err: any) {
       Alert.alert('Check-in Failed', err.message ?? 'Could not check in');
     } finally {
@@ -152,7 +269,6 @@ export default function DuringTripScreen() {
       });
     } catch (err: any) {
       setEnding(false);
-      // Show error inline — can't use Alert right after dismissing a Modal on Android
       console.error('End trip failed:', err.message);
     } finally {
       setEnding(false);
@@ -176,18 +292,327 @@ export default function DuringTripScreen() {
   const visitedCount = visitedIds.size;
   const totalCount = trip?.places.length ?? 0;
   const tripXp = trip?.xpEarned ?? 0;
+  const progress = totalCount > 0 ? visitedCount / totalCount : 0;
 
-  const markers = placeData.map(({ place }, idx) => ({
+  // Sort placeData by trip order
+  const sortedPlaceData = [...placeData].sort((a, b) => {
+    const aOrder =
+      trip?.places.find(p => p.placeId === a.place.placeId)?.order ?? 0;
+    const bOrder =
+      trip?.places.find(p => p.placeId === b.place.placeId)?.order ?? 0;
+    return aOrder - bOrder;
+  });
+
+  // Next place in journey = first unvisited place in order
+  const nextUnvisitedId =
+    sortedPlaceData.find(pd => !visitedIds.has(pd.place.placeId))?.place
+      .placeId ?? null;
+
+  const markers = sortedPlaceData.map(({ place }) => ({
     latitude: place.location.lat,
     longitude: place.location.lng,
-    title: `${idx + 1}. ${place.placeName}`,
+    title: place.placeName,
     placeId: place.placeId,
-    visited: visitedIds.has(place.placeId)
+    visited: visitedIds.has(place.placeId),
+    isCurrent: place.placeId === nextUnvisitedId
+  }));
+
+  // Route line connecting all places in order
+  const routeCoordinates = sortedPlaceData.map(pd => ({
+    latitude: pd.place.location.lat,
+    longitude: pd.place.location.lng
   }));
 
   return (
     <View className="flex-1">
-      {/* End Trip confirmation modal */}
+      {/* ── Stamp celebration overlay (non-blocking, auto-dismisses) ── */}
+      {stampModal && (
+        <Animated.View
+          pointerEvents="none"
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 100,
+            backgroundColor: 'rgba(0,0,0,0.35)',
+            alignItems: 'center',
+            justifyContent: 'center',
+            opacity: stampOpacity
+          }}
+        >
+          <Animated.View
+            style={{
+              transform: [{ scale: stampScale }],
+              backgroundColor: '#fff',
+              borderRadius: 24,
+              padding: 28,
+              alignItems: 'center',
+              gap: 6,
+              width: 260,
+              shadowColor: '#000',
+              shadowOpacity: 0.18,
+              shadowRadius: 24,
+              elevation: 12
+            }}
+          >
+            {/* Stamp circle */}
+            <View
+              style={{
+                width: 80,
+                height: 80,
+                borderRadius: 40,
+                backgroundColor: colors.brand.primary + '18',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderWidth: 3,
+                borderColor: colors.brand.primary,
+                borderStyle: 'dashed'
+              }}
+            >
+              <Ionicons
+                name="checkmark"
+                size={42}
+                color={colors.brand.primary}
+              />
+            </View>
+
+            <AppText
+              variant="subtitle"
+              className="text-center font-semibold"
+              style={{ marginTop: 4 }}
+            >
+              {stampModal.isNew ? 'Stamp Collected!' : 'Visited Again!'}
+            </AppText>
+
+            <AppText variant="muted" className="text-center">
+              {stampModal.placeName}
+            </AppText>
+
+            {stampModal.visitCount > 1 && (
+              <View
+                style={{
+                  backgroundColor: colors.brand.primary + '15',
+                  paddingHorizontal: 12,
+                  paddingVertical: 4,
+                  borderRadius: 12,
+                  marginTop: 2
+                }}
+              >
+                <AppText
+                  variant="caption"
+                  className="font-semibold"
+                  style={{ color: colors.brand.primary }}
+                >
+                  Visit #{stampModal.visitCount}
+                </AppText>
+              </View>
+            )}
+
+            <AppText
+              variant="caption"
+              style={{ color: '#94a3b8', marginTop: 4 }}
+            >
+              +10 XP earned
+            </AppText>
+          </Animated.View>
+        </Animated.View>
+      )}
+
+      {/* ── Place detail bottom sheet ── */}
+      {/* animationType="none" so we control card + overlay separately:
+          overlay fades in, card slides up — avoids the "whole screen slides" glitch */}
+      <Modal
+        visible={!!selectedPlace}
+        transparent
+        animationType="none"
+        onRequestClose={closeSheet}
+      >
+        {selectedPlace && (
+          <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+            {/* Dark overlay: tap to dismiss */}
+            <Animated.View
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(0,0,0,0.45)',
+                opacity: sheetOverlayOpacity
+              }}
+            >
+              <Pressable style={{ flex: 1 }} onPress={closeSheet} />
+            </Animated.View>
+
+            {/* White card: slides up independently */}
+            <Animated.View
+              style={{
+                backgroundColor: '#fff',
+                borderTopLeftRadius: 24,
+                borderTopRightRadius: 24,
+                maxHeight: '82%',
+                transform: [{ translateY: sheetTranslateY }]
+              }}
+            >
+              {/* Handle bar */}
+              <View
+                style={{
+                  alignItems: 'center',
+                  paddingTop: 12,
+                  paddingBottom: 4
+                }}
+              >
+                <View
+                  style={{
+                    width: 40,
+                    height: 4,
+                    borderRadius: 2,
+                    backgroundColor: '#e2e8f0'
+                  }}
+                />
+              </View>
+
+              <ScrollView
+                contentContainerStyle={{ padding: 20, gap: 12 }}
+                showsVerticalScrollIndicator={false}
+              >
+                {/* Name + rating row */}
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                  }}
+                >
+                  <AppText
+                    variant="subtitle"
+                    className="font-semibold"
+                    style={{ flex: 1, marginRight: 8 }}
+                  >
+                    {selectedPlace.place.placeName}
+                  </AppText>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 4
+                    }}
+                  >
+                    <Ionicons
+                      name="star"
+                      size={14}
+                      color={colors.brand.primary}
+                    />
+                    <AppText variant="caption" className="font-semibold">
+                      {selectedPlace.place.averageRating}
+                    </AppText>
+                  </View>
+                </View>
+
+                {/* Meta */}
+                <AppText variant="muted">
+                  {selectedPlace.place.location.area} ·{' '}
+                  {selectedPlace.place.priceRange} · ~
+                  {selectedPlace.place.typicalTimeSpent}
+                </AppText>
+
+                {/* Opening status */}
+                {(() => {
+                  const hours = getPlaceOpeningStatus(
+                    selectedPlace.place.openingHours
+                  );
+                  return (
+                    <AppText
+                      variant="caption"
+                      style={{ color: hours.isOpenNow ? '#22c55e' : '#ef4444' }}
+                    >
+                      {hours.isOpenNow ? 'Open Now' : 'Closed'}
+                      {hours.nextTime
+                        ? ` · ${hours.nextTime.type === 'close' ? 'Closes' : 'Opens'} at ${hours.nextTime.time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                        : ''}
+                    </AppText>
+                  );
+                })()}
+
+                {/* Vibe tags */}
+                <View
+                  style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}
+                >
+                  {selectedPlace.place.vibe
+                    .map(id => mockVibes.find(v => v.id === id)?.title)
+                    .filter(Boolean)
+                    .map((title, i) => (
+                      <Badge key={i} label={title as string} />
+                    ))}
+                </View>
+
+                {/* Visited badge */}
+                {visitedIds.has(selectedPlace.place.placeId) && (
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 8,
+                      backgroundColor: '#f0fdf4',
+                      borderRadius: 12,
+                      padding: 12
+                    }}
+                  >
+                    <Ionicons
+                      name="checkmark-circle"
+                      size={20}
+                      color="#22c55e"
+                    />
+                    <AppText
+                      variant="caption"
+                      className="font-semibold"
+                      style={{ color: '#16a34a' }}
+                    >
+                      You visited this place!
+                    </AppText>
+                  </View>
+                )}
+
+                {/* Promotions */}
+                {selectedPlace.promotions.length > 0 && (
+                  <View style={{ gap: 8 }}>
+                    <AppText variant="subtitle" className="font-semibold">
+                      Deals Available
+                    </AppText>
+                    {selectedPlace.promotions.map(promo => (
+                      <View
+                        key={promo.promotionId}
+                        style={{
+                          backgroundColor: '#f8fafc',
+                          borderRadius: 12,
+                          padding: 12
+                        }}
+                      >
+                        <AppText variant="caption" className="font-semibold">
+                          {promo.promotionName}
+                        </AppText>
+                        <AppText
+                          variant="caption"
+                          className="mt-1 text-colors-text"
+                        >
+                          {promo.description}
+                        </AppText>
+                      </View>
+                    ))}
+                  </View>
+                )}
+
+                {/* Bottom spacing */}
+                <View style={{ height: 16 }} />
+              </ScrollView>
+            </Animated.View>
+          </View>
+        )}
+      </Modal>
+
+      {/* ── End Trip confirmation modal ── */}
       <Modal
         visible={showEndModal}
         transparent
@@ -267,7 +692,8 @@ export default function DuringTripScreen() {
           </Pressable>
         </Pressable>
       </Modal>
-      {/* Map fills entire screen */}
+
+      {/* ── Map (full screen) ── */}
       <MapView
         ref={mapRef}
         style={{ flex: 1 }}
@@ -277,23 +703,39 @@ export default function DuringTripScreen() {
         onMapReady={() => {
           if (markers.length > 0) {
             mapRef.current?.fitToCoordinates(markers, {
-              edgePadding: { top: 100, right: 40, bottom: 280, left: 40 },
+              edgePadding: { top: 100, right: 40, bottom: 320, left: 40 },
               animated: true
             });
           }
         }}
       >
-        {markers.map((m, idx) => (
+        {/* Journey path: dashed polyline connecting all stops in order */}
+        {routeCoordinates.length > 1 && (
+          <Polyline
+            coordinates={routeCoordinates}
+            strokeColor={colors.brand.primary}
+            strokeWidth={3}
+            lineDashPattern={[12, 6]}
+          />
+        )}
+
+        {markers.map(m => (
           <Marker
             key={m.placeId}
             coordinate={{ latitude: m.latitude, longitude: m.longitude }}
             title={m.title}
-            pinColor={m.visited ? '#22c55e' : colors.brand.primary}
+            pinColor={
+              m.visited
+                ? '#22c55e'
+                : m.isCurrent
+                  ? colors.brand.primary
+                  : '#94a3b8'
+            }
           />
         ))}
       </MapView>
 
-      {/* Header overlay */}
+      {/* ── Header overlay ── */}
       <View className="absolute left-0 right-0 top-0 z-10 flex-row items-center justify-between px-4 pb-3 pt-14">
         <View className="flex-row items-center gap-2">
           <TouchableOpacity
@@ -324,56 +766,152 @@ export default function DuringTripScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* XP / progress pill */}
+      {/* ── Progress pill + bar ── */}
       <View className="absolute left-4 right-4 z-10" style={{ top: 108 }}>
-        <View className="flex-row items-center justify-center gap-4 self-center rounded-2xl bg-colors-surface-background px-5 py-2 shadow-sm">
-          <View className="flex-row items-center gap-1">
-            <Ionicons name="star" size={14} color={colors.brand.primary} />
-            <AppText
-              variant="caption"
-              className="font-semibold"
-              style={{ color: colors.brand.primary }}
+        <View
+          style={{
+            backgroundColor: '#fff',
+            borderRadius: 16,
+            paddingHorizontal: 16,
+            paddingTop: 10,
+            paddingBottom: 12,
+            shadowColor: '#000',
+            shadowOpacity: 0.06,
+            shadowRadius: 8,
+            elevation: 3
+          }}
+        >
+          {/* Stats row */}
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}
+          >
+            <View
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}
             >
-              {tripXp} XP earned
+              <Ionicons name="star" size={14} color={colors.brand.primary} />
+              <AppText
+                variant="caption"
+                className="font-semibold"
+                style={{ color: colors.brand.primary }}
+              >
+                {tripXp} XP earned
+              </AppText>
+            </View>
+
+            <AppText variant="caption" className="font-semibold">
+              {visitedCount}/{totalCount} stops
             </AppText>
           </View>
-          <View className="h-4 w-px bg-colors-brand-neutrals" />
-          <View className="flex-row items-center gap-1">
-            <Ionicons
-              name="location"
-              size={14}
-              color={colors.brand.secondary}
+
+          {/* Progress bar */}
+          <View
+            style={{
+              height: 4,
+              backgroundColor: colors.brand.neutrals,
+              borderRadius: 2,
+              marginTop: 8,
+              overflow: 'hidden'
+            }}
+          >
+            <View
+              style={{
+                height: 4,
+                width: `${Math.round(progress * 100)}%`,
+                backgroundColor: colors.brand.primary,
+                borderRadius: 2
+              }}
             />
-            <AppText variant="caption" className="font-semibold">
-              {visitedCount}/{totalCount} visited
-            </AppText>
           </View>
         </View>
       </View>
 
-      {/* Bottom cards — mirrors review-trip layout */}
+      {/* ── Journey dots + Cards ── */}
       <View className="absolute bottom-6 z-10 w-full">
-        <ScrollView
+        {/* Journey path dots — one per stop */}
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 6,
+            marginBottom: 10,
+            paddingHorizontal: 16
+          }}
+        >
+          {sortedPlaceData.map((pd, idx) => {
+            const isVisited = visitedIds.has(pd.place.placeId);
+            const isCurrent = pd.place.placeId === nextUnvisitedId;
+            return (
+              <View
+                key={pd.place.placeId}
+                style={{ alignItems: 'center', gap: 2 }}
+              >
+                {/* Connector line between dots */}
+                {idx > 0 && (
+                  <View
+                    style={{
+                      position: 'absolute',
+                      right: '50%',
+                      top: isCurrent ? 4 : 3,
+                      width: 6,
+                      height: 2,
+                      backgroundColor: isVisited ? '#22c55e' : '#cbd5e1',
+                      transform: [{ translateX: -6 }]
+                    }}
+                  />
+                )}
+                <View
+                  style={{
+                    width: isCurrent ? 12 : 8,
+                    height: isCurrent ? 12 : 8,
+                    borderRadius: 6,
+                    backgroundColor: isVisited
+                      ? '#22c55e'
+                      : isCurrent
+                        ? colors.brand.primary
+                        : '#cbd5e1',
+                    borderWidth: isCurrent ? 2 : 0,
+                    borderColor: '#fff'
+                  }}
+                />
+              </View>
+            );
+          })}
+        </View>
+
+        {/* Place cards — horizontal FlatList with map sync on scroll */}
+        <FlatList
+          ref={flatListRef}
           horizontal
+          data={sortedPlaceData}
+          keyExtractor={item => item.place.placeId}
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ paddingHorizontal: 16, gap: 8 }}
-        >
-          {placeData.map(({ place, promotions }) => {
+          snapToInterval={353}
+          decelerationRate="fast"
+          snapToAlignment="start"
+          viewabilityConfig={viewabilityConfig}
+          onViewableItemsChanged={onViewableItemsChanged}
+          renderItem={({ item: { place, promotions } }) => {
             const tripPlace = trip?.places.find(
               p => p.placeId === place.placeId
             );
             return (
               <DuringTripPlaceCard
-                key={place.placeId}
                 place={place}
                 visitedAt={tripPlace?.visitedAt ?? null}
                 promotions={promotions}
                 onCheckIn={() => handleCheckIn(place.placeId)}
                 checkingIn={checkingInId === place.placeId}
+                onPress={() => setSelectedPlace({ place, promotions })}
               />
             );
-          })}
-        </ScrollView>
+          }}
+        />
       </View>
     </View>
   );

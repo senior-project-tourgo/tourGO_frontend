@@ -30,9 +30,16 @@ export type CompleteTripResult = {
   totalDuration: number | null;
 };
 
+export type StampInfo = {
+  placeId: string;
+  visitCount: number;
+  isNew: boolean;
+};
+
 export type CheckInResult = {
   trip: Trip;
   xpEarned: number;
   totalXp: number;
   badge: string;
+  stamp: StampInfo;
 };

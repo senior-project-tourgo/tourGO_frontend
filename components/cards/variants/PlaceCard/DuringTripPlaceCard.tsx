@@ -8,7 +8,7 @@ import { getPlaceOpeningStatus } from '@/utils/openingHours';
 import { Ionicons } from '@expo/vector-icons';
 import { mockVibes } from '@/mock/vibes.mock';
 import { useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { Pressable, TouchableOpacity, View } from 'react-native';
 import { ImageWithFallback } from './ImageWithFallback';
 
 type Tab = 'checkin' | 'promotions';
@@ -19,6 +19,7 @@ interface Props {
   promotions: ApiPromotion[];
   onCheckIn: () => void;
   checkingIn?: boolean;
+  onPress?: () => void;
 }
 
 export function DuringTripPlaceCard({
@@ -26,7 +27,8 @@ export function DuringTripPlaceCard({
   visitedAt,
   promotions,
   onCheckIn,
-  checkingIn = false
+  checkingIn = false,
+  onPress
 }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>('checkin');
   const openingHours = getPlaceOpeningStatus(place.openingHours);
@@ -34,69 +36,75 @@ export function DuringTripPlaceCard({
 
   return (
     <View className="w-[345px] overflow-hidden rounded-2xl bg-colors-surface-background shadow-sm">
-      {/* Top section — identical layout to PlaceCard */}
-      <View className="h-60 flex-row gap-4 p-4">
-        <ImageWithFallback
-          primaryImageUrl={place.image}
-          className="h-52 w-32 rounded-xl"
-          resizeMode="cover"
-        />
+      {/* Top section — tappable to open place detail */}
+      <TouchableOpacity
+        activeOpacity={onPress ? 0.85 : 1}
+        onPress={onPress}
+        disabled={!onPress}
+      >
+        <View className="h-60 flex-row gap-4 p-4">
+          <ImageWithFallback
+            primaryImageUrl={place.image}
+            className="h-52 w-32 rounded-xl"
+            resizeMode="cover"
+          />
 
-        <View className="flex-1 gap-1">
-          <AppText variant="subtitle">{place.placeName}</AppText>
-          <AppText variant="muted">
-            <Ionicons name="star" color={colors.brand.primary} />{' '}
-            {place.averageRating}
-          </AppText>
-
-          <AppText variant="muted">
-            {place.location.area} · {place.priceRange}
-          </AppText>
-
-          <AppText>
-            <AppText
-              variant="muted"
-              className={
-                openingHours.isOpenNow ? 'text-green-500' : 'text-red-500'
-              }
-            >
-              {openingHours.isOpenNow ? 'Open' : 'Closed'}
-            </AppText>
+          <View className="flex-1 gap-1">
+            <AppText variant="subtitle">{place.placeName}</AppText>
             <AppText variant="muted">
-              {' · '}
-              {openingHours.nextTime
-                ? openingHours.nextTime.type === 'close'
-                  ? `Closes at ${openingHours.nextTime.time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
-                  : `Opens at ${openingHours.nextTime.time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
-                : 'Hours unavailable'}
+              <Ionicons name="star" color={colors.brand.primary} />{' '}
+              {place.averageRating}
             </AppText>
-          </AppText>
 
-          <View className="flex-row flex-wrap gap-2">
-            {place.vibe
-              .map(id => mockVibes.find(v => v.id === id)?.title)
-              .filter(Boolean)
-              .map((title, index) => (
-                <View key={place.vibe[index]}>
-                  <Badge label={title as string} />
-                </View>
-              ))}
-          </View>
+            <AppText variant="muted">
+              {place.location.area} · {place.priceRange}
+            </AppText>
 
-          {/* Visited badge */}
-          {isVisited && (
-            <View className="mt-1 flex-row items-center gap-1">
-              <Ionicons name="checkmark-circle" size={14} color="#22c55e" />
+            <AppText>
               <AppText
-                variant="caption"
-                className="font-semibold text-green-500"
+                variant="muted"
+                className={
+                  openingHours.isOpenNow ? 'text-green-500' : 'text-red-500'
+                }
               >
-                Visited
+                {openingHours.isOpenNow ? 'Open' : 'Closed'}
               </AppText>
+              <AppText variant="muted">
+                {' · '}
+                {openingHours.nextTime
+                  ? openingHours.nextTime.type === 'close'
+                    ? `Closes at ${openingHours.nextTime.time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                    : `Opens at ${openingHours.nextTime.time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                  : 'Hours unavailable'}
+              </AppText>
+            </AppText>
+
+            <View className="flex-row flex-wrap gap-2">
+              {place.vibe
+                .map(id => mockVibes.find(v => v.id === id)?.title)
+                .filter(Boolean)
+                .map((title, index) => (
+                  <View key={place.vibe[index]}>
+                    <Badge label={title as string} />
+                  </View>
+                ))}
             </View>
-          )}
+
+            {/* Visited badge */}
+            {isVisited && (
+              <View className="mt-1 flex-row items-center gap-1">
+                <Ionicons name="checkmark-circle" size={14} color="#22c55e" />
+                <AppText
+                  variant="caption"
+                  className="font-semibold text-green-500"
+                >
+                  Visited
+                </AppText>
+              </View>
+            )}
+          </View>
         </View>
-      </View>
+      </TouchableOpacity>
 
       {/* Tab strip */}
       <View className="flex-row border-t border-colors-brand-neutrals">
