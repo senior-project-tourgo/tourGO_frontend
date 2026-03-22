@@ -14,19 +14,25 @@ import {
   completeTrip,
   getTripById
 } from '@/services/trip.service';
+import {
+  fetchRouteSegment,
+  type TransportMode,
+  type RouteSegment
+} from '@/services/directions.service';
 import colors from '@/theme/colors';
 import { mockVibes } from '@/mock/vibes.mock';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import * as Location from 'expo-location';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
   Animated,
   FlatList,
   Modal,
+  PanResponder,
   Pressable,
   ScrollView,
   TouchableOpacity,
@@ -59,6 +65,11 @@ export default function DuringTripScreen() {
   const [selectedPlace, setSelectedPlace] = useState<PlaceWithPromos | null>(
     null
   );
+  const [transportMode, setTransportMode] = useState<TransportMode>('driving');
+  const [routeSegments, setRouteSegments] = useState<RouteSegment[]>([]);
+  const [routeLoading, setRouteLoading] = useState(false);
+  // Cache: key = `${fromPlaceId}-${toPlaceId}-${mode}` → full segment
+  const routeCache = useRef<Record<string, RouteSegment>>({});
 
   const mapRef = useRef<MapView>(null);
   const flatListRef = useRef<FlatList<PlaceWithPromos>>(null);
@@ -66,9 +77,38 @@ export default function DuringTripScreen() {
   const stampOpacity = useRef(new Animated.Value(0)).current;
   const dismissTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Bottom sheet animation — card slides up, overlay fades in separately
+  // Bottom sheet animation — card slides up from the bottom
   const sheetTranslateY = useRef(new Animated.Value(700)).current;
-  const sheetOverlayOpacity = useRef(new Animated.Value(0)).current;
+
+  // PanResponder for drag-to-dismiss on the handle
+  const sheetPanResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dy) > 5,
+      onPanResponderMove: (_, g) => {
+        // Only allow dragging downward
+        if (g.dy > 0) sheetTranslateY.setValue(g.dy);
+      },
+      onPanResponderRelease: (_, g) => {
+        if (g.dy > 60 || g.vy > 0.5) {
+          // Fling threshold met — dismiss
+          Animated.timing(sheetTranslateY, {
+            toValue: 700,
+            duration: 220,
+            useNativeDriver: true
+          }).start(() => setSelectedPlace(null));
+        } else {
+          // Snap back
+          Animated.spring(sheetTranslateY, {
+            toValue: 0,
+            useNativeDriver: true,
+            tension: 80,
+            friction: 10
+          }).start();
+        }
+      }
+    })
+  ).current;
 
   // Stable refs for FlatList viewability — must not change across renders
   const viewabilityConfig = useRef({ itemVisiblePercentThreshold: 60 }).current;
@@ -137,6 +177,43 @@ export default function DuringTripScreen() {
     load();
   }, [load]);
 
+  // Fetch real road routes whenever placeData or transport mode changes
+  useEffect(() => {
+    if (placeData.length < 2 || !trip) return;
+
+    const ordered = [...placeData].sort((a, b) => {
+      const aO =
+        trip.places.find(p => p.placeId === a.place.placeId)?.order ?? 0;
+      const bO =
+        trip.places.find(p => p.placeId === b.place.placeId)?.order ?? 0;
+      return aO - bO;
+    });
+
+    const fetchAll = async () => {
+      setRouteLoading(true);
+      const segments = await Promise.all(
+        ordered.slice(0, -1).map(async (pd, i) => {
+          const from = pd.place.location;
+          const to = ordered[i + 1].place.location;
+          const cacheKey = `${pd.place.placeId}-${ordered[i + 1].place.placeId}-${transportMode}`;
+
+          if (routeCache.current[cacheKey]) {
+            return routeCache.current[cacheKey];
+          }
+
+          const coords = await fetchRouteSegment(from, to, transportMode);
+          routeCache.current[cacheKey] = coords;
+          return coords;
+        })
+      );
+      setRouteSegments(segments);
+      setRouteLoading(false);
+    };
+
+    fetchAll();
+    // routeCache.current is a stable ref, safe to omit
+  }, [placeData, transportMode, trip]);
+
   useEffect(() => {
     return () => {
       if (dismissTimer.current) clearTimeout(dismissTimer.current);
@@ -147,38 +224,23 @@ export default function DuringTripScreen() {
   useEffect(() => {
     if (selectedPlace) {
       sheetTranslateY.setValue(700);
-      sheetOverlayOpacity.setValue(0);
-      Animated.parallel([
-        Animated.spring(sheetTranslateY, {
-          toValue: 0,
-          useNativeDriver: true,
-          tension: 65,
-          friction: 11
-        }),
-        Animated.timing(sheetOverlayOpacity, {
-          toValue: 1,
-          duration: 220,
-          useNativeDriver: true
-        })
-      ]).start();
+      Animated.spring(sheetTranslateY, {
+        toValue: 0,
+        useNativeDriver: true,
+        tension: 65,
+        friction: 11
+      }).start();
     }
-    // sheetTranslateY and sheetOverlayOpacity are stable Animated.Value refs
+    // sheetTranslateY is a stable Animated.Value ref
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedPlace]);
 
   const closeSheet = () => {
-    Animated.parallel([
-      Animated.timing(sheetTranslateY, {
-        toValue: 700,
-        duration: 240,
-        useNativeDriver: true
-      }),
-      Animated.timing(sheetOverlayOpacity, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver: true
-      })
-    ]).start(() => setSelectedPlace(null));
+    Animated.timing(sheetTranslateY, {
+      toValue: 700,
+      duration: 240,
+      useNativeDriver: true
+    }).start(() => setSelectedPlace(null));
   };
 
   const showStamp = (data: StampModalData) => {
@@ -317,12 +379,6 @@ export default function DuringTripScreen() {
     isCurrent: place.placeId === nextUnvisitedId
   }));
 
-  // Route line connecting all places in order
-  const routeCoordinates = sortedPlaceData.map(pd => ({
-    latitude: pd.place.location.lat,
-    longitude: pd.place.location.lng
-  }));
-
   return (
     <View className="flex-1">
       {/* ── Stamp celebration overlay (non-blocking, auto-dismisses) ── */}
@@ -431,22 +487,19 @@ export default function DuringTripScreen() {
       >
         {selectedPlace && (
           <View style={{ flex: 1, justifyContent: 'flex-end' }}>
-            {/* Dark overlay: tap to dismiss */}
-            <Animated.View
+            {/* Transparent dismiss area — map stays fully visible behind */}
+            <Pressable
               style={{
                 position: 'absolute',
                 top: 0,
                 left: 0,
                 right: 0,
-                bottom: 0,
-                backgroundColor: 'rgba(0,0,0,0.45)',
-                opacity: sheetOverlayOpacity
+                bottom: 0
               }}
-            >
-              <Pressable style={{ flex: 1 }} onPress={closeSheet} />
-            </Animated.View>
+              onPress={closeSheet}
+            />
 
-            {/* White card: slides up independently */}
+            {/* White card slides up from the bottom */}
             <Animated.View
               style={{
                 backgroundColor: '#fff',
@@ -456,20 +509,21 @@ export default function DuringTripScreen() {
                 transform: [{ translateY: sheetTranslateY }]
               }}
             >
-              {/* Handle bar */}
+              {/* Handle bar — drag down to dismiss */}
               <View
                 style={{
                   alignItems: 'center',
                   paddingTop: 12,
-                  paddingBottom: 4
+                  paddingBottom: 8
                 }}
+                {...sheetPanResponder.panHandlers}
               >
                 <View
                   style={{
                     width: 40,
                     height: 4,
                     borderRadius: 2,
-                    backgroundColor: '#e2e8f0'
+                    backgroundColor: '#cbd5e1'
                   }}
                 />
               </View>
@@ -709,15 +763,53 @@ export default function DuringTripScreen() {
           }
         }}
       >
-        {/* Journey path: dashed polyline connecting all stops in order */}
-        {routeCoordinates.length > 1 && (
-          <Polyline
-            coordinates={routeCoordinates}
-            strokeColor={colors.brand.primary}
-            strokeWidth={3}
-            lineDashPattern={[12, 6]}
-          />
-        )}
+        {/* Real road routes — one Polyline + duration label per segment */}
+        {routeSegments.map((segment, i) => {
+          const from = sortedPlaceData[i]?.place.location;
+          const to = sortedPlaceData[i + 1]?.place.location;
+          const midLat = from && to ? (from.lat + to.lat) / 2 : 0;
+          const midLng = from && to ? (from.lng + to.lng) / 2 : 0;
+          return (
+            <React.Fragment key={i}>
+              <Polyline
+                coordinates={segment.coords}
+                strokeColor={routeLoading ? '#cbd5e1' : colors.brand.primary}
+                strokeWidth={4}
+                lineDashPattern={routeLoading ? [8, 6] : undefined}
+              />
+              {segment.duration && !routeLoading && (
+                <Marker
+                  coordinate={{ latitude: midLat, longitude: midLng }}
+                  anchor={{ x: 0.5, y: 0.5 }}
+                  tracksViewChanges={false}
+                >
+                  <View
+                    style={{
+                      backgroundColor: '#fff',
+                      borderRadius: 10,
+                      paddingHorizontal: 7,
+                      paddingVertical: 3,
+                      borderWidth: 1.5,
+                      borderColor: colors.brand.primary,
+                      shadowColor: '#000',
+                      shadowOpacity: 0.1,
+                      shadowRadius: 4,
+                      elevation: 3
+                    }}
+                  >
+                    <AppText
+                      variant="caption"
+                      className="font-semibold"
+                      style={{ color: colors.brand.primary, fontSize: 11 }}
+                    >
+                      {segment.duration}
+                    </AppText>
+                  </View>
+                </Marker>
+              )}
+            </React.Fragment>
+          );
+        })}
 
         {markers.map(m => (
           <Marker
@@ -766,8 +858,51 @@ export default function DuringTripScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* ── Progress pill + bar ── */}
+      {/* ── Transport mode toggle + Progress pill ── */}
       <View className="absolute left-4 right-4 z-10" style={{ top: 108 }}>
+        {/* Mode toggle */}
+        <View
+          style={{
+            flexDirection: 'row',
+            alignSelf: 'center',
+            backgroundColor: '#fff',
+            borderRadius: 24,
+            padding: 4,
+            gap: 2,
+            marginBottom: 8,
+            shadowColor: '#000',
+            shadowOpacity: 0.06,
+            shadowRadius: 8,
+            elevation: 3
+          }}
+        >
+          {(
+            [
+              { mode: 'driving', icon: 'car-outline' },
+              { mode: 'walking', icon: 'walk-outline' }
+            ] as { mode: TransportMode; icon: string }[]
+          ).map(({ mode, icon }) => (
+            <TouchableOpacity
+              key={mode}
+              onPress={() => setTransportMode(mode)}
+              style={{
+                paddingHorizontal: 14,
+                paddingVertical: 7,
+                borderRadius: 20,
+                backgroundColor:
+                  transportMode === mode ? colors.brand.primary : 'transparent'
+              }}
+            >
+              <Ionicons
+                name={icon as any}
+                size={18}
+                color={transportMode === mode ? '#fff' : '#94a3b8'}
+              />
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Progress pill */}
         <View
           style={{
             backgroundColor: '#fff',
