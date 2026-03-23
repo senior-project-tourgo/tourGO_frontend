@@ -372,7 +372,6 @@ export default function TripScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [startingId, setStartingId] = useState<string | null>(null);
   const [tripToDelete, setTripToDelete] = useState<Trip | null>(null);
-  const [_deleting, setDeleting] = useState(false);
 
   const load = useCallback(async () => {
     try {
