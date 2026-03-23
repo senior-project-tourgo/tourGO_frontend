@@ -39,11 +39,13 @@ const STATUS_COLOR: Record<Trip['status'], string> = {
 function DeleteConfirmModal({
   trip,
   onCancel,
-  onConfirm
+  onConfirm,
+  deleting
 }: {
   trip: Trip | null;
   onCancel: () => void;
   onConfirm: () => void;
+  deleting: boolean;
 }) {
   return (
     <Modal
@@ -111,16 +113,17 @@ function DeleteConfirmModal({
             </Pressable>
             <Pressable
               onPress={onConfirm}
+              disabled={deleting}
               style={{
                 flex: 1,
                 borderRadius: 12,
-                backgroundColor: '#ef4444',
+                backgroundColor: deleting ? '#fca5a5' : '#ef4444',
                 paddingVertical: 12,
                 alignItems: 'center'
               }}
             >
               <AppText style={{ color: '#fff' }} className="font-semibold">
-                Delete
+                {deleting ? 'Deleting...' : 'Delete'}
               </AppText>
             </Pressable>
           </View>
@@ -372,6 +375,7 @@ export default function TripScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [startingId, setStartingId] = useState<string | null>(null);
   const [tripToDelete, setTripToDelete] = useState<Trip | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -525,6 +529,7 @@ export default function TripScreen() {
         trip={tripToDelete}
         onCancel={() => setTripToDelete(null)}
         onConfirm={confirmDelete}
+        deleting={deleting}
       />
     </>
   );
