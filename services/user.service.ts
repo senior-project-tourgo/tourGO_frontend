@@ -1,5 +1,6 @@
 import api from '@/config/api';
 import type { Place } from '@/features/place/place.types';
+import type { ApiPromotion } from '@/services/promotion.service';
 
 export type UserProfile = {
   _id: string;
@@ -59,9 +60,9 @@ export async function getSavedPlaces(): Promise<Place[]> {
   }
 }
 
-export async function getSavedPromotions(): Promise<any[]> {
+export async function getSavedPromotions(): Promise<ApiPromotion[]> {
   try {
-    const response = await api.get<any[]>('/user/saved-promotions');
+    const response = await api.get<ApiPromotion[]>('/user/saved-promotions');
     return response.data;
   } catch (error: any) {
     throw new Error(

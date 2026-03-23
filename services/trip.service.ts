@@ -134,9 +134,9 @@ export async function createTrip(payload: {
   itineraryName: string;
   places: { placeId: string; order: number }[];
   status: 'saved' | 'current';
-}) {
+}): Promise<Trip> {
   try {
-    const response = await api.post('/trips/create-trip', payload);
+    const response = await api.post<Trip>('/trips/create-trip', payload);
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || 'Trip creation failed');

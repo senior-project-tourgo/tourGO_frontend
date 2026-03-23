@@ -3,6 +3,7 @@ import { searchPlaces, getActivePlaces } from '@/features/place/place.api';
 import type { Place } from '@/features/place/place.types';
 import { pendingPlaceStore } from '@/stores/pendingPlaceStore';
 import colors from '@/theme/colors';
+import { haversineKm } from '@/utils/distance';
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -15,19 +16,6 @@ import {
   TextInput,
   View
 } from 'react-native';
-
-// --- Haversine ---
-function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number) {
-  const R = 6371;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLng = ((lng2 - lng1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
 
 // --- Place row ---
 function PlaceRow({
@@ -159,6 +147,9 @@ export default function AddPlaceScreen() {
   // Load nearby places on mount (empty query = all active)
   useEffect(() => {
     loadPlaces('');
+    return () => {
+      if (searchTimer.current) clearTimeout(searchTimer.current);
+    };
   }, []);
 
   async function loadPlaces(q: string) {

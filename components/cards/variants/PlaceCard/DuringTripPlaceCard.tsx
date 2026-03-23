@@ -81,11 +81,13 @@ export function DuringTripPlaceCard({
 
             <View className="flex-row flex-wrap gap-2">
               {place.vibe
-                .map(id => mockVibes.find(v => v.id === id)?.title)
-                .filter(Boolean)
-                .map((title, index) => (
-                  <View key={place.vibe[index]}>
-                    <Badge label={title as string} />
+                .flatMap(id => {
+                  const title = mockVibes.find(v => v.id === id)?.title;
+                  return title ? [{ id, title }] : [];
+                })
+                .map(({ id, title }) => (
+                  <View key={id}>
+                    <Badge label={title} />
                   </View>
                 ))}
             </View>

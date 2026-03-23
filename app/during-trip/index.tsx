@@ -6,7 +6,7 @@ import { getPlacesByIds } from '@/features/place/placeById.api';
 import type { Trip } from '@/features/trip/trip.types';
 import { getPlaceOpeningStatus } from '@/utils/openingHours';
 import {
-  getPromotionsByPlace,
+  getAllPromotions,
   type ApiPromotion
 } from '@/services/promotion.service';
 import {
@@ -144,16 +144,18 @@ export default function DuringTripScreen() {
 
       const places = await getPlacesByIds(placeIds);
 
-      const withPromos: PlaceWithPromos[] = await Promise.all(
-        places.map(async place => {
-          try {
-            const promos = await getPromotionsByPlace(place.placeId);
-            return { place, promotions: promos };
-          } catch {
-            return { place, promotions: [] };
-          }
-        })
+      const allPromos = await getAllPromotions().catch(
+        () => [] as ApiPromotion[]
       );
+      const promosByPlace = allPromos.reduce((acc, p) => {
+        acc.set(p.placeId, [...(acc.get(p.placeId) ?? []), p]);
+        return acc;
+      }, new Map<string, ApiPromotion[]>());
+
+      const withPromos: PlaceWithPromos[] = places.map(place => ({
+        place,
+        promotions: promosByPlace.get(place.placeId) ?? []
+      }));
 
       setPlaceData(withPromos);
 

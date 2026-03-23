@@ -1,7 +1,7 @@
 import { AppText } from '@/components/AppText';
 import colors from '@/theme/colors';
 import { Ionicons } from '@expo/vector-icons';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Animated, PanResponder, View } from 'react-native';
 
 const TRACK_HEIGHT = 56;
@@ -24,6 +24,13 @@ export function SwipeToUnlock({
   const maxTranslate = trackWidth - THUMB_SIZE - HORIZONTAL_PADDING * 2;
   const pan = useRef(new Animated.Value(0)).current;
   const unlocked = useRef(false);
+
+  useEffect(() => {
+    if (!disabled && unlocked.current) {
+      unlocked.current = false;
+      Animated.spring(pan, { toValue: 0, useNativeDriver: true }).start();
+    }
+  }, [disabled]);
 
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => !disabled && !unlocked.current,
