@@ -25,7 +25,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import * as Location from 'expo-location';
 import { router, useLocalSearchParams } from 'expo-router';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -67,6 +67,13 @@ export default function DuringTripScreen() {
   );
   const [transportMode, setTransportMode] = useState<TransportMode>('driving');
   const [routeSegments, setRouteSegments] = useState<RouteSegment[]>([]);
+  const [userLocation, setUserLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
+  const [userRouteSegment, setUserRouteSegment] = useState<RouteSegment | null>(
+    null
+  );
   // Cache: key = `${fromPlaceId}-${toPlaceId}-${mode}` → full segment (avoids re-fetching on mode switch)
   const routeCache = useRef<Record<string, RouteSegment>>({});
 
@@ -131,10 +138,32 @@ export default function DuringTripScreen() {
   const load = useCallback(async () => {
     if (!tripId) return;
     try {
-      const [fetchedTrip] = await Promise.all([
+      const [fetchedTrip, locationPerm] = await Promise.all([
         getTripById(tripId),
         Location.requestForegroundPermissionsAsync()
       ]);
+
+      const devLat = process.env.EXPO_PUBLIC_DEV_LATITUDE;
+      const devLng = process.env.EXPO_PUBLIC_DEV_LONGITUDE;
+
+      if (devLat && devLng) {
+        setUserLocation({
+          latitude: parseFloat(devLat),
+          longitude: parseFloat(devLng)
+        });
+      } else if (locationPerm.status === 'granted') {
+        try {
+          const pos = await Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.Balanced
+          });
+          setUserLocation({
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude
+          });
+        } catch {
+          // Location unavailable — skip user→first segment
+        }
+      }
 
       setTrip(fetchedTrip);
 
@@ -214,6 +243,37 @@ export default function DuringTripScreen() {
     // routeCache.current is a stable ref, safe to omit
   }, [placeData, transportMode, trip]);
 
+  // Fetch route from user's current location to the first place
+  useEffect(() => {
+    if (!userLocation || placeData.length === 0 || !trip) return;
+
+    const ordered = [...placeData].sort((a, b) => {
+      const aO =
+        trip.places.find(p => p.placeId === a.place.placeId)?.order ?? 0;
+      const bO =
+        trip.places.find(p => p.placeId === b.place.placeId)?.order ?? 0;
+      return aO - bO;
+    });
+
+    const firstPlace = ordered[0];
+    if (!firstPlace) return;
+
+    const cacheKey = `user-${firstPlace.place.placeId}-${transportMode}`;
+    if (routeCache.current[cacheKey]) {
+      setUserRouteSegment(routeCache.current[cacheKey]);
+      return;
+    }
+
+    const from = { lat: userLocation.latitude, lng: userLocation.longitude };
+    fetchRouteSegment(from, firstPlace.place.location, transportMode)
+      .then(segment => {
+        routeCache.current[cacheKey] = segment;
+        setUserRouteSegment(segment);
+      })
+      .catch(() => setUserRouteSegment(null));
+    // routeCache.current is a stable ref, safe to omit
+  }, [userLocation, placeData, trip, transportMode]);
+
   useEffect(() => {
     return () => {
       if (dismissTimer.current) clearTimeout(dismissTimer.current);
@@ -279,6 +339,24 @@ export default function DuringTripScreen() {
       setTrip(result.trip);
 
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+      // Scroll to the next card after check-in
+      const ordered = [...placeData].sort((a, b) => {
+        const aO =
+          trip.places.find(p => p.placeId === a.place.placeId)?.order ?? 0;
+        const bO =
+          trip.places.find(p => p.placeId === b.place.placeId)?.order ?? 0;
+        return aO - bO;
+      });
+      const currentIndex = ordered.findIndex(
+        pd => pd.place.placeId === placeId
+      );
+      if (currentIndex !== -1 && currentIndex + 1 < ordered.length) {
+        flatListRef.current?.scrollToIndex({
+          index: currentIndex + 1,
+          animated: true
+        });
+      }
 
       const placeName =
         placeData.find(pd => pd.place.placeId === placeId)?.place.placeName ??
@@ -378,6 +456,40 @@ export default function DuringTripScreen() {
     visited: visitedIds.has(place.placeId),
     isCurrent: place.placeId === nextUnvisitedId
   }));
+
+  // Precompute per-segment styles so Polylines and Markers can be rendered in
+  // separate flat passes — Fragment wrapping inside MapView prevents react-native-maps
+  // from recognising Polylines at the native layer in some versions.
+  const segmentStyles = routeSegments.map((_, i) => {
+    const fromPlace = sortedPlaceData[i]?.place;
+    const toPlace = sortedPlaceData[i + 1]?.place;
+    const fromVisited = visitedIds.has(fromPlace?.placeId);
+    const toVisited = visitedIds.has(toPlace?.placeId);
+    const isGrey = toVisited;
+    const isNext = fromVisited && !toVisited;
+    return {
+      strokeColor: isGrey ? '#94a3b8' : colors.brand.primary,
+      strokeWidth: isNext ? 4 : 3,
+      lineDashPattern: (!isGrey && !isNext ? [5, 8] : undefined) as
+        | number[]
+        | undefined,
+      midLat:
+        fromPlace && toPlace
+          ? (fromPlace.location.lat + toPlace.location.lat) / 2
+          : 0,
+      midLng:
+        fromPlace && toPlace
+          ? (fromPlace.location.lng + toPlace.location.lng) / 2
+          : 0
+    };
+  });
+
+  const userSegmentColor =
+    userRouteSegment &&
+    sortedPlaceData.length > 0 &&
+    visitedIds.has(sortedPlaceData[0].place.placeId)
+      ? '#94a3b8'
+      : colors.brand.primary;
 
   return (
     <View className="flex-1">
@@ -763,64 +875,123 @@ export default function DuringTripScreen() {
           }
         }}
       >
-        {/* Real road routes — one Polyline + duration label per segment */}
-        {routeSegments.map((segment, i) => {
-          const from = sortedPlaceData[i]?.place.location;
-          const to = sortedPlaceData[i + 1]?.place.location;
-          const midLat = from && to ? (from.lat + to.lat) / 2 : 0;
-          const midLng = from && to ? (from.lng + to.lng) / 2 : 0;
-          return (
-            <React.Fragment key={i}>
-              <Polyline
-                coordinates={segment.coords}
-                strokeColor={colors.brand.primary}
-                strokeWidth={4}
-              />
-              {segment.duration && (
-                <Marker
-                  coordinate={{ latitude: midLat, longitude: midLng }}
-                  anchor={{ x: 0.5, y: 0.5 }}
-                  tracksViewChanges={false}
+        {/* ── Polylines (flat pass — no Fragment wrapper) ── */}
+
+        {/* User location → first place */}
+        {userRouteSegment && (
+          <Polyline
+            key={`user-poly-${visitedCount}`}
+            coordinates={userRouteSegment.coords}
+            strokeColor={userSegmentColor}
+            strokeWidth={4}
+          />
+        )}
+
+        {/* Place-to-place */}
+        {routeSegments.map((segment, i) => (
+          <Polyline
+            key={`poly-${i}-${visitedCount}`}
+            coordinates={segment.coords}
+            strokeColor={segmentStyles[i].strokeColor}
+            strokeWidth={segmentStyles[i].strokeWidth}
+            lineDashPattern={segmentStyles[i].lineDashPattern}
+          />
+        ))}
+
+        {/* ── Duration labels (flat pass — no Fragment wrapper) ── */}
+
+        {/* User route duration */}
+        {userRouteSegment?.duration &&
+          userLocation &&
+          sortedPlaceData.length > 0 && (
+            <Marker
+              key="user-dur"
+              coordinate={{
+                latitude:
+                  (userLocation.latitude +
+                    sortedPlaceData[0].place.location.lat) /
+                  2,
+                longitude:
+                  (userLocation.longitude +
+                    sortedPlaceData[0].place.location.lng) /
+                  2
+              }}
+              anchor={{ x: 0.5, y: 0.5 }}
+              tracksViewChanges={false}
+            >
+              <View
+                style={{
+                  backgroundColor: '#fff',
+                  borderRadius: 10,
+                  paddingHorizontal: 7,
+                  paddingVertical: 3,
+                  borderWidth: 1.5,
+                  borderColor: userSegmentColor,
+                  shadowColor: '#000',
+                  shadowOpacity: 0.1,
+                  shadowRadius: 4,
+                  elevation: 3
+                }}
+              >
+                <AppText
+                  variant="caption"
+                  className="font-semibold"
+                  style={{ color: userSegmentColor, fontSize: 11 }}
                 >
-                  <View
-                    style={{
-                      backgroundColor: '#fff',
-                      borderRadius: 10,
-                      paddingHorizontal: 7,
-                      paddingVertical: 3,
-                      borderWidth: 1.5,
-                      borderColor: colors.brand.primary,
-                      shadowColor: '#000',
-                      shadowOpacity: 0.1,
-                      shadowRadius: 4,
-                      elevation: 3
-                    }}
-                  >
-                    <AppText
-                      variant="caption"
-                      className="font-semibold"
-                      style={{ color: colors.brand.primary, fontSize: 11 }}
-                    >
-                      {segment.duration}
-                    </AppText>
-                  </View>
-                </Marker>
-              )}
-            </React.Fragment>
-          );
-        })}
+                  {userRouteSegment.duration}
+                </AppText>
+              </View>
+            </Marker>
+          )}
+
+        {/* Place-to-place duration labels */}
+        {routeSegments.map((segment, i) =>
+          segment.duration ? (
+            <Marker
+              key={`dur-${i}`}
+              coordinate={{
+                latitude: segmentStyles[i].midLat,
+                longitude: segmentStyles[i].midLng
+              }}
+              anchor={{ x: 0.5, y: 0.5 }}
+              tracksViewChanges={false}
+            >
+              <View
+                style={{
+                  backgroundColor: '#fff',
+                  borderRadius: 10,
+                  paddingHorizontal: 7,
+                  paddingVertical: 3,
+                  borderWidth: 1.5,
+                  borderColor: segmentStyles[i].strokeColor,
+                  shadowColor: '#000',
+                  shadowOpacity: 0.1,
+                  shadowRadius: 4,
+                  elevation: 3
+                }}
+              >
+                <AppText
+                  variant="caption"
+                  className="font-semibold"
+                  style={{
+                    color: segmentStyles[i].strokeColor,
+                    fontSize: 11
+                  }}
+                >
+                  {segment.duration}
+                </AppText>
+              </View>
+            </Marker>
+          ) : null
+        )}
 
         {markers.map(m => (
           <Marker
-            key={m.placeId}
+            key={`${m.placeId}-${m.visited}`}
             coordinate={{ latitude: m.latitude, longitude: m.longitude }}
             title={m.title}
             pinColor={
-              m.visited
-                ? '#22c55e'
-                : m.isCurrent
-                  ? colors.brand.primary
-                  : '#94a3b8'
+              m.visited ? '#22c55e' : m.isCurrent ? 'red' : colors.brand.primary
             }
           />
         ))}
@@ -849,9 +1020,9 @@ export default function DuringTripScreen() {
         <TouchableOpacity
           onPress={() => setShowEndModal(true)}
           disabled={ending}
-          className="rounded-full bg-red-500 px-4 py-2"
+          className="rounded-full bg-red-500 px-5 py-2.5"
         >
-          <AppText variant="caption" className="font-semibold text-white">
+          <AppText variant="body" className="font-semibold text-white">
             {ending ? 'Ending…' : 'End Trip'}
           </AppText>
         </TouchableOpacity>

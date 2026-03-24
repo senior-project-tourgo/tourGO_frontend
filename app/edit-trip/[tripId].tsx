@@ -11,11 +11,12 @@ import { getTripById, updateTrip } from '@/services/trip.service';
 import { pendingPlaceStore } from '@/stores/pendingPlaceStore';
 import colors from '@/theme/colors';
 import { router, useLocalSearchParams, useFocusEffect } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import type { EditableTripPlace } from '@/hooks/review-trip/useEditableTrip';
 import {
   ActivityIndicator,
   Alert,
-  ScrollView,
+  FlatList,
   TextInput,
   View
 } from 'react-native';
@@ -34,6 +35,22 @@ export default function EditTripScreen() {
   const [itineraryName, setItineraryName] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [focusCoordinate, setFocusCoordinate] = useState<
+    { latitude: number; longitude: number } | undefined
+  >(undefined);
+
+  const viewabilityConfig = useRef({ itemVisiblePercentThreshold: 60 }).current;
+  const onViewableItemsChanged = useRef(
+    ({ viewableItems }: { viewableItems: any[] }) => {
+      if (viewableItems.length > 0) {
+        const item = viewableItems[0].item as EditableTripPlace;
+        setFocusCoordinate({
+          latitude: Number(item.place.location.lat),
+          longitude: Number(item.place.location.lng)
+        });
+      }
+    }
+  ).current;
 
   // Load the trip + its places on mount
   useEffect(() => {
@@ -127,6 +144,7 @@ export default function EditTripScreen() {
           title: `${index + 1}. ${item.place.placeName}`,
           pinColor: colors.brand.primary
         }))}
+        focusCoordinate={focusCoordinate}
       />
 
       {/* Bottom panel */}
@@ -154,49 +172,49 @@ export default function EditTripScreen() {
         </View>
 
         {/* Place cards */}
-        <ScrollView
+        <FlatList
           horizontal
+          data={editablePlaces}
+          keyExtractor={item => item.place.placeId}
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ paddingHorizontal: 16, gap: 8 }}
-        >
-          {editablePlaces.map((item, index) => (
-            <View
-              key={item.place.placeId}
-              style={{
-                marginRight: index === editablePlaces.length - 1 ? 0 : 12
-              }}
-            >
-              <PlaceCard
-                place={item.place}
-                onPress={() => router.push(`/places/${item.place.placeId}`)}
-                showCross
-                onPressCross={() => {
-                  if (editablePlaces.length === 1) {
-                    Alert.alert(
-                      'Cannot Remove',
-                      'A trip must have at least one place 😕'
-                    );
-                    return;
-                  }
-                  removePlace(item.place.placeId);
-                }}
-              />
-            </View>
-          ))}
-
-          <NoPlaceCard
-            title="+ Add Place"
-            subtitle="Find another spot"
-            onPress={() =>
-              router.push({
-                pathname: '/review-trip/add-place',
-                params: {
-                  addedIds: editablePlaces.map(p => p.place.placeId).join(',')
+          snapToInterval={353}
+          decelerationRate="fast"
+          snapToAlignment="start"
+          viewabilityConfig={viewabilityConfig}
+          onViewableItemsChanged={onViewableItemsChanged}
+          renderItem={({ item }) => (
+            <PlaceCard
+              place={item.place}
+              onPress={() => router.push(`/places/${item.place.placeId}`)}
+              showCross
+              onPressCross={() => {
+                if (editablePlaces.length === 1) {
+                  Alert.alert(
+                    'Cannot Remove',
+                    'A trip must have at least one place 😕'
+                  );
+                  return;
                 }
-              })
-            }
-          />
-        </ScrollView>
+                removePlace(item.place.placeId);
+              }}
+            />
+          )}
+          ListFooterComponent={
+            <NoPlaceCard
+              title="+ Add Place"
+              subtitle="Find another spot"
+              onPress={() =>
+                router.push({
+                  pathname: '/review-trip/add-place',
+                  params: {
+                    addedIds: editablePlaces.map(p => p.place.placeId).join(',')
+                  }
+                })
+              }
+            />
+          }
+        />
 
         {/* Save button */}
         <View className="flex w-[350px] self-center">

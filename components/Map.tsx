@@ -17,9 +17,10 @@ export type MapMarker = {
 type Props = {
   region: MapRegion;
   markers?: MapMarker[];
+  focusCoordinate?: { latitude: number; longitude: number };
 };
 
-export function Map({ region, markers }: Props) {
+export function Map({ region, markers, focusCoordinate }: Props) {
   const mapRef = useRef<MapView>(null);
 
   // Fit all markers into view whenever the set of markers changes.
@@ -41,6 +42,20 @@ export function Map({ region, markers }: Props) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [markersKey]);
+
+  // Zoom into a specific pin when focusCoordinate changes
+  useEffect(() => {
+    if (!mapRef.current || !focusCoordinate) return;
+    mapRef.current.animateToRegion(
+      {
+        latitude: focusCoordinate.latitude,
+        longitude: focusCoordinate.longitude,
+        latitudeDelta: 0.015,
+        longitudeDelta: 0.015
+      },
+      400
+    );
+  }, [focusCoordinate?.latitude, focusCoordinate?.longitude]);
 
   return (
     <View className="flex-1">

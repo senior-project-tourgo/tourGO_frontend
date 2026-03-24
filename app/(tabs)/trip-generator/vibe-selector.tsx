@@ -148,12 +148,14 @@ export default function VibeSelectorScreen() {
         )}
       />
 
-      <Button
-        title="Generate Itinerary"
-        onPress={handleContinue}
-        disabled={selectedVibes.length === 0}
-        isLoading={isLoading}
-      />
+      <View style={{ marginTop: 12, marginBottom: 8 }}>
+        <Button
+          title="Generate Itinerary"
+          onPress={handleContinue}
+          disabled={selectedVibes.length === 0}
+          isLoading={isLoading}
+        />
+      </View>
 
       {/* ── Vibe mismatch feedback modal ── */}
       <Modal

@@ -13,7 +13,7 @@ export function VibeCard({ title, image, selected, onPress }: VibeCardProps) {
     <TouchableOpacity
       onPress={onPress}
       activeOpacity={0.8}
-      className={`flex-1 overflow-hidden rounded-2xl border 
+      className={`flex-1 overflow-hidden rounded-2xl border
         ${selected ? 'border-colors-brand-primary bg-colors-brand-primary/20' : 'border-gray-200 bg-colors-surface-background'}
       `}
     >
