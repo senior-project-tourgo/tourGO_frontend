@@ -95,7 +95,8 @@ export default function VibeSelectorScreen() {
         numberOfPeople: normalizeNumberParam(
           params.numberOfPeople,
           'numberOfPeople'
-        )
+        ),
+        groupType: normalizeStringParam(params.groupType) || undefined
       });
 
       const placeIds = result.recommendedPlaces.map(p => p.placeId).join(',');

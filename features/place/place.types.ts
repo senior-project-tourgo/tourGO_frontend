@@ -13,6 +13,7 @@ export type Place = {
   isActive: boolean;
   typicalTimeSpent: string;
   vibe: string[];
+  suitableFor: string[];
   specialFacilities: string[];
   contactNumber: string | null;
   socialMedia: SocialMedia;

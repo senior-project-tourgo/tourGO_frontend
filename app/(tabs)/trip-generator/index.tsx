@@ -1,3 +1,4 @@
+import { AppText } from '@/components/AppText';
 import { AppTextInput } from '@/components/AppTextInput';
 import { Button } from '@/components/Button';
 import DatePickerBar from '@/components/DatePickerBar';
@@ -8,7 +9,7 @@ import { Stepper } from '@/components/Stepper';
 import { TimePickerBar } from '@/components/TimePickerBar';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
 
 import { PACE_OPTIONS, PaceValue } from '@/constants/paceOptions';
 import { AREA_OPTIONS } from '@/constants/areaOptions';
@@ -18,6 +19,9 @@ import {
   TIME_WINDOW_RANGES
 } from '@/constants/timeOptions';
 import { Area } from '@/features/place/place.types';
+import { GROUP_TYPES, type GroupType } from '@/mock/groupTypes.mock';
+import colors from '@/theme/colors';
+import { Ionicons } from '@expo/vector-icons';
 import { buildTripPayload } from '@/utils/tripForm';
 
 export default function TripGeneratorScreen() {
@@ -28,6 +32,7 @@ export default function TripGeneratorScreen() {
   const [areaError, setAreaError] = useState<string | undefined>();
 
   const [people, setPeople] = useState<number>(1);
+  const [groupType, setGroupType] = useState<GroupType | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
   const [tripDate, setTripDate] = useState<Date | null>(null);
@@ -58,6 +63,11 @@ export default function TripGeneratorScreen() {
 
     setStartTime(start);
     setEndTime(end);
+  };
+
+  const handleGroupTypeSelect = (gt: GroupType) => {
+    setGroupType(gt);
+    setPeople(gt.defaultPeople);
   };
 
   const handleContinue = async () => {
@@ -95,7 +105,8 @@ export default function TripGeneratorScreen() {
       pace,
       tripDate,
       startTime,
-      endTime
+      endTime,
+      groupType: groupType?.id
     });
 
     router.push({
@@ -194,13 +205,73 @@ export default function TripGeneratorScreen() {
             onChange={setPace}
           />
 
+          {/* Group Type */}
+          <View className="gap-2">
+            <AppText variant="caption" className="font-semibold">
+              Who are you traveling with?
+            </AppText>
+            <View className="flex-row flex-wrap gap-2">
+              {GROUP_TYPES.map(gt => {
+                const selected = groupType?.id === gt.id;
+                return (
+                  <Pressable
+                    key={gt.id}
+                    onPress={() => handleGroupTypeSelect(gt)}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 6,
+                      paddingHorizontal: 12,
+                      paddingVertical: 8,
+                      borderRadius: 20,
+                      borderWidth: 1.5,
+                      borderColor: selected
+                        ? colors.brand.primary
+                        : colors.brand.neutrals,
+                      backgroundColor: selected
+                        ? colors.brand.primary + '18'
+                        : colors.surface.background
+                    }}
+                  >
+                    <Ionicons
+                      name={gt.icon as any}
+                      size={14}
+                      color={
+                        selected ? colors.brand.primary : colors.brand.secondary
+                      }
+                    />
+                    <AppText
+                      variant="caption"
+                      className="font-semibold"
+                      style={{
+                        color: selected
+                          ? colors.brand.primary
+                          : colors.text.DEFAULT
+                      }}
+                    >
+                      {gt.label}
+                    </AppText>
+                  </Pressable>
+                );
+              })}
+            </View>
+            {groupType && (
+              <AppText
+                variant="caption"
+                style={{ color: colors.brand.secondary }}
+              >
+                {groupType.description}
+              </AppText>
+            )}
+          </View>
+
           {/* Number of People */}
           <Stepper
             label="How many people?"
             value={people}
             onChange={setPeople}
             min={1}
-            max={10}
+            max={50}
           />
 
           {/* Continue Button */}

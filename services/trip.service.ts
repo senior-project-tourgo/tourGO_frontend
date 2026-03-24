@@ -97,6 +97,7 @@ export type GenerateTripInput = {
   itineraryName?: string;
   budgetLevel?: number;
   numberOfPeople?: number;
+  groupType?: string;
 };
 
 export type GenerateRecommendationResult = {

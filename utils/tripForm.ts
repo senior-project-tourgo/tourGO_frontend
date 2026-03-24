@@ -16,7 +16,8 @@ export function buildTripPayload({
   pace,
   tripDate,
   startTime,
-  endTime
+  endTime,
+  groupType
 }: {
   itineraryName: string;
   area: Area | null;
@@ -25,12 +26,14 @@ export function buildTripPayload({
   tripDate?: Date | null;
   startTime?: Date | null;
   endTime?: Date | null;
+  groupType?: string;
 }) {
   const payload: Record<string, any> = {
     itineraryName: itineraryName.trim(),
     travelingArea: area,
     numberOfPeople: people,
-    pace
+    pace,
+    groupType: groupType ?? ''
   };
 
   if (tripDate) payload.tripDate = formatDate(tripDate);
