@@ -1,11 +1,22 @@
 import { AppText } from '@/components/AppText';
 import { Screen } from '@/components/Screen';
-import { getUserProfile, type UserProfile } from '@/services/user.service';
+import {
+  getStampCard,
+  getUserProfile,
+  type StampEntry,
+  type UserProfile
+} from '@/services/user.service';
 import colors from '@/theme/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Image,
+  Pressable,
+  ScrollView,
+  View
+} from 'react-native';
 import { useAuth } from '../../../context/AuthContext';
 
 const BADGE_THRESHOLDS = [
@@ -92,14 +103,110 @@ function NavRow({
   );
 }
 
+function StampCardSection({ stamps }: { stamps: StampEntry[] }) {
+  if (stamps.length === 0) {
+    return (
+      <View className="gap-3">
+        <AppText variant="body" className="font-semibold">
+          Stamp Card
+        </AppText>
+        <View
+          className="items-center rounded-2xl p-6"
+          style={{ backgroundColor: colors.surface.background }}
+        >
+          <Ionicons
+            name="map-outline"
+            size={32}
+            color={colors.brand.secondary}
+          />
+          <AppText variant="muted" className="mt-2 text-center">
+            No stamps yet. Start a trip to collect stamps!
+          </AppText>
+        </View>
+      </View>
+    );
+  }
+
+  return (
+    <View className="gap-3">
+      <AppText variant="body" className="font-semibold">
+        Stamp Card
+      </AppText>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        className="-mx-1"
+      >
+        {stamps.map(stamp => (
+          <View
+            key={stamp.placeId}
+            className="mx-1 w-28 overflow-hidden rounded-2xl"
+            style={{ backgroundColor: colors.surface.background }}
+          >
+            {stamp.image ? (
+              <Image
+                source={{ uri: stamp.image }}
+                style={{ width: '100%', height: 80 }}
+                resizeMode="cover"
+              />
+            ) : (
+              <View
+                style={{
+                  width: '100%',
+                  height: 80,
+                  backgroundColor: colors.brand.neutrals,
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <Ionicons
+                  name="location-outline"
+                  size={28}
+                  color={colors.brand.secondary}
+                />
+              </View>
+            )}
+            <View className="gap-0.5 p-2">
+              <AppText
+                variant="caption"
+                className="font-semibold"
+                numberOfLines={2}
+              >
+                {stamp.placeName}
+              </AppText>
+              <View className="flex-row items-center gap-1">
+                <Ionicons
+                  name="checkmark-circle"
+                  size={12}
+                  color={colors.brand.primary}
+                />
+                <AppText
+                  variant="caption"
+                  style={{ color: colors.brand.primary }}
+                >
+                  {stamp.visitCount}×
+                </AppText>
+              </View>
+            </View>
+          </View>
+        ))}
+      </ScrollView>
+    </View>
+  );
+}
+
 export default function ProfileScreen() {
   const { user } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [stamps, setStamps] = useState<StampEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getUserProfile()
-      .then(setProfile)
+    Promise.all([getUserProfile(), getStampCard().catch(() => [])])
+      .then(([p, s]) => {
+        setProfile(p);
+        setStamps(s);
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
@@ -160,6 +267,9 @@ export default function ProfileScreen() {
           </View>
         ) : null}
       </View>
+
+      {/* Stamp Card */}
+      {!loading && <StampCardSection stamps={stamps} />}
 
       {/* Nav rows */}
       <View className="gap-3">

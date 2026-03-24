@@ -60,6 +60,25 @@ export async function getSavedPlaces(): Promise<Place[]> {
   }
 }
 
+export type StampEntry = {
+  placeId: string;
+  placeName: string;
+  image: string;
+  visitCount: number;
+  lastVisitedAt: string;
+};
+
+export async function getStampCard(): Promise<StampEntry[]> {
+  try {
+    const response = await api.get<StampEntry[]>('/user/stamps');
+    return response.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || 'Failed to fetch stamp card'
+    );
+  }
+}
+
 export async function getSavedPromotions(): Promise<ApiPromotion[]> {
   try {
     const response = await api.get<ApiPromotion[]>('/user/saved-promotions');

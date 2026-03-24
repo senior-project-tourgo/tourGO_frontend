@@ -120,16 +120,17 @@ export default function EditTripScreen() {
       {/* Full-screen map */}
       <Map
         region={region}
-        markers={editablePlaces.map(item => ({
+        markers={editablePlaces.map((item, index) => ({
           id: item.place.placeId,
           latitude: Number(item.place.location.lat),
           longitude: Number(item.place.location.lng),
-          title: item.place.placeName
+          title: `${index + 1}. ${item.place.placeName}`,
+          pinColor: colors.brand.primary
         }))}
       />
 
-      {/* Bottom panel — mirrors review-trip */}
-      <View className="absolute bottom-6 z-10 w-full gap-4">
+      {/* Bottom panel */}
+      <View className="absolute bottom-6 z-10 gap-4">
         {/* Editable trip name */}
         <View className="mx-4 rounded-2xl bg-colors-surface-background px-4 py-3 shadow-sm">
           <AppText
@@ -198,7 +199,7 @@ export default function EditTripScreen() {
         </ScrollView>
 
         {/* Save button */}
-        <View className="mx-4">
+        <View className="flex w-[350px] self-center">
           <Button
             title={saving ? 'Saving…' : 'Save Changes'}
             onPress={handleSave}
@@ -207,6 +208,12 @@ export default function EditTripScreen() {
           />
         </View>
       </View>
+
+      {saving && (
+        <View className="absolute inset-0 items-center justify-center bg-black/10">
+          <ActivityIndicator size="large" />
+        </View>
+      )}
     </View>
   );
 }
