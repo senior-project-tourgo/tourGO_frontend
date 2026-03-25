@@ -23,6 +23,7 @@ import { GROUP_TYPES, type GroupType } from '@/mock/groupTypes.mock';
 import colors from '@/theme/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { buildTripPayload } from '@/utils/tripForm';
+import SelectableChips from '@/components/SelectableChips';
 
 export default function TripGeneratorScreen() {
   const router = useRouter();
@@ -206,64 +207,12 @@ export default function TripGeneratorScreen() {
           />
 
           {/* Group Type */}
-          <View className="gap-2">
-            <AppText variant="caption" className="font-semibold">
-              Who are you traveling with?
-            </AppText>
-            <View className="flex-row flex-wrap gap-2">
-              {GROUP_TYPES.map(gt => {
-                const selected = groupType?.id === gt.id;
-                return (
-                  <Pressable
-                    key={gt.id}
-                    onPress={() => handleGroupTypeSelect(gt)}
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: 6,
-                      paddingHorizontal: 12,
-                      paddingVertical: 8,
-                      borderRadius: 20,
-                      borderWidth: 1.5,
-                      borderColor: selected
-                        ? colors.brand.primary
-                        : colors.brand.neutrals,
-                      backgroundColor: selected
-                        ? colors.brand.primary + '18'
-                        : colors.surface.background
-                    }}
-                  >
-                    <Ionicons
-                      name={gt.icon as any}
-                      size={14}
-                      color={
-                        selected ? colors.brand.primary : colors.brand.secondary
-                      }
-                    />
-                    <AppText
-                      variant="caption"
-                      className="font-semibold"
-                      style={{
-                        color: selected
-                          ? colors.brand.primary
-                          : colors.text.DEFAULT
-                      }}
-                    >
-                      {gt.label}
-                    </AppText>
-                  </Pressable>
-                );
-              })}
-            </View>
-            {groupType && (
-              <AppText
-                variant="caption"
-                style={{ color: colors.brand.secondary }}
-              >
-                {groupType.description}
-              </AppText>
-            )}
-          </View>
+          <SelectableChips
+            title="Who are you traveling with?"
+            options={GROUP_TYPES}
+            selectedOption={groupType}
+            onSelect={handleGroupTypeSelect}
+          />
 
           {/* Number of People */}
           <Stepper
