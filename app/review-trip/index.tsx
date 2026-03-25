@@ -34,7 +34,16 @@ export default function ReviewTripScreen() {
     { latitude: number; longitude: number } | undefined
   >(undefined);
 
+  // ✅ Default Kathmandu location (fallback only)
+  const DEFAULT_REGION = {
+    latitude: 27.7061,
+    longitude: 85.3148,
+    latitudeDelta: 0.05,
+    longitudeDelta: 0.05
+  };
+
   const viewabilityConfig = useRef({ itemVisiblePercentThreshold: 60 }).current;
+
   const onViewableItemsChanged = useRef(
     ({ viewableItems }: { viewableItems: any[] }) => {
       if (viewableItems.length > 0) {
@@ -75,7 +84,7 @@ export default function ReviewTripScreen() {
       />
 
       <Map
-        region={region}
+        region={region ?? DEFAULT_REGION}
         markers={editablePlaces.map((item, index) => ({
           id: item.place.placeId,
           latitude: Number(item.place.location.lat),
