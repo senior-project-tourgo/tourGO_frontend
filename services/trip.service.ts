@@ -2,6 +2,7 @@
 
 import api from '@/config/api';
 import { SelectorOption } from '@/constants/selectorOptions';
+import { TransportMode } from '@/constants/transportOptions';
 import { Place } from '@/features/place/place.types';
 import type {
   Trip,
@@ -98,6 +99,9 @@ export type GenerateTripInput = {
   budgetLevel?: number;
   numberOfPeople?: number;
   groupType?: string;
+  startLat?: number;
+  startLng?: number;
+  transportMode?: TransportMode;
 };
 
 export type GenerateRecommendationResult = {
@@ -105,23 +109,14 @@ export type GenerateRecommendationResult = {
   itineraryId?: string;
 };
 
-const PACE_TO_PLACES: Record<string, number> = {
-  relaxed: 3,
-  balanced: 5,
-  packed: 7
-};
-
 export async function generateRecommendation(
   preferences: GenerateTripInput
 ): Promise<GenerateRecommendationResult> {
   try {
-    const numberOfPlaces = PACE_TO_PLACES[preferences.pace] ?? 5;
+    // numberOfPlaces is now computed server-side from startTime/endTime/pace/transportMode
     const response = await api.post<GenerateRecommendationResult>(
       '/recommend',
-      {
-        ...preferences,
-        numberOfPlaces
-      }
+      preferences
     );
     return response.data;
   } catch (error: any) {

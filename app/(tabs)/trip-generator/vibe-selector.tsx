@@ -84,6 +84,10 @@ export default function VibeSelectorScreen() {
     try {
       setIsLoading(true);
 
+      const startLatRaw = normalizeStringParam(params.startLat);
+      const startLngRaw = normalizeStringParam(params.startLng);
+      const transportModeRaw = normalizeStringParam(params.transportMode);
+
       const result = await generateRecommendation({
         area: normalizeStringParam(params.travelingArea) as Area,
         vibes: selectedVibes,
@@ -96,7 +100,10 @@ export default function VibeSelectorScreen() {
           params.numberOfPeople,
           'numberOfPeople'
         ),
-        groupType: normalizeStringParam(params.groupType) || undefined
+        groupType: normalizeStringParam(params.groupType) || undefined,
+        startLat: startLatRaw ? Number(startLatRaw) : undefined,
+        startLng: startLngRaw ? Number(startLngRaw) : undefined,
+        transportMode: (transportModeRaw as any) || undefined
       });
 
       const placeIds = result.recommendedPlaces.map(p => p.placeId).join(',');
