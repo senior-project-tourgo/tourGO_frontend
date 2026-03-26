@@ -12,8 +12,6 @@ import { TimePickerBar } from '@/components/TimePickerBar';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, View } from 'react-native';
-
-import { PACE_OPTIONS, PaceValue } from '@/constants/paceOptions';
 import {
   TIME_WINDOW_OPTIONS,
   TimeWindowValue,
@@ -26,7 +24,7 @@ import colors from '@/theme/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { buildTripPayload } from '@/utils/tripForm';
 import SelectableChips from '@/components/SelectableChips';
-import { OptionSelector } from '@/components/SelectorOptions';
+import { PaceValue, PACE_OPTIONS } from '@/constants/paceOptions';
 
 export default function TripGeneratorScreen() {
   const router = useRouter();
@@ -249,7 +247,7 @@ export default function TripGeneratorScreen() {
             />
 
             {/* Time-of-day tiles */}
-            <View style={{ gap: 6 }}>
+            <View className="space-y-1.5">
               <AppText className="text-base font-medium">
                 Time of Day
                 <AppText style={{ color: '#ef4444' }}> *</AppText>
@@ -315,43 +313,22 @@ export default function TripGeneratorScreen() {
             completed={!!transportMode}
           >
             {/* Pace tiles */}
-            <View style={{ gap: 6 }}>
+            <View className="space-y-1.5">
               <AppText className="text-base font-medium">Pace</AppText>
-              <View style={{ flexDirection: 'row', gap: 10 }}>
-                <IconTile
-                  icon="leaf-outline"
-                  label="Relaxed"
-                  description="Slow & easy"
-                  selected={pace === 'relaxed'}
-                  onPress={() => setPace('relaxed')}
-                  width="31%"
-                />
-                <IconTile
-                  icon="walk-outline"
-                  label="Balanced"
-                  description="Mix of both"
-                  selected={pace === 'balanced'}
-                  onPress={() => setPace('balanced')}
-                  width="31%"
-                />
-                <IconTile
-                  icon="flash-outline"
-                  label="Packed"
-                  description="See it all"
-                  selected={pace === 'packed'}
-                  onPress={() => setPace('packed')}
-                  width="31%"
-                />
+              <View className="flex-row gap-2.5">
+                {PACE_OPTIONS.map(option => (
+                  <IconTile
+                    key={option.value}
+                    icon={option.icon as keyof typeof Ionicons.glyphMap}
+                    label={option.label}
+                    description={option.description}
+                    selected={pace === option.value}
+                    onPress={() => setPace(option.value)}
+                    width="31%"
+                  />
+                ))}
               </View>
             </View>
-
-            {/* Trip Pace */}
-            <OptionSelector
-              label="How packed should your trip be?"
-              value={pace}
-              options={PACE_OPTIONS}
-              onChange={setPace}
-            />
 
             {/* Group Type */}
             <SelectableChips
@@ -362,7 +339,7 @@ export default function TripGeneratorScreen() {
             />
 
             {/* Transport tiles */}
-            <View style={{ gap: 6 }}>
+            <View className="space-y-1.5">
               <AppText className="text-base font-medium">Transport</AppText>
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
                 {TRANSPORT_OPTIONS.map(option => (

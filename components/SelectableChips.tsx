@@ -47,7 +47,7 @@ function SelectableChips<
               className={`flex-row items-center gap-1.5 rounded-full border px-3 py-2 ${
                 selected
                   ? 'border-colors-brand-primary bg-colors-brand-primary/10'
-                  : 'border-colors-text bg-colors-surface-background'
+                  : 'border-colors-text/20 bg-colors-surface-background'
               }`}
             >
               <Ionicons

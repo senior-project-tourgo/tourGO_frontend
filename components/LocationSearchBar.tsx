@@ -12,6 +12,8 @@ import colors from '@/theme/colors';
 import api from '@/config/api';
 import { Area } from '@/features/place/place.types';
 import * as Location from 'expo-location';
+import SelectableChips from './SelectableChips';
+import { QUICK_PICKS, QuickPick } from '@/constants/quickPicks';
 
 type Prediction = {
   placeId: string;
@@ -26,29 +28,6 @@ export type PlaceDetails = {
   area: Area | null;
   formattedAddress: string;
 };
-
-type QuickPick = {
-  label: string;
-  icon: keyof typeof Ionicons.glyphMap;
-  query: string;
-};
-
-const QUICK_PICKS: QuickPick[] = [
-  { label: 'Thamel', icon: 'storefront-outline', query: 'Thamel, Kathmandu' },
-  { label: 'Lakeside', icon: 'water-outline', query: 'Lakeside, Pokhara' },
-  {
-    label: 'Bhaktapur',
-    icon: 'library-outline',
-    query: 'Bhaktapur Durbar Square'
-  },
-  {
-    label: 'Patan',
-    icon: 'color-palette-outline',
-    query: 'Patan Durbar Square, Lalitpur'
-  },
-  { label: 'Boudha', icon: 'globe-outline', query: 'Boudhanath, Kathmandu' },
-  { label: 'Ason', icon: 'basket-outline', query: 'Ason, Kathmandu' }
-];
 
 type LocationSearchBarProps = {
   label?: string;
@@ -110,7 +89,6 @@ export function LocationSearchBar({
       });
       onSelect(res.data);
     } catch {
-      // keep the text but no coords
     } finally {
       setDetailsLoading(false);
     }
@@ -131,15 +109,13 @@ export function LocationSearchBar({
         accuracy: Location.Accuracy.Balanced
       });
 
-      // Directly use coords; area will be determined by proximity to known areas
       onSelect({
         lat: loc.coords.latitude,
         lng: loc.coords.longitude,
-        area: null, // backend will infer from proximity to places
+        area: null,
         formattedAddress: `${loc.coords.latitude.toFixed(5)}, ${loc.coords.longitude.toFixed(5)}`
       });
     } catch {
-      // silently fail
     } finally {
       setGpsLoading(false);
     }
@@ -154,12 +130,12 @@ export function LocationSearchBar({
   // ── Selected state ──
   if (selectedLabel) {
     return (
-      <View style={{ gap: 6 }}>
+      <View className="gap-1.5">
         {label && (
-          <AppText variant="caption" className="font-semibold">
+          <AppText className="font-semibold">
             {label}{' '}
             {required && (
-              <AppText variant="caption" style={{ color: '#ef4444' }}>
+              <AppText variant="caption" className="text-red-500">
                 *
               </AppText>
             )}
@@ -167,35 +143,14 @@ export function LocationSearchBar({
         )}
         <Pressable
           onPress={handleClear}
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 10,
-            paddingHorizontal: 14,
-            paddingVertical: 12,
-            borderRadius: 14,
-            borderWidth: 1.5,
-            borderColor: colors.brand.primary,
-            backgroundColor: colors.brand.primary + '12'
-          }}
+          className="border-primary bg-primary/10 flex-row items-center gap-2.5 rounded-xl border-2 px-3.5 py-3"
         >
-          <View
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: 16,
-              backgroundColor: colors.brand.primary + '20',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
+          <View className="h-8 w-8 items-center justify-center rounded-full bg-colors-brand-primary/20">
             <Ionicons name="location" size={16} color={colors.brand.primary} />
           </View>
-          <View style={{ flex: 1 }}>
+          <View className="flex-1">
             <AppText
-              variant="caption"
-              className="font-semibold"
-              style={{ color: colors.brand.primary }}
+              className="font-semibold text-colors-text"
               numberOfLines={1}
             >
               {selectedLabel}
@@ -211,16 +166,15 @@ export function LocationSearchBar({
     );
   }
 
-  // ── Search state ──
   const showQuickPicks = query.length === 0 && predictions.length === 0;
 
   return (
-    <View style={{ gap: 8 }}>
+    <View className="gap-2">
       {label && (
-        <AppText variant="caption" className="font-semibold">
+        <AppText className="font-semibold">
           {label}{' '}
           {required && (
-            <AppText variant="caption" style={{ color: '#ef4444' }}>
+            <AppText variant="caption" className="text-red-500">
               *
             </AppText>
           )}
@@ -229,17 +183,7 @@ export function LocationSearchBar({
 
       {/* Search input */}
       <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: 8,
-          paddingHorizontal: 14,
-          paddingVertical: 10,
-          borderRadius: 14,
-          borderWidth: 1.5,
-          borderColor: error ? '#ef4444' : colors.brand.neutrals,
-          backgroundColor: colors.surface.background
-        }}
+        className={`flex-row items-center gap-2 rounded-xl border-2 px-3.5 py-2.5 ${error ? 'border-red-500' : 'border-gray-300'} bg-white`}
       >
         <Ionicons
           name="search-outline"
@@ -252,13 +196,13 @@ export function LocationSearchBar({
           onChangeText={handleChangeText}
           placeholder="Search a place..."
           placeholderTextColor="#999"
-          style={{ flex: 1, fontSize: 14, paddingVertical: 0 }}
+          className="flex-1 py-0 text-sm"
         />
         {(loading || detailsLoading) && (
           <ActivityIndicator size="small" color={colors.brand.primary} />
         )}
         {query.length > 0 && !loading && (
-          <Pressable onPress={handleClear} hitSlop={8}>
+          <Pressable onPress={handleClear} className="p-2">
             <Ionicons
               name="close-circle"
               size={18}
@@ -269,38 +213,21 @@ export function LocationSearchBar({
       </View>
 
       {error && (
-        <AppText variant="caption" style={{ color: '#ef4444' }}>
+        <AppText variant="caption" className="text-red-500">
           {error}
         </AppText>
       )}
 
-      {/* Quick-pick chips + GPS button */}
+      {/* Quick-pick chips + GPS */}
       {showQuickPicks && (
-        <View style={{ gap: 10 }}>
-          {/* Use my location row */}
+        <View className="gap-2.5">
+          {/* Use my location */}
           <Pressable
             onPress={handleUseMyLocation}
             disabled={gpsLoading}
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 8,
-              paddingHorizontal: 12,
-              paddingVertical: 10,
-              borderRadius: 12,
-              backgroundColor: colors.brand.primary + '10'
-            }}
+            className="flex-row items-center gap-2.5 rounded-lg bg-colors-brand-primary/10 px-3 py-2.5"
           >
-            <View
-              style={{
-                width: 28,
-                height: 28,
-                borderRadius: 14,
-                backgroundColor: colors.brand.primary + '20',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
+            <View className="h-7 w-7 items-center justify-center rounded-full bg-colors-brand-primary/20">
               {gpsLoading ? (
                 <ActivityIndicator size="small" color={colors.brand.primary} />
               ) : (
@@ -313,57 +240,37 @@ export function LocationSearchBar({
             </View>
             <AppText
               variant="caption"
-              className="font-semibold"
-              style={{ color: colors.brand.primary }}
+              className="font-semibold text-colors-text"
             >
               {gpsLoading ? 'Getting location...' : 'Use my current location'}
             </AppText>
           </Pressable>
 
-          {/* Popular places */}
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-            {QUICK_PICKS.map(pick => (
-              <Pressable
-                key={pick.label}
-                onPress={() => handleQuickPick(pick)}
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: 6,
-                  paddingHorizontal: 12,
-                  paddingVertical: 8,
-                  borderRadius: 20,
-                  borderWidth: 1,
-                  borderColor: colors.brand.neutrals,
-                  backgroundColor: colors.surface.background
-                }}
-              >
-                <Ionicons
-                  name={pick.icon}
-                  size={14}
-                  color={colors.brand.primary}
-                />
-                <AppText variant="caption" className="font-semibold">
-                  {pick.label}
-                </AppText>
-              </Pressable>
-            ))}
-          </View>
+          {/* Popular places using SelectableChips */}
+          <SelectableChips
+            title="Popular places"
+            options={QUICK_PICKS.map((pick, idx) => ({
+              id: idx,
+              label: pick.label,
+              icon: pick.icon,
+              description: pick.query
+            }))}
+            selectedOption={null}
+            onSelect={opt =>
+              handleQuickPick({
+                label: opt.label,
+                icon: opt.icon,
+                query: opt.description!
+              })
+            }
+            showDescription={false}
+          />
         </View>
       )}
 
       {/* Autocomplete dropdown */}
       {predictions.length > 0 && (
-        <View
-          style={{
-            borderRadius: 14,
-            borderWidth: 1,
-            borderColor: colors.brand.neutrals,
-            backgroundColor: '#fff',
-            maxHeight: 220,
-            overflow: 'hidden'
-          }}
-        >
+        <View className="max-h-56 overflow-hidden rounded-xl border border-gray-300 bg-white">
           <FlatList
             data={predictions}
             keyExtractor={item => item.placeId}
@@ -371,33 +278,16 @@ export function LocationSearchBar({
             renderItem={({ item }) => (
               <Pressable
                 onPress={() => handleSelect(item)}
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: 10,
-                  paddingHorizontal: 14,
-                  paddingVertical: 12,
-                  borderBottomWidth: 0.5,
-                  borderBottomColor: colors.brand.neutrals
-                }}
+                className="flex-row items-center gap-2.5 border-b border-gray-300 px-3.5 py-3"
               >
-                <View
-                  style={{
-                    width: 28,
-                    height: 28,
-                    borderRadius: 14,
-                    backgroundColor: colors.brand.primary + '12',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
-                >
+                <View className="h-7 w-7 items-center justify-center rounded-full bg-colors-brand-primary/10">
                   <Ionicons
                     name="location-outline"
                     size={14}
                     color={colors.brand.primary}
                   />
                 </View>
-                <View style={{ flex: 1 }}>
+                <View className="flex-1">
                   <AppText
                     variant="caption"
                     className="font-semibold"
@@ -405,15 +295,15 @@ export function LocationSearchBar({
                   >
                     {item.mainText}
                   </AppText>
-                  {item.secondaryText ? (
+                  {item.secondaryText && (
                     <AppText
                       variant="caption"
-                      style={{ color: colors.brand.secondary, fontSize: 11 }}
+                      className="text-xs text-gray-500"
                       numberOfLines={1}
                     >
                       {item.secondaryText}
                     </AppText>
-                  ) : null}
+                  )}
                 </View>
               </Pressable>
             )}

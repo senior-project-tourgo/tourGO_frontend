@@ -2,23 +2,24 @@ import { SelectorOption } from './selectorOptions';
 
 export const PACE_OPTIONS = [
   {
-    value: 'relaxed',
+    icon: 'leaf-outline',
     label: 'Relaxed',
-    description: 'Take it slow and enjoy each place',
-    icon: 'leaf-outline'
+    description: 'Slow & easy',
+    value: 'relaxed'
   },
   {
-    value: 'balanced',
+    icon: 'walk-outline',
     label: 'Balanced',
-    description: 'A mix of exploring and relaxing',
-    icon: 'walk-outline'
+    description: 'Mix of both',
+    value: 'balanced'
   },
   {
-    value: 'packed',
+    icon: 'flash-outline',
     label: 'Packed',
-    description: 'Fit in as many highlights as possible',
-    icon: 'flash-outline'
+    description: 'See it all',
+    value: 'packed'
   }
-] as const satisfies readonly SelectorOption[];
+] as const satisfies readonly SelectorOption<string>[];
 
+/** Union type of all valid pace values ('relaxed' | 'balanced' | 'packed') */
 export type PaceValue = (typeof PACE_OPTIONS)[number]['value'];
