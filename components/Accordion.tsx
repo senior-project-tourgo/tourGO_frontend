@@ -21,13 +21,12 @@ if (
 type AccordionProps = {
   icon: keyof typeof Ionicons.glyphMap;
   title: string;
-  /** Short text shown next to the title when collapsed (e.g. "Morning, Walking") */
   summary?: string;
-  /** Show a completion checkmark when the section is filled */
   completed?: boolean;
-  /** Start expanded */
   defaultOpen?: boolean;
   children: ReactNode;
+  footer?: ReactNode;
+  onToggle?: (open: boolean) => void;
 };
 
 export function Accordion({
@@ -36,7 +35,9 @@ export function Accordion({
   summary,
   completed,
   defaultOpen = false,
-  children
+  children,
+  footer,
+  onToggle
 }: AccordionProps) {
   const [open, setOpen] = useState(defaultOpen);
   const spin = useRef(new Animated.Value(defaultOpen ? 1 : 0)).current;
@@ -51,7 +52,11 @@ export function Accordion({
 
   const toggle = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setOpen(prev => !prev);
+    setOpen(prev => {
+      const next = !prev;
+      onToggle?.(next);
+      return next;
+    });
   };
 
   const rotate = spin.interpolate({
@@ -99,7 +104,7 @@ export function Accordion({
           <AppText className="font-semibold" style={{ fontSize: 15 }}>
             {title}
           </AppText>
-          {!open && summary ? (
+          {!open && summary && (
             <AppText
               variant="caption"
               style={{ color: colors.brand.secondary, marginTop: 1 }}
@@ -107,7 +112,7 @@ export function Accordion({
             >
               {summary}
             </AppText>
-          ) : null}
+          )}
         </View>
 
         {completed && !open && (
@@ -137,6 +142,7 @@ export function Accordion({
           }}
         >
           {children}
+          {footer && <View style={{ marginTop: 8 }}>{footer}</View>}
         </View>
       )}
     </View>
