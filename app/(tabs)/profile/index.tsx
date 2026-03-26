@@ -30,6 +30,7 @@ function XpProgressBar({ xp, badge }: { xp: number; badge: string }) {
   const idx = BADGE_THRESHOLDS.findIndex(b => b.badge === badge);
   const next = BADGE_THRESHOLDS[idx - 1];
   const prev = BADGE_THRESHOLDS[idx];
+
   if (!next) {
     return (
       <View className="gap-1">
@@ -43,7 +44,9 @@ function XpProgressBar({ xp, badge }: { xp: number; badge: string }) {
       </View>
     );
   }
+
   const progress = Math.min((xp - prev.xp) / (next.xp - prev.xp), 1);
+
   return (
     <View className="gap-1">
       <View className="flex-row justify-between">
@@ -151,12 +154,11 @@ function StampCardSection({ stamps }: { stamps: StampEntry[] }) {
               />
             ) : (
               <View
+                className="items-center justify-center"
                 style={{
                   width: '100%',
                   height: 80,
-                  backgroundColor: colors.brand.neutrals,
-                  alignItems: 'center',
-                  justifyContent: 'center'
+                  backgroundColor: colors.brand.neutrals
                 }}
               >
                 <Ionicons
@@ -256,10 +258,7 @@ export default function ProfileScreen() {
               <AppText variant="caption" className="font-semibold">
                 🏅 {profile.badge}
               </AppText>
-              <AppText
-                variant="caption"
-                style={{ color: colors.brand.secondary }}
-              >
+              <AppText variant="caption" className="text-colors-text">
                 {profile.xp} XP total
               </AppText>
             </View>

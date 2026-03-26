@@ -57,7 +57,6 @@ export default function TripGeneratorScreen() {
 
   const isItineraryInvalid = submitted && !itineraryName.trim();
 
-  // ── Summaries for accordion headers ──
   const locationSummary = locationLabel
     ? locationLabel.length > 30
       ? locationLabel.slice(0, 30) + '...'
@@ -168,7 +167,6 @@ export default function TripGeneratorScreen() {
         <HeaderWithBack title="Plan Your Trip" />
 
         <View className="gap-4">
-          {/* ── Trip Name (always visible, no accordion) ── */}
           <AppTextInput
             label="Trip Name"
             placeholder="e.g. Weekend in Pokhara"
@@ -180,7 +178,6 @@ export default function TripGeneratorScreen() {
             }
           />
 
-          {/* ── Location ── */}
           <Accordion
             icon="location-outline"
             title="Where are you starting from?"
@@ -208,25 +205,19 @@ export default function TripGeneratorScreen() {
               }}
             />
             {area && (
-              <View
-                style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
-              >
+              <View className="flex-row items-center gap-1.5">
                 <Ionicons
                   name="navigate-outline"
                   size={14}
                   color={colors.brand.primary}
                 />
-                <AppText
-                  variant="caption"
-                  style={{ color: colors.brand.primary }}
-                >
+                <AppText variant="caption" className="text-colors-text">
                   Showing places in {area}
                 </AppText>
               </View>
             )}
           </Accordion>
 
-          {/* ── When ── */}
           <Accordion
             icon="calendar-outline"
             title="When is your trip?"
@@ -246,13 +237,12 @@ export default function TripGeneratorScreen() {
               error={tripDateError}
             />
 
-            {/* Time-of-day tiles */}
             <View className="space-y-1.5">
-              <AppText className="text-base font-medium">
+              <AppText className="font-medium text-colors-text">
                 Time of Day
-                <AppText style={{ color: '#ef4444' }}> *</AppText>
+                <AppText className="text-red-500"> *</AppText>
               </AppText>
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+              <View className="flex-row flex-wrap gap-2.5">
                 {TIME_WINDOW_OPTIONS.map(option => (
                   <IconTile
                     key={option.value}
@@ -267,22 +257,18 @@ export default function TripGeneratorScreen() {
                 ))}
               </View>
               {timeWindowError && (
-                <AppText variant="caption" style={{ color: '#ef4444' }}>
+                <AppText variant="caption" className="text-red-500">
                   {timeWindowError}
                 </AppText>
               )}
             </View>
 
-            {/* Fine-tune time */}
-            <View style={{ gap: 6 }}>
-              <AppText
-                className="text-base font-medium"
-                style={{ color: colors.brand.secondary }}
-              >
+            <View className="gap-1.5">
+              <AppText className="text-secondary font-medium">
                 Or set exact times
               </AppText>
-              <View style={{ flexDirection: 'row', gap: 8 }}>
-                <View style={{ flex: 1 }}>
+              <View className="flex-row gap-2">
+                <View className="flex-1">
                   <TimePickerBar
                     label="From"
                     value={startTime ?? undefined}
@@ -293,7 +279,7 @@ export default function TripGeneratorScreen() {
                     }}
                   />
                 </View>
-                <View style={{ flex: 1 }}>
+                <View className="flex-1">
                   <TimePickerBar
                     label="To"
                     value={endTime ?? undefined}
@@ -305,16 +291,14 @@ export default function TripGeneratorScreen() {
             </View>
           </Accordion>
 
-          {/* ── Style (pace + transport) ── */}
           <Accordion
             icon="speedometer-outline"
             title="How packed should your trip be?"
             summary={styleSummary}
             completed={!!transportMode}
           >
-            {/* Pace tiles */}
             <View className="space-y-1.5">
-              <AppText className="text-base font-medium">Pace</AppText>
+              <AppText className="font-medium">Pace</AppText>
               <View className="flex-row gap-2.5">
                 {PACE_OPTIONS.map(option => (
                   <IconTile
@@ -330,7 +314,6 @@ export default function TripGeneratorScreen() {
               </View>
             </View>
 
-            {/* Group Type */}
             <SelectableChips
               title="Who are you traveling with?"
               options={GROUP_TYPES}
@@ -338,10 +321,9 @@ export default function TripGeneratorScreen() {
               onSelect={handleGroupTypeSelect}
             />
 
-            {/* Transport tiles */}
             <View className="space-y-1.5">
-              <AppText className="text-base font-medium">Transport</AppText>
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+              <AppText className="font-medium">Transport</AppText>
+              <View className="flex-row flex-wrap gap-2.5">
                 {TRANSPORT_OPTIONS.map(option => (
                   <IconTile
                     key={option.value}
@@ -358,14 +340,12 @@ export default function TripGeneratorScreen() {
             </View>
           </Accordion>
 
-          {/* ── Group ── */}
           <Accordion
             icon="people-outline"
             title="Who are you traveling with?"
             summary={groupSummary}
             completed={!!groupType}
           >
-            {/* People stepper */}
             <Stepper
               label="How many people?"
               value={people}
@@ -375,8 +355,7 @@ export default function TripGeneratorScreen() {
             />
           </Accordion>
 
-          {/* ── Continue ── */}
-          <View style={{ marginTop: 4 }}>
+          <View className="mt-4">
             <Button title="Choose Your Vibes" onPress={handleContinue} />
           </View>
         </View>

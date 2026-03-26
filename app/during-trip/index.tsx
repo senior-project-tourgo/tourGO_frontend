@@ -716,16 +716,7 @@ export default function DuringTripScreen() {
 
                 {/* Visited badge */}
                 {visitedIds.has(selectedPlace.place.placeId) && (
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: 8,
-                      backgroundColor: '#f0fdf4',
-                      borderRadius: 12,
-                      padding: 12
-                    }}
-                  >
+                  <View className="flex-row items-center gap-2 rounded-xl bg-green-50 p-3">
                     <Ionicons
                       name="checkmark-circle"
                       size={20}
@@ -733,8 +724,7 @@ export default function DuringTripScreen() {
                     />
                     <AppText
                       variant="caption"
-                      className="font-semibold"
-                      style={{ color: '#16a34a' }}
+                      className="font-semibold text-green-700"
                     >
                       You visited this place!
                     </AppText>
@@ -742,19 +732,16 @@ export default function DuringTripScreen() {
                 )}
 
                 {/* Promotions */}
+                {/* Promotions */}
                 {selectedPlace.promotions.length > 0 && (
-                  <View style={{ gap: 8 }}>
+                  <View className="gap-2">
                     <AppText variant="subtitle" className="font-semibold">
                       Deals Available
                     </AppText>
                     {selectedPlace.promotions.map(promo => (
                       <View
                         key={promo.promotionId}
-                        style={{
-                          backgroundColor: '#f8fafc',
-                          borderRadius: 12,
-                          padding: 12
-                        }}
+                        className="rounded-xl bg-gray-50 p-3"
                       >
                         <AppText variant="caption" className="font-semibold">
                           {promo.promotionName}

@@ -75,7 +75,10 @@ function StatCard({
   color?: string;
 }) {
   return (
-    <View className="flex-1 items-center gap-1 rounded-2xl bg-colors-surface-background p-4 shadow-sm">
+    <View
+      className="flex-1 items-center gap-1 rounded-2xl p-4 shadow-sm"
+      style={{ backgroundColor: colors.surface.background }}
+    >
       <Ionicons name={icon} size={24} color={color ?? colors.brand.primary} />
       <AppText variant="subtitle" className="font-semibold">
         {value}
@@ -179,7 +182,10 @@ export default function TripSummaryScreen() {
       </View>
 
       {/* Badge progress */}
-      <View className="mb-6 gap-3 rounded-2xl bg-colors-surface-background p-4 shadow-sm">
+      <View
+        className="mb-6 gap-3 rounded-2xl p-4 shadow-sm"
+        style={{ backgroundColor: colors.surface.background }}
+      >
         <AppText variant="subtitle" className="font-semibold">
           Badge Progress
         </AppText>

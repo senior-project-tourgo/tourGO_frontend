@@ -30,7 +30,7 @@ export function SwipeToUnlock({
       unlocked.current = false;
       Animated.spring(pan, { toValue: 0, useNativeDriver: true }).start();
     }
-  }, [disabled]);
+  }, [disabled, pan]);
 
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => !disabled && !unlocked.current,
@@ -62,17 +62,15 @@ export function SwipeToUnlock({
 
   return (
     <View
+      className={`justify-center overflow-hidden rounded-full`}
       style={{
         width: trackWidth,
         height: TRACK_HEIGHT,
-        backgroundColor: disabled ? colors.surface.muted : colors.brand.primary,
-        borderRadius: TRACK_HEIGHT / 2,
-        justifyContent: 'center',
         padding: HORIZONTAL_PADDING,
-        overflow: 'hidden'
+        backgroundColor: disabled ? colors.surface.muted : colors.brand.primary
       }}
     >
-      {/* Label fades out as thumb slides */}
+      {/* Label fades out */}
       <Animated.View
         style={{
           position: 'absolute',
@@ -83,7 +81,7 @@ export function SwipeToUnlock({
       >
         <AppText
           variant="caption"
-          className="font-semibold"
+          className="font-semibold text-white"
           style={{ color: colors.text.inverse, letterSpacing: 0.5 }}
         >
           {label}
@@ -97,10 +95,9 @@ export function SwipeToUnlock({
           width: THUMB_SIZE,
           height: THUMB_SIZE,
           borderRadius: THUMB_SIZE / 2,
-          backgroundColor: colors.surface.background,
-          alignItems: 'center',
-          justifyContent: 'center'
+          backgroundColor: colors.surface.background
         }}
+        className="items-center justify-center"
         {...panResponder.panHandlers}
       >
         <Ionicons
