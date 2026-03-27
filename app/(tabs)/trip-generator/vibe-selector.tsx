@@ -3,6 +3,7 @@ import { Button } from '@/components/Button';
 import { VibeCard } from '@/components/cards/variants/VibeCard';
 import { HeaderWithBack } from '@/components/PageHeader';
 import { PaceValue } from '@/constants/paceOptions';
+import { TRANSPORT_OPTIONS, TransportMode } from '@/constants/transportOptions';
 import { Area, Place } from '@/features/place/place.types';
 import { mockVibes } from '@/mock/vibes.mock';
 import { generateRecommendation } from '@/services/trip.service';
@@ -101,7 +102,9 @@ export default function VibeSelectorScreen() {
         groupType: normalizeStringParam(params.groupType) || undefined,
         startLat: startLatRaw ? Number(startLatRaw) : undefined,
         startLng: startLngRaw ? Number(startLngRaw) : undefined,
-        transportMode: (transportModeRaw as any) || undefined
+        transportMode: TRANSPORT_OPTIONS.some(o => o.value === transportModeRaw)
+          ? (transportModeRaw as TransportMode)
+          : undefined
       });
 
       const placeIds = result.recommendedPlaces.map(p => p.placeId).join(',');

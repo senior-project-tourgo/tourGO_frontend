@@ -41,10 +41,10 @@ export function buildTripPayload({
     itineraryName: itineraryName.trim(),
     travelingArea: area,
     numberOfPeople: people,
-    pace,
-    groupType: groupType ?? ''
+    pace
   };
 
+  if (groupType) payload.groupType = groupType;
   if (tripDate) payload.tripDate = formatDate(tripDate);
   if (startTime) payload.startTime = formatTime(startTime);
   if (endTime) payload.endTime = formatTime(endTime);

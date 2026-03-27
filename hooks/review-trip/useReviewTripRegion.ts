@@ -45,6 +45,7 @@ export function useReviewTripRegion(editablePlaces: EditablePlace[]) {
     let active = true;
 
     async function initFromLocation() {
+      if (initialised.current) return;
       try {
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (!active || initialised.current) return;
