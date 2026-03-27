@@ -177,7 +177,7 @@ export default function DuringTripScreen() {
 
       setTrip(fetchedTrip);
 
-      const placeIds = fetchedTrip.places
+      const placeIds = [...fetchedTrip.places]
         .sort((a, b) => a.order - b.order)
         .map(p => p.placeId);
 
