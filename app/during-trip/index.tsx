@@ -418,8 +418,11 @@ export default function DuringTripScreen() {
         }
       });
     } catch (err: any) {
-      setEnding(false);
-      console.error('End trip failed:', err.message);
+      console.error('End trip failed:', err?.message ?? err);
+      Alert.alert(
+        'Unable to complete trip',
+        'Something went wrong. Please try again.'
+      );
     } finally {
       setEnding(false);
     }

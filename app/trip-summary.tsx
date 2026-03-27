@@ -29,6 +29,14 @@ function XpBar({ current, badge }: { current: number; badge: string }) {
   const next = BADGE_THRESHOLDS[idx - 1];
   const prev = BADGE_THRESHOLDS[idx];
 
+  if (idx === -1) {
+    return (
+      <AppText variant="muted" className="text-center">
+        Progress unavailable
+      </AppText>
+    );
+  }
+
   if (!next) {
     return (
       <AppText variant="muted" className="text-center">
