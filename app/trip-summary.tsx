@@ -105,21 +105,31 @@ export default function TripSummaryScreen() {
     visitedCoords: string;
   }>();
 
-  const summary: SummaryParams = params.summary
-    ? JSON.parse(params.summary as string)
-    : {
-        tripName: 'Trip Complete',
-        xpEarned: 0,
-        totalXp: 0,
-        badge: 'Newcomer',
-        visitedCount: 0,
-        totalPlaces: 0,
-        totalDuration: null
-      };
+  const summary: SummaryParams = (() => {
+    try {
+      return params.summary ? JSON.parse(params.summary as string) : null;
+    } catch {
+      return null;
+    }
+  })() ?? {
+    tripName: 'Trip Complete',
+    xpEarned: 0,
+    totalXp: 0,
+    badge: 'Newcomer',
+    visitedCount: 0,
+    totalPlaces: 0,
+    totalDuration: null
+  };
 
-  const coords: { lat: number; lng: number }[] = params.visitedCoords
-    ? JSON.parse(params.visitedCoords as string)
-    : [];
+  const coords: { lat: number; lng: number }[] = (() => {
+    try {
+      return params.visitedCoords
+        ? JSON.parse(params.visitedCoords as string)
+        : [];
+    } catch {
+      return [];
+    }
+  })();
 
   const km = totalRouteKm(coords);
   const hours = summary.totalDuration
