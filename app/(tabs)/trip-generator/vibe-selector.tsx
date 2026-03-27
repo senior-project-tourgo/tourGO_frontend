@@ -2,7 +2,6 @@ import { AppText } from '@/components/AppText';
 import { Button } from '@/components/Button';
 import { VibeCard } from '@/components/cards/variants/VibeCard';
 import { HeaderWithBack } from '@/components/PageHeader';
-import { Screen } from '@/components/Screen';
 import { PaceValue } from '@/constants/paceOptions';
 import { Area, Place } from '@/features/place/place.types';
 import { mockVibes } from '@/mock/vibes.mock';
@@ -13,6 +12,7 @@ import { AxiosError } from 'axios';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { FlatList, Modal, Pressable, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type VibeMismatchData = {
   placeIds: string;
@@ -28,11 +28,10 @@ export default function VibeSelectorScreen() {
   const [mismatch, setMismatch] = useState<VibeMismatchData | null>(null);
   const params = useLocalSearchParams();
 
-  const toggleVibe = (id: string) => {
+  const toggleVibe = (id: string) =>
     setSelectedVibes(prev =>
       prev.includes(id) ? prev.filter(v => v !== id) : [...prev, id]
     );
-  };
 
   const normalizeNumberParam = (
     param: string | string[] | undefined,
@@ -48,12 +47,8 @@ export default function VibeSelectorScreen() {
     return num;
   };
 
-  const normalizeStringParam = (
-    param: string | string[] | undefined
-  ): string => {
-    const value = Array.isArray(param) ? param[0] : param;
-    return value || '';
-  };
+  const normalizeStringParam = (param: string | string[] | undefined): string =>
+    (Array.isArray(param) ? param[0] : param) || '';
 
   const navigateToReview = (placeIds: string) => {
     router.push({
@@ -62,7 +57,6 @@ export default function VibeSelectorScreen() {
     });
   };
 
-  /** Check how many recommended places match at least one selected vibe */
   const checkVibeMismatch = (
     places: Place[],
     vibes: string[]
@@ -71,11 +65,8 @@ export default function VibeSelectorScreen() {
     const unmatchedNames: string[] = [];
     for (const place of places) {
       const hasMatch = place.vibe.some(v => vibes.includes(v));
-      if (hasMatch) {
-        matchCount++;
-      } else {
-        unmatchedNames.push(place.placeName);
-      }
+      if (hasMatch) matchCount++;
+      else unmatchedNames.push(place.placeName);
     }
     return { matchCount, unmatchedNames };
   };
@@ -113,7 +104,6 @@ export default function VibeSelectorScreen() {
       );
 
       if (matchCount < result.recommendedPlaces.length) {
-        // Some places don't match — show feedback before proceeding
         setMismatch({
           placeIds,
           matchCount,
@@ -135,16 +125,20 @@ export default function VibeSelectorScreen() {
   };
 
   return (
-    <Screen scroll={false}>
-      <HeaderWithBack title="Select Your Vibes" />
-
+    <SafeAreaView className="flex-1 bg-colors-surface-background">
+      {/* Scrollable content */}
       <FlatList
-        showsVerticalScrollIndicator={false}
         data={mockVibes}
         keyExtractor={item => item.id}
         numColumns={2}
-        columnWrapperStyle={{ gap: 16 }}
-        contentContainerStyle={{ paddingTop: 16, gap: 16, paddingBottom: 16 }}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingTop: 16, paddingHorizontal: 16 }}
+        columnWrapperStyle={{
+          gap: 16,
+          justifyContent: 'space-between',
+          marginBottom: 16
+        }}
+        ListHeaderComponent={<HeaderWithBack title="Select Your Vibes" />}
         renderItem={({ item }) => (
           <VibeCard
             title={item.title}
@@ -155,7 +149,8 @@ export default function VibeSelectorScreen() {
         )}
       />
 
-      <View style={{ marginTop: 12, marginBottom: 8 }}>
+      {/* Fixed bottom button */}
+      <View className="mt-8 px-4 pb-24">
         <Button
           title="Generate Itinerary"
           onPress={handleContinue}
@@ -164,7 +159,7 @@ export default function VibeSelectorScreen() {
         />
       </View>
 
-      {/* ── Vibe mismatch feedback modal ── */}
+      {/* Vibe mismatch modal */}
       <Modal
         visible={!!mismatch}
         transparent
@@ -172,37 +167,15 @@ export default function VibeSelectorScreen() {
         onRequestClose={() => setMismatch(null)}
       >
         <Pressable
-          style={{
-            flex: 1,
-            backgroundColor: 'rgba(0,0,0,0.55)',
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: 24
-          }}
+          className="flex-1 items-center justify-center bg-black/55 p-6"
           onPress={() => setMismatch(null)}
         >
           <Pressable
-            style={{
-              width: '100%',
-              backgroundColor: '#fff',
-              borderRadius: 20,
-              padding: 24,
-              gap: 16
-            }}
+            className="w-full gap-4 rounded-2xl bg-white p-6"
             onPress={() => {}}
           >
-            {/* Icon */}
-            <View style={{ alignItems: 'center' }}>
-              <View
-                style={{
-                  width: 60,
-                  height: 60,
-                  borderRadius: 30,
-                  backgroundColor: colors.brand.neutrals,
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
+            <View className="items-center">
+              <View className="h-16 w-16 items-center justify-center rounded-full bg-gray-200">
                 <Ionicons
                   name="alert-circle-outline"
                   size={30}
@@ -211,87 +184,51 @@ export default function VibeSelectorScreen() {
               </View>
             </View>
 
-            {/* Headline */}
             <AppText variant="subtitle" className="text-center font-semibold">
               Partial Vibe Match
             </AppText>
 
-            {/* Stats */}
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'center',
-                gap: 8
-              }}
-            >
-              <View
-                style={{
-                  backgroundColor: '#f0fdf4',
-                  borderRadius: 12,
-                  paddingHorizontal: 14,
-                  paddingVertical: 8,
-                  alignItems: 'center'
-                }}
-              >
+            <View className="mt-2 flex-row justify-center gap-2">
+              <View className="items-center rounded-xl bg-green-50 px-3 py-2">
                 <AppText
                   variant="subtitle"
-                  className="font-semibold"
-                  style={{ color: '#16a34a' }}
+                  className="font-semibold text-green-600"
                 >
                   {mismatch?.matchCount}
                 </AppText>
-                <AppText variant="caption" style={{ color: '#16a34a' }}>
+                <AppText variant="caption" className="text-green-600">
                   matched
                 </AppText>
               </View>
-              <View
-                style={{
-                  backgroundColor: '#fff7ed',
-                  borderRadius: 12,
-                  paddingHorizontal: 14,
-                  paddingVertical: 8,
-                  alignItems: 'center'
-                }}
-              >
+              <View className="items-center rounded-xl bg-orange-50 px-3 py-2">
                 <AppText
                   variant="subtitle"
-                  className="font-semibold"
-                  style={{ color: colors.brand.primary }}
+                  className="font-semibold text-colors-brand-primary"
                 >
                   {(mismatch?.totalCount ?? 0) - (mismatch?.matchCount ?? 0)}
                 </AppText>
                 <AppText
                   variant="caption"
-                  style={{ color: colors.brand.primary }}
+                  className="text-colors-brand-primary"
                 >
                   outside vibes
                 </AppText>
               </View>
             </View>
 
-            {/* Unmatched place names */}
             {mismatch && mismatch.unmatchedNames.length > 0 && (
-              <View style={{ gap: 4 }}>
-                <AppText variant="caption" style={{ color: '#64748b' }}>
+              <View className="mt-2 gap-1">
+                <AppText variant="caption" className="text-gray-500">
                   These places don&apos;t match your selected vibes:
                 </AppText>
                 {mismatch.unmatchedNames.map(name => (
-                  <View
-                    key={name}
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: 6
-                    }}
-                  >
+                  <View key={name} className="flex-row items-center gap-1.5">
                     <Ionicons
                       name="location-outline"
                       size={13}
                       color="#94a3b8"
                     />
-                    <AppText variant="caption" style={{ color: '#475569' }}>
-                      {name}
-                    </AppText>
+                    <AppText variant="caption">{name}</AppText>
                   </View>
                 ))}
               </View>
@@ -299,33 +236,22 @@ export default function VibeSelectorScreen() {
 
             <AppText
               variant="caption"
-              className="text-center"
-              style={{ color: '#94a3b8' }}
+              className="mt-2 text-center text-gray-400"
             >
               You can continue with this mix or go back and pick different
               vibes.
             </AppText>
 
-            {/* Actions */}
-            <View style={{ flexDirection: 'row', gap: 10 }}>
+            <View className="mt-4 flex-row gap-2.5">
               <Pressable
                 onPress={() => setMismatch(null)}
-                style={{
-                  flex: 1,
-                  borderRadius: 12,
-                  borderWidth: 1.5,
-                  borderColor: colors.brand.primary,
-                  paddingVertical: 12,
-                  alignItems: 'center'
-                }}
+                className="border-primary flex-1 items-center rounded-xl border-2 px-0 py-3"
               >
-                <AppText
-                  className="font-semibold"
-                  style={{ color: colors.brand.primary }}
-                >
+                <AppText className="text-primary font-semibold">
                   Rechoose Vibes
                 </AppText>
               </Pressable>
+
               <Pressable
                 onPress={() => {
                   if (mismatch) {
@@ -333,22 +259,14 @@ export default function VibeSelectorScreen() {
                     navigateToReview(mismatch.placeIds);
                   }
                 }}
-                style={{
-                  flex: 1,
-                  borderRadius: 12,
-                  backgroundColor: colors.brand.primary,
-                  paddingVertical: 12,
-                  alignItems: 'center'
-                }}
+                className="bg-primary flex-1 items-center rounded-xl px-0 py-3"
               >
-                <AppText className="font-semibold" style={{ color: '#fff' }}>
-                  Continue
-                </AppText>
+                <AppText className="font-semibold text-white">Continue</AppText>
               </Pressable>
             </View>
           </Pressable>
         </Pressable>
       </Modal>
-    </Screen>
+    </SafeAreaView>
   );
 }

@@ -1,28 +1,24 @@
-import {
-  ScrollView,
-  RefreshControl,
-  View,
-  ActivityIndicator,
-  Alert
-} from 'react-native';
-import { HeaderWithBack } from '@/components/PageHeader';
+import { ActivityIndicator, Alert } from 'react-native';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+
 import { Screen } from '@/components/Screen';
+import { HeaderWithBack } from '@/components/PageHeader';
 import { Button } from '@/components/Button';
-import colors from '@/theme/colors';
 import { TripSection } from '@/components/TripSection';
 import { DeleteConfirmModal } from '@/components/DeleteConfirmModal';
+import { AppText } from '@/components/AppText';
+import colors from '@/theme/colors';
+
 import {
   fetchAllUserTrips,
   startTrip,
   deleteTrip
 } from '@/services/trip.service';
-import { router } from 'expo-router';
-import { useState, useEffect, useCallback } from 'react';
 import type { Trip } from '@/features/trip/trip.types';
-import { Ionicons } from '@expo/vector-icons';
-import { AppText } from '@/components/AppText';
 
-export default function TripScreen() {
+function useTrips() {
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -47,8 +43,8 @@ export default function TripScreen() {
   }, [load]);
 
   const handleStart = async (trip: Trip) => {
+    setStartingId(trip._id);
     try {
-      setStartingId(trip._id);
       await startTrip(trip._id);
       router.push({ pathname: '/during-trip', params: { tripId: trip._id } });
     } catch (err: any) {
@@ -58,15 +54,7 @@ export default function TripScreen() {
     }
   };
 
-  const handleResume = (trip: Trip) =>
-    router.push({ pathname: '/during-trip', params: { tripId: trip._id } });
-  const handleEdit = (trip: Trip) =>
-    router.push({
-      pathname: '/edit-trip/[tripId]',
-      params: { tripId: trip._id }
-    });
-
-  const confirmDelete = async () => {
+  const handleDelete = async () => {
     if (!tripToDelete) return;
     const target = tripToDelete;
     setDeleting(true);
@@ -81,17 +69,55 @@ export default function TripScreen() {
     }
   };
 
+  return {
+    trips,
+    loading,
+    refreshing,
+    startingId,
+    tripToDelete,
+    deleting,
+    load,
+    handleStart,
+    handleDelete,
+    setRefreshing,
+    setTripToDelete
+  };
+}
+
+export default function TripScreen() {
+  const {
+    trips,
+    loading,
+    startingId,
+    tripToDelete,
+    deleting,
+    handleStart,
+    handleDelete,
+    setTripToDelete
+  } = useTrips();
+
   const cardProps = (t: Trip) => ({
     onStart: () => handleStart(t),
-    onResume: () => handleResume(t),
-    onEdit: () => handleEdit(t),
+    onResume: () =>
+      router.push({ pathname: '/during-trip', params: { tripId: t._id } }),
+    onEdit: () =>
+      router.push({
+        pathname: '/edit-trip/[tripId]',
+        params: { tripId: t._id }
+      }),
     onDelete: () => setTripToDelete(t),
     starting: startingId === t._id
   });
 
-  const current = trips.filter(t => t.status === 'current');
-  const saved = trips.filter(t => t.status === 'saved');
-  const completed = trips.filter(t => t.status === 'completed');
+  const current = useMemo(
+    () => trips.filter(t => t.status === 'current'),
+    [trips]
+  );
+  const saved = useMemo(() => trips.filter(t => t.status === 'saved'), [trips]);
+  const completed = useMemo(
+    () => trips.filter(t => t.status === 'completed'),
+    [trips]
+  );
 
   if (loading) {
     return (
@@ -106,74 +132,57 @@ export default function TripScreen() {
   }
 
   return (
-    <>
-      <ScrollView
-        className="bg-colors-surface-background"
-        contentContainerStyle={{
-          paddingTop: 64,
-          paddingHorizontal: 24,
-          paddingBottom: 120
-        }}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={() => {
-              setRefreshing(true);
-              load();
-            }}
-            tintColor={colors.brand.primary}
+    <Screen scroll>
+      <HeaderWithBack title="My Trips" showBack={false} />
+
+      <Button
+        title="Plan New Trip"
+        onPress={() => router.push('/(tabs)/trip-generator')}
+        className="mb-6"
+      />
+
+      {trips.length === 0 && (
+        <Screen padded={false}>
+          <Ionicons
+            name="map-outline"
+            size={48}
+            color={colors.brand.neutrals}
+            className="mt-10"
           />
-        }
-      >
-        <HeaderWithBack title="My Trips" showBack={false} />
-        <Button
-          title="Plan New Trip"
-          onPress={() => router.push('/(tabs)/trip-generator')}
-          className="mb-6"
-        />
+          <AppText variant="subtitle" className="mt-4 text-center">
+            No trips yet
+          </AppText>
+          <AppText variant="muted" className="text-center">
+            Plan your first trip using the button above
+          </AppText>
+        </Screen>
+      )}
 
-        {trips.length === 0 && (
-          <View className="items-center gap-2 pt-10">
-            <Ionicons
-              name="map-outline"
-              size={48}
-              color={colors.brand.neutrals}
-            />
-            <AppText variant="subtitle" className="text-center">
-              No trips yet
-            </AppText>
-            <AppText variant="muted" className="text-center">
-              Plan your first trip using the button above
-            </AppText>
-          </View>
-        )}
-
-        <TripSection
-          title="Active Trip"
-          trips={current}
-          collapsedLimit={1}
-          cardProps={cardProps}
-        />
-        <TripSection
-          title="Saved Trips"
-          trips={saved}
-          collapsedLimit={1}
-          cardProps={cardProps}
-        />
-        <TripSection
-          title="Completed"
-          trips={completed}
-          collapsedLimit={2}
-          cardProps={cardProps}
-        />
-      </ScrollView>
+      <TripSection
+        title="Active Trip"
+        trips={current}
+        collapsedLimit={1}
+        cardProps={cardProps}
+      />
+      <TripSection
+        title="Saved Trips"
+        trips={saved}
+        collapsedLimit={1}
+        cardProps={cardProps}
+      />
+      <TripSection
+        title="Completed"
+        trips={completed}
+        collapsedLimit={2}
+        cardProps={cardProps}
+      />
 
       <DeleteConfirmModal
         trip={tripToDelete}
         onCancel={() => setTripToDelete(null)}
-        onConfirm={confirmDelete}
+        onConfirm={handleDelete}
         deleting={deleting}
       />
-    </>
+    </Screen>
   );
 }
