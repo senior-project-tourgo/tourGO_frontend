@@ -36,7 +36,7 @@ export const AppTextInput = forwardRef<TextInput, AppTextInputProps>(
             ref={ref}
             value={value}
             placeholderTextColor={placeholderTextColor}
-            className={`text-base text-colors-text ${rightIcon ? 'pr-10' : 'pr-2'}`}
+            className={`text-base text-colors-text ${rightIcon ? 'pr-8' : 'pr-1'}`}
             style={{
               paddingTop: 0, // push text slightly down
               lineHeight: 18
@@ -44,7 +44,7 @@ export const AppTextInput = forwardRef<TextInput, AppTextInputProps>(
             {...props}
           />
           {rightIcon && (
-            <View className="absolute right-2 top-1/2 -translate-y-1/2">
+            <View className="absolute right-0 top-1/2 -translate-y-1/2">
               {rightIcon}
             </View>
           )}

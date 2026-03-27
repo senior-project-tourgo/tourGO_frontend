@@ -60,9 +60,7 @@ export function LocationSearchBar({
       setLoading(true);
       const res = await api.get<{ predictions: Prediction[] }>(
         '/geocode/autocomplete',
-        {
-          params: { input: text.trim() }
-        }
+        { params: { input: text.trim() } }
       );
       setPredictions(res.data.predictions ?? []);
     } catch {
@@ -144,55 +142,26 @@ export function LocationSearchBar({
       </AppText>
     ) : null;
 
-  // ── Selected state ──
-  if (selectedLabel) {
-    return (
-      <View className="gap-1.5">
-        {renderLabel()}
-        <Pressable
-          onPress={handleClear}
-          className="border-primary bg-primary/10 flex-row items-center gap-2.5 rounded-xl border-2 px-3.5 py-3"
-        >
-          <View className="h-8 w-8 items-center justify-center rounded-full bg-colors-brand-primary/20">
-            <Ionicons name="location" size={16} color={colors.brand.primary} />
-          </View>
-          <View className="flex-1">
-            <AppText
-              className="font-semibold text-colors-text"
-              numberOfLines={1}
-            >
-              {selectedLabel}
-            </AppText>
-          </View>
-          <Ionicons
-            name="close-circle"
-            size={20}
-            color={colors.brand.secondary}
-          />
-        </Pressable>
-      </View>
-    );
-  }
-
   const showQuickPicks = query.length === 0 && predictions.length === 0;
 
   return (
     <View className="gap-2">
       {renderLabel()}
 
-      {/* Search input using AppTextInput */}
+      {/* Input / Selected state using AppTextInput */}
       <AppTextInput
         ref={inputRef}
-        value={query}
+        value={selectedLabel ?? query}
         onChangeText={handleChangeText}
         placeholder="Search a place..."
         error={error}
         label={undefined}
         required={required}
+        editable={!selectedLabel} // read-only if a selection exists
         rightIcon={
           loading || detailsLoading ? (
             <ActivityIndicator size="small" color={colors.brand.primary} />
-          ) : query.length > 0 ? (
+          ) : query.length > 0 || selectedLabel ? (
             <Pressable onPress={handleClear} className="p-2">
               <Ionicons
                 name="close-circle"
