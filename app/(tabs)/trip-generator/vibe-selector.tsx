@@ -11,7 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { AxiosError } from 'axios';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { FlatList, Modal, Pressable, View } from 'react-native';
+import { Alert, FlatList, Modal, Pressable, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 type VibeMismatchData = {
@@ -85,8 +85,9 @@ export default function VibeSelectorScreen() {
       const startLngRaw = normalizeStringParam(params.startLng);
       const transportModeRaw = normalizeStringParam(params.transportMode);
 
+      const areaRaw = normalizeStringParam(params.travelingArea);
       const result = await generateRecommendation({
-        area: normalizeStringParam(params.travelingArea) as Area,
+        area: (areaRaw || undefined) as Area | undefined,
         vibes: selectedVibes,
         pace: normalizeStringParam(params.pace) as PaceValue,
         itineraryName: normalizeStringParam(params.itineraryName),
@@ -121,9 +122,10 @@ export default function VibeSelectorScreen() {
       }
     } catch (error) {
       const axiosError = error as AxiosError<{ message?: string }>;
-      throw new Error(
+      Alert.alert(
+        'Could not generate itinerary',
         axiosError.response?.data?.message ||
-          'Failed to generate recommendation'
+          'Something went wrong. Please try again.'
       );
     } finally {
       setIsLoading(false);

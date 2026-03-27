@@ -15,7 +15,9 @@ interface EditablePlace {
 
 export function useSaveTrip(
   editablePlaces: EditablePlace[],
-  itineraryName: string
+  itineraryName: string,
+  startCoords?: { latitude: number; longitude: number } | null,
+  startLabel?: string | null
 ) {
   const [loading, setLoading] = useState(false);
 
@@ -40,7 +42,14 @@ export function useSaveTrip(
       if (status === 'current') {
         router.replace({
           pathname: '/during-trip',
-          params: { tripId: trip._id }
+          params: {
+            tripId: trip._id,
+            ...(startCoords && {
+              startLat: startCoords.latitude,
+              startLng: startCoords.longitude
+            }),
+            ...(startLabel && { startLabel })
+          }
         });
       } else {
         router.replace('/(tabs)/trip');

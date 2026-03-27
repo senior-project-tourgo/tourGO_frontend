@@ -1,4 +1,4 @@
-import { ActivityIndicator, Alert } from 'react-native';
+import { ActivityIndicator, Alert, View } from 'react-native';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -17,6 +17,7 @@ import {
   deleteTrip
 } from '@/services/trip.service';
 import type { Trip } from '@/features/trip/trip.types';
+import { getPlacesByIds } from '@/features/place/placeById.api';
 
 function useTrips() {
   const [trips, setTrips] = useState<Trip[]>([]);
@@ -25,11 +26,24 @@ function useTrips() {
   const [startingId, setStartingId] = useState<string | null>(null);
   const [tripToDelete, setTripToDelete] = useState<Trip | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [placeImages, setPlaceImages] = useState<Record<string, string>>({});
 
   const load = useCallback(async () => {
     try {
       const data = await fetchAllUserTrips();
       setTrips(data);
+
+      const allIds = [
+        ...new Set(data.flatMap(t => t.places.map(p => p.placeId)))
+      ];
+      if (allIds.length > 0) {
+        const places = await getPlacesByIds(allIds);
+        const imageMap: Record<string, string> = {};
+        places.forEach(p => {
+          imageMap[p.placeId] = p.image;
+        });
+        setPlaceImages(imageMap);
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -76,6 +90,7 @@ function useTrips() {
     startingId,
     tripToDelete,
     deleting,
+    placeImages,
     load,
     handleStart,
     handleDelete,
@@ -91,6 +106,7 @@ export default function TripScreen() {
     startingId,
     tripToDelete,
     deleting,
+    placeImages,
     handleStart,
     handleDelete,
     setTripToDelete
@@ -106,7 +122,8 @@ export default function TripScreen() {
         params: { tripId: t._id }
       }),
     onDelete: () => setTripToDelete(t),
-    starting: startingId === t._id
+    starting: startingId === t._id,
+    placeImages
   });
 
   const current = useMemo(
@@ -142,12 +159,11 @@ export default function TripScreen() {
       />
 
       {trips.length === 0 && (
-        <Screen padded={false}>
+        <View style={{ alignItems: 'center', marginTop: 40 }}>
           <Ionicons
             name="map-outline"
             size={48}
             color={colors.brand.neutrals}
-            className="mt-10"
           />
           <AppText variant="subtitle" className="mt-4 text-center">
             No trips yet
@@ -155,27 +171,12 @@ export default function TripScreen() {
           <AppText variant="muted" className="text-center">
             Plan your first trip using the button above
           </AppText>
-        </Screen>
+        </View>
       )}
 
-      <TripSection
-        title="Active Trip"
-        trips={current}
-        collapsedLimit={1}
-        cardProps={cardProps}
-      />
-      <TripSection
-        title="Saved Trips"
-        trips={saved}
-        collapsedLimit={1}
-        cardProps={cardProps}
-      />
-      <TripSection
-        title="Completed"
-        trips={completed}
-        collapsedLimit={2}
-        cardProps={cardProps}
-      />
+      <TripSection title="Active Trip" trips={current} cardProps={cardProps} />
+      <TripSection title="Saved Plans" trips={saved} cardProps={cardProps} />
+      <TripSection title="Completed" trips={completed} cardProps={cardProps} />
 
       <DeleteConfirmModal
         trip={tripToDelete}

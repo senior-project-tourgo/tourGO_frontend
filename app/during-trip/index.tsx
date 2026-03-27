@@ -52,7 +52,17 @@ type StampModalData = {
 };
 
 export default function DuringTripScreen() {
-  const { tripId } = useLocalSearchParams<{ tripId: string }>();
+  const { tripId, startLat, startLng, startLabel } = useLocalSearchParams<{
+    tripId: string;
+    startLat: string;
+    startLng: string;
+    startLabel: string;
+  }>();
+
+  const startCoords =
+    startLat && startLng
+      ? { latitude: parseFloat(startLat), longitude: parseFloat(startLng) }
+      : null;
 
   const [trip, setTrip] = useState<Trip | null>(null);
   const [placeData, setPlaceData] = useState<PlaceWithPromos[]>([]);
@@ -982,6 +992,20 @@ export default function DuringTripScreen() {
             }
           />
         ))}
+
+        {/* Starting point */}
+        {startCoords && (
+          <Marker
+            key="starting-point"
+            coordinate={startCoords}
+            title={
+              typeof startLabel === 'string' && startLabel
+                ? startLabel
+                : 'Starting Point'
+            }
+            pinColor="#22c55e"
+          />
+        )}
       </MapView>
 
       {/* ── Header overlay ── */}

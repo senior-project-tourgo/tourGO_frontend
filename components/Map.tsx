@@ -72,12 +72,7 @@ export function Map({ region, markers, focusCoordinate, routes }: Props) {
         back to place #1 on every re-render. initialRegion sets the starting
         viewport once and then leaves the map free to pan/zoom.
       */}
-      <MapView
-        ref={mapRef}
-        style={{ flex: 1 }}
-        initialRegion={region}
-        showsUserLocation
-      >
+      <MapView ref={mapRef} style={{ flex: 1 }} initialRegion={region}>
         {routes?.map((route, index) => (
           <Polyline
             key={`route-${index}`}

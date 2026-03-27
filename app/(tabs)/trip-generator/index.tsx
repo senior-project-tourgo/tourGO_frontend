@@ -56,7 +56,7 @@ export default function TripGeneratorScreen() {
     let hasError = false;
 
     if (!itineraryName.trim()) hasError = true;
-    if (!area || !startCoords) {
+    if (!startCoords) {
       setLocationError('Please search and select a starting location');
       hasError = true;
     }
@@ -135,14 +135,11 @@ export default function TripGeneratorScreen() {
             setPace={setPace}
             transportMode={transportMode}
             setTransportMode={setTransportMode}
-            groupType={groupType}
-            setGroupType={setGroupType}
-            people={people}
-            setPeople={setPeople}
           />
 
           <GroupSection
             groupType={groupType}
+            setGroupType={setGroupType}
             people={people}
             setPeople={setPeople}
           />

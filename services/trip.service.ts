@@ -89,7 +89,7 @@ export async function completeTrip(
 }
 
 export type GenerateTripInput = {
-  area: 'Kathmandu' | 'Pokhara' | 'Bhaktapur' | 'Lalitpur';
+  area?: 'Kathmandu' | 'Pokhara' | 'Bhaktapur' | 'Lalitpur';
   vibes: string[];
   pace: SelectorOption['value'];
   tripDate: string;

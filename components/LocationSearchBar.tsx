@@ -246,7 +246,7 @@ export function LocationSearchBar({
             {predictions.map(item => (
               <Pressable
                 key={item.placeId}
-                onPress={() => handleSelect(item)}
+                onPress={() => handleSelectPrediction(item)}
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',

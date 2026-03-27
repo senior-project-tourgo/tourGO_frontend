@@ -36,7 +36,12 @@ export default function ReviewTripScreen() {
 
   const { region } = useReviewTripRegion(editablePlaces);
 
-  const { saveTrip, loading } = useSaveTrip(editablePlaces, finalItineraryName);
+  const { saveTrip, loading } = useSaveTrip(
+    editablePlaces,
+    finalItineraryName,
+    startCoords,
+    startLabel
+  );
 
   const [focusCoordinate, setFocusCoordinate] = useState<
     { latitude: number; longitude: number } | undefined

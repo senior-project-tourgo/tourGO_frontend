@@ -2,13 +2,11 @@ import { View } from 'react-native';
 import { Accordion } from '@/components/Accordion';
 import { AppText } from '@/components/AppText';
 import { IconTile } from '@/components/IconTile';
-import SelectableChips from '@/components/SelectableChips';
 import { PACE_OPTIONS, type PaceValue } from '@/constants/paceOptions';
 import {
   TRANSPORT_OPTIONS,
   type TransportMode
 } from '@/constants/transportOptions';
-import { GROUP_TYPES, type GroupType } from '@/mock/groupTypes.mock';
 import { Ionicons } from '@expo/vector-icons';
 
 type TripStyleSectionProps = {
@@ -16,27 +14,14 @@ type TripStyleSectionProps = {
   setPace: (value: PaceValue) => void;
   transportMode: TransportMode | null;
   setTransportMode: (mode: TransportMode) => void;
-  groupType: GroupType | null;
-  setGroupType: (gt: GroupType) => void;
-  people: number;
-  setPeople: (num: number) => void;
 };
 
 export default function TripStyleSection({
   pace,
   setPace,
   transportMode,
-  setTransportMode,
-  groupType,
-  setGroupType,
-  people,
-  setPeople
+  setTransportMode
 }: TripStyleSectionProps) {
-  const handleGroupTypeSelect = (gt: GroupType) => {
-    setGroupType(gt);
-    setPeople(gt.defaultPeople);
-  };
-
   const styleSummary =
     [
       pace === 'relaxed'
@@ -74,13 +59,6 @@ export default function TripStyleSection({
           ))}
         </View>
       </View>
-
-      <SelectableChips
-        title="Who are you traveling with?"
-        options={GROUP_TYPES}
-        selectedOption={groupType}
-        onSelect={handleGroupTypeSelect}
-      />
 
       <View className="space-y-1.5">
         <AppText className="font-medium">Transport</AppText>
