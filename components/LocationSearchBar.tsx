@@ -1,12 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
-import {
-  ActivityIndicator,
-  FlatList,
-  Pressable,
-  TextInput,
-  View
-} from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { AppText } from './AppText';
+import { AppTextInput } from './AppTextInput';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '@/theme/colors';
 import api from '@/config/api';
@@ -51,11 +46,13 @@ export function LocationSearchBar({
   const [loading, setLoading] = useState(false);
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [gpsLoading, setGpsLoading] = useState(false);
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const inputRef = useRef<TextInput>(null);
 
-  const fetchPredictions = useCallback(async (input: string) => {
-    if (input.trim().length < 2) {
+  const inputRef = useRef<any>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // ── API ──
+  const fetchPredictions = useCallback(async (text: string) => {
+    if (text.trim().length < 2) {
       setPredictions([]);
       return;
     }
@@ -63,7 +60,9 @@ export function LocationSearchBar({
       setLoading(true);
       const res = await api.get<{ predictions: Prediction[] }>(
         '/geocode/autocomplete',
-        { params: { input: input.trim() } }
+        {
+          params: { input: text.trim() }
+        }
       );
       setPredictions(res.data.predictions ?? []);
     } catch {
@@ -73,16 +72,8 @@ export function LocationSearchBar({
     }
   }, []);
 
-  const handleChangeText = (text: string) => {
-    setQuery(text);
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => fetchPredictions(text), 300);
-  };
-
-  const handleSelect = async (prediction: Prediction) => {
+  const fetchPlaceDetails = async (prediction: Prediction) => {
     setDetailsLoading(true);
-    setPredictions([]);
-    setQuery(prediction.mainText);
     try {
       const res = await api.get<PlaceDetails>('/geocode/details', {
         params: { placeId: prediction.placeId }
@@ -94,7 +85,21 @@ export function LocationSearchBar({
     }
   };
 
+  // ── Handlers ──
+  const handleChangeText = (text: string) => {
+    setQuery(text);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => fetchPredictions(text), 300);
+  };
+
+  const handleSelectPrediction = (prediction: Prediction) => {
+    setQuery(prediction.mainText);
+    setPredictions([]);
+    fetchPlaceDetails(prediction);
+  };
+
   const handleQuickPick = (pick: QuickPick) => {
+    if (!pick.query) return;
     setQuery(pick.query);
     fetchPredictions(pick.query);
     inputRef.current?.focus();
@@ -108,7 +113,6 @@ export function LocationSearchBar({
       const loc = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Balanced
       });
-
       onSelect({
         lat: loc.coords.latitude,
         lng: loc.coords.longitude,
@@ -127,20 +131,24 @@ export function LocationSearchBar({
     onClear();
   };
 
+  // ── Render label + required ──
+  const renderLabel = () =>
+    label ? (
+      <AppText className="font-semibold">
+        {label}{' '}
+        {required && (
+          <AppText variant="caption" className="text-red-500">
+            *
+          </AppText>
+        )}
+      </AppText>
+    ) : null;
+
   // ── Selected state ──
   if (selectedLabel) {
     return (
       <View className="gap-1.5">
-        {label && (
-          <AppText className="font-semibold">
-            {label}{' '}
-            {required && (
-              <AppText variant="caption" className="text-red-500">
-                *
-              </AppText>
-            )}
-          </AppText>
-        )}
+        {renderLabel()}
         <Pressable
           onPress={handleClear}
           className="border-primary bg-primary/10 flex-row items-center gap-2.5 rounded-xl border-2 px-3.5 py-3"
@@ -170,58 +178,35 @@ export function LocationSearchBar({
 
   return (
     <View className="gap-2">
-      {label && (
-        <AppText className="font-semibold">
-          {label}{' '}
-          {required && (
-            <AppText variant="caption" className="text-red-500">
-              *
-            </AppText>
-          )}
-        </AppText>
-      )}
+      {renderLabel()}
 
-      {/* Search input */}
-      <View
-        className={`flex-row items-center gap-2 rounded-xl border-2 px-3.5 py-2.5 ${error ? 'border-red-500' : 'border-gray-300'} bg-white`}
-      >
-        <Ionicons
-          name="search-outline"
-          size={18}
-          color={colors.brand.primary}
-        />
-        <TextInput
-          ref={inputRef}
-          value={query}
-          onChangeText={handleChangeText}
-          placeholder="Search a place..."
-          placeholderTextColor="#999"
-          className="flex-1 py-0 text-sm"
-        />
-        {(loading || detailsLoading) && (
-          <ActivityIndicator size="small" color={colors.brand.primary} />
-        )}
-        {query.length > 0 && !loading && (
-          <Pressable onPress={handleClear} className="p-2">
-            <Ionicons
-              name="close-circle"
-              size={18}
-              color={colors.brand.secondary}
-            />
-          </Pressable>
-        )}
-      </View>
+      {/* Search input using AppTextInput */}
+      <AppTextInput
+        ref={inputRef}
+        value={query}
+        onChangeText={handleChangeText}
+        placeholder="Search a place..."
+        error={error}
+        label={undefined} // label handled above
+        required={required}
+        rightIcon={
+          loading || detailsLoading ? (
+            <ActivityIndicator size="small" color={colors.brand.primary} />
+          ) : query.length > 0 ? (
+            <Pressable onPress={handleClear} className="p-2">
+              <Ionicons
+                name="close-circle"
+                size={18}
+                color={colors.brand.secondary}
+              />
+            </Pressable>
+          ) : null
+        }
+      />
 
-      {error && (
-        <AppText variant="caption" className="text-red-500">
-          {error}
-        </AppText>
-      )}
-
-      {/* Quick-pick chips + GPS */}
+      {/* Quick picks */}
       {showQuickPicks && (
         <View className="gap-2.5">
-          {/* Use my location */}
           <Pressable
             onPress={handleUseMyLocation}
             disabled={gpsLoading}
@@ -246,7 +231,6 @@ export function LocationSearchBar({
             </AppText>
           </Pressable>
 
-          {/* Popular places using SelectableChips */}
           <SelectableChips
             title="Popular places"
             options={QUICK_PICKS.map((pick, idx) => ({
@@ -257,10 +241,11 @@ export function LocationSearchBar({
             }))}
             selectedOption={null}
             onSelect={opt =>
+              opt.description &&
               handleQuickPick({
                 label: opt.label,
                 icon: opt.icon,
-                query: opt.description!
+                query: opt.description
               })
             }
             showDescription={false}
@@ -268,47 +253,46 @@ export function LocationSearchBar({
         </View>
       )}
 
-      {/* Autocomplete dropdown */}
+      {/* Predictions */}
       {predictions.length > 0 && (
-        <View className="max-h-56 overflow-hidden rounded-xl border border-gray-300 bg-white">
-          <FlatList
-            data={predictions}
-            keyExtractor={item => item.placeId}
-            keyboardShouldPersistTaps="handled"
-            renderItem={({ item }) => (
-              <Pressable
-                onPress={() => handleSelect(item)}
-                className="flex-row items-center gap-2.5 border-b border-gray-300 px-3.5 py-3"
-              >
-                <View className="h-7 w-7 items-center justify-center rounded-full bg-colors-brand-primary/10">
-                  <Ionicons
-                    name="location-outline"
-                    size={14}
-                    color={colors.brand.primary}
-                  />
-                </View>
-                <View className="flex-1">
+        <ScrollView
+          className="max-h-56 overflow-hidden rounded-xl border border-gray-300 bg-white"
+          nestedScrollEnabled
+        >
+          {predictions.map(item => (
+            <Pressable
+              key={item.placeId}
+              onPress={() => handleSelectPrediction(item)}
+              className="flex-row items-center gap-2.5 border-b border-gray-300 px-3.5 py-3"
+            >
+              <View className="h-7 w-7 items-center justify-center rounded-full bg-colors-brand-primary/10">
+                <Ionicons
+                  name="location-outline"
+                  size={14}
+                  color={colors.brand.primary}
+                />
+              </View>
+              <View className="flex-1">
+                <AppText
+                  variant="caption"
+                  className="font-semibold"
+                  numberOfLines={1}
+                >
+                  {item.mainText}
+                </AppText>
+                {item.secondaryText && (
                   <AppText
                     variant="caption"
-                    className="font-semibold"
+                    className="text-xs text-gray-500"
                     numberOfLines={1}
                   >
-                    {item.mainText}
+                    {item.secondaryText}
                   </AppText>
-                  {item.secondaryText && (
-                    <AppText
-                      variant="caption"
-                      className="text-xs text-gray-500"
-                      numberOfLines={1}
-                    >
-                      {item.secondaryText}
-                    </AppText>
-                  )}
-                </View>
-              </Pressable>
-            )}
-          />
-        </View>
+                )}
+              </View>
+            </Pressable>
+          ))}
+        </ScrollView>
       )}
     </View>
   );
