@@ -187,7 +187,7 @@ export function LocationSearchBar({
         onChangeText={handleChangeText}
         placeholder="Search a place..."
         error={error}
-        label={undefined} // label handled above
+        label={undefined}
         required={required}
         rightIcon={
           loading || detailsLoading ? (
@@ -200,7 +200,9 @@ export function LocationSearchBar({
                 color={colors.brand.secondary}
               />
             </Pressable>
-          ) : null
+          ) : (
+            <Ionicons name="search" size={18} color={colors.brand.primary} />
+          )
         }
       />
 

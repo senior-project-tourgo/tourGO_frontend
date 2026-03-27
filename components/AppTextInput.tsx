@@ -1,12 +1,12 @@
 import React, { forwardRef, ReactNode } from 'react';
-import { TextInput, TextInputProps, View, StyleSheet } from 'react-native';
+import { TextInput, TextInputProps, View } from 'react-native';
 import { FormField } from './FormField';
 
 interface AppTextInputProps extends TextInputProps {
   label?: string;
   error?: string;
   required?: boolean;
-  rightIcon?: ReactNode; // NEW: icon or component on the right
+  rightIcon?: ReactNode;
 }
 
 export const AppTextInput = forwardRef<TextInput, AppTextInputProps>(
@@ -31,38 +31,26 @@ export const AppTextInput = forwardRef<TextInput, AppTextInputProps>(
         error={error}
         hasValue={hasValue}
       >
-        <View style={styles.container}>
+        <View className="relative w-full">
           <TextInput
             ref={ref}
             value={value}
             placeholderTextColor={placeholderTextColor}
-            style={[styles.input, rightIcon ? { paddingRight: 30 } : {}]}
+            className={`text-base text-colors-text ${rightIcon ? 'pr-10' : 'pr-2'}`}
+            style={{
+              paddingTop: 0, // push text slightly down
+              lineHeight: 18
+            }}
             {...props}
           />
-          {rightIcon && <View style={styles.icon}>{rightIcon}</View>}
+          {rightIcon && (
+            <View className="absolute right-2 top-1/2 -translate-y-1/2">
+              {rightIcon}
+            </View>
+          )}
         </View>
       </FormField>
     );
   }
 );
-
 AppTextInput.displayName = 'AppTextInput';
-
-const styles = StyleSheet.create({
-  container: {
-    position: 'relative',
-    width: '100%'
-  },
-  input: {
-    fontSize: 16,
-    lineHeight: 18,
-    paddingVertical: 0,
-    color: '#000'
-  },
-  icon: {
-    position: 'absolute',
-    right: 5,
-    top: '50%',
-    transform: [{ translateY: -8 }]
-  }
-});
