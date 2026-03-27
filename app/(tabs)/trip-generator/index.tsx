@@ -81,7 +81,8 @@ export default function TripGeneratorScreen() {
       groupType: groupType?.id,
       transportMode: transportMode ?? undefined,
       startLat: startCoords?.lat,
-      startLng: startCoords?.lng
+      startLng: startCoords?.lng,
+      startLabel: locationLabel ?? undefined
     });
 
     router.push({

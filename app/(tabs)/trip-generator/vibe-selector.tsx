@@ -53,7 +53,13 @@ export default function VibeSelectorScreen() {
   const navigateToReview = (placeIds: string) => {
     router.push({
       pathname: '/review-trip',
-      params: { placeIds, itineraryName: params.itineraryName }
+      params: {
+        placeIds,
+        itineraryName: params.itineraryName,
+        startLat: params.startLat,
+        startLng: params.startLng,
+        startLabel: params.startLabel
+      }
     });
   };
 

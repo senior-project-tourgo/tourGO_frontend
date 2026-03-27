@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { View } from 'react-native';
-import MapView, { Marker, Region } from 'react-native-maps';
+import MapView, { Marker, Polyline, Region } from 'react-native-maps';
 
 export type MapRegion = Region;
 
@@ -14,13 +14,20 @@ export type MapMarker = {
   pinColor?: string;
 };
 
+export type MapRoute = {
+  coords: { latitude: number; longitude: number }[];
+  /** true = solid primary colour, false/undefined = dashed muted colour */
+  solid?: boolean;
+};
+
 type Props = {
   region: MapRegion;
   markers?: MapMarker[];
   focusCoordinate?: { latitude: number; longitude: number };
+  routes?: MapRoute[];
 };
 
-export function Map({ region, markers, focusCoordinate }: Props) {
+export function Map({ region, markers, focusCoordinate, routes }: Props) {
   const mapRef = useRef<MapView>(null);
 
   // Fit all markers into view whenever the set of markers changes.
@@ -71,6 +78,15 @@ export function Map({ region, markers, focusCoordinate }: Props) {
         initialRegion={region}
         showsUserLocation
       >
+        {routes?.map((route, index) => (
+          <Polyline
+            key={`route-${index}`}
+            coordinates={route.coords}
+            strokeColor={route.solid ? '#f97316' : '#94a3b8'}
+            strokeWidth={route.solid ? 4 : 2}
+            lineDashPattern={route.solid ? undefined : [6, 8]}
+          />
+        ))}
         {markers?.map((marker, index) => (
           <Marker
             key={marker.id ?? `marker-${index}`}

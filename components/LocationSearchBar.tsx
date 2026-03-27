@@ -1,5 +1,11 @@
 import { useCallback, useRef, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  TextInput,
+  View
+} from 'react-native';
 import { AppText } from './AppText';
 import { AppTextInput } from './AppTextInput';
 import { Ionicons } from '@expo/vector-icons';
@@ -226,44 +232,69 @@ export function LocationSearchBar({
 
       {/* Predictions */}
       {predictions.length > 0 && (
-        <ScrollView
-          className="max-h-56 overflow-hidden rounded-xl border border-gray-300 bg-white"
-          nestedScrollEnabled
+        <View
+          style={{
+            borderRadius: 14,
+            borderWidth: 1,
+            borderColor: colors.brand.neutrals,
+            backgroundColor: '#fff',
+            maxHeight: 220,
+            overflow: 'hidden'
+          }}
         >
-          {predictions.map(item => (
-            <Pressable
-              key={item.placeId}
-              onPress={() => handleSelectPrediction(item)}
-              className="flex-row items-center gap-2.5 border-b border-gray-300 px-3.5 py-3"
-            >
-              <View className="h-7 w-7 items-center justify-center rounded-full bg-colors-brand-primary/10">
-                <Ionicons
-                  name="location-outline"
-                  size={14}
-                  color={colors.brand.primary}
-                />
-              </View>
-              <View className="flex-1">
-                <AppText
-                  variant="caption"
-                  className="font-semibold"
-                  numberOfLines={1}
+          <ScrollView keyboardShouldPersistTaps="handled">
+            {predictions.map(item => (
+              <Pressable
+                key={item.placeId}
+                onPress={() => handleSelect(item)}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 10,
+                  paddingHorizontal: 14,
+                  paddingVertical: 12,
+                  borderBottomWidth: 0.5,
+                  borderBottomColor: colors.brand.neutrals
+                }}
+              >
+                <View
+                  style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: 14,
+                    backgroundColor: colors.brand.primary + '12',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
                 >
-                  {item.mainText}
-                </AppText>
-                {item.secondaryText && (
+                  <Ionicons
+                    name="location-outline"
+                    size={14}
+                    color={colors.brand.primary}
+                  />
+                </View>
+                <View style={{ flex: 1 }}>
                   <AppText
                     variant="caption"
-                    className="text-xs text-gray-500"
+                    className="font-semibold"
                     numberOfLines={1}
                   >
-                    {item.secondaryText}
+                    {item.mainText}
                   </AppText>
-                )}
-              </View>
-            </Pressable>
-          ))}
-        </ScrollView>
+                  {item.secondaryText ? (
+                    <AppText
+                      variant="caption"
+                      style={{ color: colors.brand.secondary, fontSize: 11 }}
+                      numberOfLines={1}
+                    >
+                      {item.secondaryText}
+                    </AppText>
+                  ) : null}
+                </View>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </View>
       )}
     </View>
   );

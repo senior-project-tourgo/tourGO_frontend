@@ -21,7 +21,8 @@ export function buildTripPayload({
   groupType,
   transportMode,
   startLat,
-  startLng
+  startLng,
+  startLabel
 }: {
   itineraryName: string;
   area: Area | null;
@@ -34,6 +35,7 @@ export function buildTripPayload({
   transportMode?: TransportMode;
   startLat?: number;
   startLng?: number;
+  startLabel?: string;
 }) {
   const payload: Record<string, any> = {
     itineraryName: itineraryName.trim(),
@@ -49,6 +51,7 @@ export function buildTripPayload({
   if (transportMode) payload.transportMode = transportMode;
   if (startLat != null) payload.startLat = startLat;
   if (startLng != null) payload.startLng = startLng;
+  if (startLabel) payload.startLabel = startLabel;
 
   return payload;
 }
