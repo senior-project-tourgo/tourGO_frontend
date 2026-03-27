@@ -61,7 +61,7 @@ export default function EditTripScreen() {
         const trip = await getTripById(tripId as string);
         setItineraryName(trip.itineraryName);
 
-        const ids = trip.places
+        const ids = [...trip.places]
           .sort((a, b) => a.order - b.order)
           .map(p => p.placeId);
 
