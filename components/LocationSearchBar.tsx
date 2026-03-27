@@ -3,7 +3,6 @@ import {
   ActivityIndicator,
   Pressable,
   ScrollView,
-  TextInput,
   View
 } from 'react-native';
 import { AppText } from './AppText';
