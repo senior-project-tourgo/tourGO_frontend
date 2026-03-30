@@ -185,8 +185,13 @@ export default function DuringTripScreen() {
           longitudeDelta: 0.05
         });
       }
-    } catch (err: any) {
-      Alert.alert('Error', err.message ?? 'Failed to load trip');
+    } catch (error: any) {
+      console.error('Failed to load trip data:', error);
+      // Show an alert or toast to the user
+      Alert.alert(
+        'Error',
+        'Failed to load trip information. Please try again.'
+      );
     } finally {
       setLoading(false);
     }

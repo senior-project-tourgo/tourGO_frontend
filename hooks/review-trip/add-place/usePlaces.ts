@@ -8,15 +8,27 @@ export function usePlaces(initialQuery = '') {
   const [places, setPlaces] = useState<Place[]>([]);
   const [loading, setLoading] = useState(true);
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isMounted = useRef(true);
 
   useEffect(() => {
     loadPlaces('');
+
+    return () => {
+      // Cleanup on unmount
+      if (searchTimer.current) clearTimeout(searchTimer.current);
+      isMounted.current = false;
+    };
   }, []);
 
   function onChangeQuery(text: string) {
     setQuery(text);
     if (searchTimer.current) clearTimeout(searchTimer.current);
-    searchTimer.current = setTimeout(() => loadPlaces(text), 350);
+
+    searchTimer.current = setTimeout(() => {
+      if (isMounted.current) {
+        loadPlaces(text);
+      }
+    }, 350);
   }
 
   async function loadPlaces(q: string) {
