@@ -11,6 +11,10 @@ const colors = {
   text: {
     DEFAULT: '#2C302E',
     inverse: '#FFFFFF'
+  },
+  status: {
+    success: '#28A745', // green for correct/right
+    error: '#DC3545' // red for wrong/error
   }
 };
 

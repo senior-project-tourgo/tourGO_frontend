@@ -5,7 +5,6 @@ import { format } from 'date-fns';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText } from './AppText';
 import { FormField } from './FormField';
-
 import colors from '@/theme/colors';
 
 type Props = {

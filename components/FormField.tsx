@@ -1,6 +1,7 @@
 import { View } from 'react-native';
 import { ReactNode } from 'react';
 import { AppText } from './AppText';
+import colors from '@/theme/colors';
 
 interface FormFieldProps {
   label?: string;
@@ -24,19 +25,26 @@ export function FormField({
       {label && (
         <AppText>
           {label}
-          {required && <AppText className="text-red-500"> *</AppText>}
+          {required && (
+            <AppText style={{ color: colors.status.error }}> *</AppText>
+          )}
         </AppText>
       )}
 
       <View
         className={`h-14 justify-center rounded-full border px-4
         ${hasValue ? 'bg-white' : 'bg-gray-100'}
-        ${hasError ? 'border-red-500' : 'border-gray-300'}`}
+        border-gray-300`}
+        style={hasError ? { borderColor: colors.status.error } : undefined}
       >
         {children}
       </View>
 
-      {hasError && <AppText className="text-sm text-red-500">{error}</AppText>}
+      {hasError && (
+        <AppText className="text-sm" style={{ color: colors.status.error }}>
+          {error}
+        </AppText>
+      )}
     </View>
   );
 }

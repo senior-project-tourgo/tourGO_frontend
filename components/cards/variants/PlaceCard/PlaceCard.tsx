@@ -47,9 +47,11 @@ export function PlaceCard({
           <AppText>
             <AppText
               variant="muted"
-              className={
-                openingHours.isOpenNow ? 'text-green-500' : 'text-red-500'
-              }
+              style={{
+                color: openingHours.isOpenNow
+                  ? colors.status.success
+                  : colors.status.error
+              }}
             >
               {openingHours.isOpenNow ? 'Open' : 'Closed'}
             </AppText>

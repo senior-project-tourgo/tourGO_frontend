@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Alert } from 'react-native';
 import { router } from 'expo-router';
 import { createTrip } from '@/services/trip.service';
+import type { Trip } from '@/features/trip/trip.types';
 
 interface EditablePlace {
   place: {
@@ -14,7 +15,9 @@ interface EditablePlace {
 
 export function useSaveTrip(
   editablePlaces: EditablePlace[],
-  itineraryName: string
+  itineraryName: string,
+  startCoords?: { latitude: number; longitude: number } | null,
+  startLabel?: string | null
 ) {
   const [loading, setLoading] = useState(false);
 
@@ -27,7 +30,7 @@ export function useSaveTrip(
     try {
       setLoading(true);
 
-      await createTrip({
+      const trip: Trip = await createTrip({
         itineraryName,
         places: editablePlaces.map(p => ({
           placeId: p.place.placeId,
@@ -37,7 +40,17 @@ export function useSaveTrip(
       });
 
       if (status === 'current') {
-        router.replace('/during-trip');
+        router.replace({
+          pathname: '/during-trip',
+          params: {
+            tripId: trip._id,
+            ...(startCoords && {
+              startLat: startCoords.latitude,
+              startLng: startCoords.longitude
+            }),
+            ...(startLabel && { startLabel })
+          }
+        });
       } else {
         router.replace('/(tabs)/trip');
       }

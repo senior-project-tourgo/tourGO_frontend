@@ -1,12 +1,10 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import {
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  TouchableOpacity,
-  View
-} from 'react-native';
+import { Alert, ScrollView, TouchableOpacity, View } from 'react-native';
+import Animated, {
+  useAnimatedKeyboard,
+  useAnimatedStyle
+} from 'react-native-reanimated';
 
 import { AppText } from '@/components/AppText';
 import { Button } from '@/components/Button';
@@ -26,6 +24,11 @@ export default function RegisterScreen() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+
+  const keyboard = useAnimatedKeyboard();
+  const spacerStyle = useAnimatedStyle(() => ({
+    height: keyboard.height.value
+  }));
 
   const isNameInvalid = submitted && !name.trim();
   const isUsernameInvalid =
@@ -62,11 +65,11 @@ export default function RegisterScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      className="flex-1 bg-colors-brand-secondary"
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <View className="flex-grow justify-end">
+    <View className="flex-1 bg-colors-brand-secondary">
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end' }}
+        keyboardShouldPersistTaps="handled"
+      >
         <BaseCard className="w-full rounded-t-[40px] px-8 py-16">
           <AppText className="mb-2" variant="title">
             Create Account
@@ -169,7 +172,9 @@ export default function RegisterScreen() {
             </AppText>
           </TouchableOpacity>
         </BaseCard>
-      </View>
-    </KeyboardAvoidingView>
+
+        <Animated.View style={spacerStyle} />
+      </ScrollView>
+    </View>
   );
 }

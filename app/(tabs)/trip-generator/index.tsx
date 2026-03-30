@@ -1,92 +1,74 @@
-import { AppTextInput } from '@/components/AppTextInput';
-import { Button } from '@/components/Button';
-import DatePickerBar from '@/components/DatePickerBar';
-import { HeaderWithBack } from '@/components/PageHeader';
-import { Screen } from '@/components/Screen';
-import { OptionSelector } from '@/components/SelectorOptions';
-import { Stepper } from '@/components/Stepper';
-import { TimePickerBar } from '@/components/TimePickerBar';
-import { useRouter } from 'expo-router';
-import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, View } from 'react-native';
+import { useState } from 'react';
+import { useRouter } from 'expo-router';
 
-import { PACE_OPTIONS, PaceValue } from '@/constants/paceOptions';
-import { AREA_OPTIONS } from '@/constants/areaOptions';
-import {
-  TIME_WINDOW_OPTIONS,
-  TimeWindowValue,
-  TIME_WINDOW_RANGES
-} from '@/constants/timeOptions';
-import { Area } from '@/features/place/place.types';
+import { Screen } from '@/components/Screen';
+import { HeaderWithBack } from '@/components/PageHeader';
+import { Button } from '@/components/Button';
+
+import TripNameSection from './sections/TripNameSection';
+import LocationSection from './sections/LocationSection';
+import TripTimeSection from './sections/TripTimeSection';
+import TripStyleSection from './sections/TripStyleSection';
+import GroupSection from './sections/GroupSection';
+
 import { buildTripPayload } from '@/utils/tripForm';
+import { type TimeWindowValue } from '@/constants/timeOptions';
+import { type TransportMode } from '@/constants/transportOptions';
+import { type PaceValue } from '@/constants/paceOptions';
+import { type GroupType } from '@/mock/groupTypes.mock';
+import type { Area } from '@/features/place/place.types';
 
 export default function TripGeneratorScreen() {
   const router = useRouter();
 
-  const [itineraryName, setItineraryName] = useState('');
+  // --- Trip Name ---
+  const [itineraryName, setItineraryName] = useState<string>('');
+  const [submitted, setSubmitted] = useState<boolean>(false);
+
+  // --- Location ---
   const [area, setArea] = useState<Area | null>(null);
-  const [areaError, setAreaError] = useState<string | undefined>();
+  const [startCoords, setStartCoords] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
+  const [locationLabel, setLocationLabel] = useState<string | null>(null);
+  const [locationError, setLocationError] = useState<string | undefined>();
 
-  const [people, setPeople] = useState<number>(1);
-  const [submitted, setSubmitted] = useState(false);
-
+  // --- Trip Time ---
   const [tripDate, setTripDate] = useState<Date | null>(null);
   const [tripDateError, setTripDateError] = useState<string | undefined>();
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [endTime, setEndTime] = useState<Date | null>(null);
-
-  const [pace, setPace] = useState<PaceValue>('balanced');
   const [timeWindow, setTimeWindow] = useState<TimeWindowValue | null>(null);
   const [timeWindowError, setTimeWindowError] = useState<string | undefined>();
 
-  const isItineraryInvalid = submitted && !itineraryName.trim();
-
-  const handleTimeWindowChange = (value: TimeWindowValue) => {
-    setTimeWindow(value);
-    setTimeWindowError(undefined);
-
-    const range = TIME_WINDOW_RANGES[value];
-
-    const start = new Date();
-    const end = new Date();
-
-    const [startH, startM] = range.start.split(':').map(Number);
-    const [endH, endM] = range.end.split(':').map(Number);
-
-    start.setHours(startH, startM, 0, 0);
-    end.setHours(endH, endM, 0, 0);
-
-    setStartTime(start);
-    setEndTime(end);
-  };
+  // --- Trip Style ---
+  const [pace, setPace] = useState<PaceValue>('balanced');
+  const [transportMode, setTransportMode] = useState<TransportMode | null>(
+    null
+  );
+  const [groupType, setGroupType] = useState<GroupType | null>(null);
+  const [people, setPeople] = useState<number>(1);
 
   const handleContinue = async () => {
     setSubmitted(true);
-
     let hasError = false;
 
-    if (!itineraryName.trim()) {
+    if (!itineraryName.trim()) hasError = true;
+    if (!startCoords) {
+      setLocationError('Please search and select a starting location');
       hasError = true;
     }
-
-    if (!area) {
-      setAreaError('Please select a location');
-      hasError = true;
-    }
-
     if (!tripDate) {
       setTripDateError('Please select a trip date');
       hasError = true;
     }
-
     if (!timeWindow && (!startTime || !endTime)) {
       setTimeWindowError('Please select a time window');
       hasError = true;
     }
-
-    if (hasError) {
-      return;
-    }
+    if (hasError) return;
 
     const payload = buildTripPayload({
       itineraryName,
@@ -95,7 +77,12 @@ export default function TripGeneratorScreen() {
       pace,
       tripDate,
       startTime,
-      endTime
+      endTime,
+      groupType: groupType?.id,
+      transportMode: transportMode ?? undefined,
+      startLat: startCoords?.lat,
+      startLng: startCoords?.lng,
+      startLabel: locationLabel ?? undefined
     });
 
     router.push({
@@ -110,101 +97,56 @@ export default function TripGeneratorScreen() {
     >
       <Screen>
         <HeaderWithBack title="Plan Your Trip" />
-
-        <View className="gap-6">
-          {/* Itinerary Name */}
-          <AppTextInput
-            label="Trip Name"
-            placeholder="e.g. Weekend in Pokhara"
-            value={itineraryName}
-            onChangeText={setItineraryName}
-            required
-            error={
-              isItineraryInvalid ? 'Itinerary name is required' : undefined
-            }
+        <View className="gap-4">
+          <TripNameSection
+            itineraryName={itineraryName}
+            setItineraryName={setItineraryName}
+            submitted={submitted}
           />
 
-          {/* Traveling Area */}
-          <OptionSelector
-            label="Where are you going?"
-            value={area ?? undefined}
-            options={AREA_OPTIONS}
-            onChange={v => {
-              setArea(v);
-              setAreaError(undefined); // clear error when user selects
-            }}
-            required
-            error={areaError}
+          <LocationSection
+            area={area}
+            setArea={setArea}
+            startCoords={startCoords}
+            setStartCoords={setStartCoords}
+            locationLabel={locationLabel}
+            setLocationLabel={setLocationLabel}
+            locationError={locationError}
+            setLocationError={setLocationError}
           />
 
-          {/* Trip Date */}
-          <DatePickerBar
-            label="When is your trip?"
-            value={tripDate}
-            onChange={v => {
-              setTripDate(v);
-              setTripDateError(undefined); // clear error when user selects
-            }}
-            required
-            error={tripDateError}
+          <TripTimeSection
+            tripDate={tripDate}
+            setTripDate={setTripDate}
+            tripDateError={tripDateError}
+            setTripDateError={setTripDateError}
+            startTime={startTime}
+            setStartTime={setStartTime}
+            endTime={endTime}
+            setEndTime={setEndTime}
+            timeWindow={timeWindow}
+            setTimeWindow={setTimeWindow}
+            timeWindowError={timeWindowError}
+            setTimeWindowError={setTimeWindowError}
           />
 
-          {/* Time Window Preset */}
-          <OptionSelector
-            label="What time of day?"
-            value={timeWindow ?? undefined}
-            options={TIME_WINDOW_OPTIONS}
-            onChange={handleTimeWindowChange}
-            required
-            error={timeWindowError}
+          <TripStyleSection
+            pace={pace}
+            setPace={setPace}
+            transportMode={transportMode}
+            setTransportMode={setTransportMode}
           />
 
-          {/* Manual Time Row */}
-          <View className="flex-row gap-2">
-            <View className="flex-1">
-              <TimePickerBar
-                label="Start exploring"
-                value={startTime ?? undefined}
-                onChange={date => {
-                  setStartTime(date);
-                  setTimeWindow(null);
+          <GroupSection
+            groupType={groupType}
+            setGroupType={setGroupType}
+            people={people}
+            setPeople={setPeople}
+          />
 
-                  if (endTime && date > endTime) {
-                    setEndTime(date);
-                  }
-                }}
-              />
-            </View>
-
-            <View className="flex-1">
-              <TimePickerBar
-                label="Finish exploring"
-                value={endTime ?? undefined}
-                onChange={setEndTime}
-                minimumDate={startTime ?? undefined}
-              />
-            </View>
+          <View className="mt-4">
+            <Button title="Choose Your Vibes" onPress={handleContinue} />
           </View>
-
-          {/* Trip Pace */}
-          <OptionSelector
-            label="How packed should your trip be?"
-            value={pace}
-            options={PACE_OPTIONS}
-            onChange={setPace}
-          />
-
-          {/* Number of People */}
-          <Stepper
-            label="How many people?"
-            value={people}
-            onChange={setPeople}
-            min={1}
-            max={10}
-          />
-
-          {/* Continue Button */}
-          <Button title="Choose Your Vibes" onPress={handleContinue} />
         </View>
       </Screen>
     </KeyboardAvoidingView>

@@ -12,10 +12,14 @@ interface UseReviewTripParamsProps {
 export function useReviewTripParams({
   setInitialPlaces
 }: UseReviewTripParamsProps) {
-  const { placeIds, itineraryName } = useLocalSearchParams<{
-    placeIds: string;
-    itineraryName: string;
-  }>();
+  const { placeIds, itineraryName, startLat, startLng, startLabel } =
+    useLocalSearchParams<{
+      placeIds: string;
+      itineraryName: string;
+      startLat: string;
+      startLng: string;
+      startLabel: string;
+    }>();
 
   const normalizeStringParam = (
     param: string | string[] | undefined
@@ -53,5 +57,13 @@ export function useReviewTripParams({
     loadPlaces();
   }, [placeIds, setInitialPlaces]);
 
-  return { finalItineraryName };
+  const startCoords =
+    startLat && startLng
+      ? { latitude: Number(startLat), longitude: Number(startLng) }
+      : null;
+
+  const finalStartLabel =
+    (Array.isArray(startLabel) ? startLabel[0] : startLabel) || null;
+
+  return { finalItineraryName, startCoords, startLabel: finalStartLabel };
 }

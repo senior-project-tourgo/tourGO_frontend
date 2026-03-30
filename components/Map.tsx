@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { View } from 'react-native';
-import MapView, { Marker, Region } from 'react-native-maps';
+import MapView, { Marker, Polyline, Region } from 'react-native-maps';
 
 export type MapRegion = Region;
 
@@ -8,44 +8,89 @@ export type MapMarker = {
   latitude: number;
   longitude: number;
   title?: string;
+  /** Optional identifier used as the React key — falls back to index */
+  id?: string;
+  /** Pin colour — defaults to the platform default (red). Pass a hex string or named colour. */
+  pinColor?: string;
+};
+
+export type MapRoute = {
+  coords: { latitude: number; longitude: number }[];
+  /** true = solid primary colour, false/undefined = dashed muted colour */
+  solid?: boolean;
 };
 
 type Props = {
   region: MapRegion;
   markers?: MapMarker[];
+  focusCoordinate?: { latitude: number; longitude: number };
+  routes?: MapRoute[];
 };
 
-export function Map({ region, markers }: Props) {
+export function Map({ region, markers, focusCoordinate, routes }: Props) {
   const mapRef = useRef<MapView>(null);
 
+  // Fit all markers into view whenever the set of markers changes.
+  // We use a JSON-stringified key so this only fires when coordinates actually
+  // change, not on every parent re-render where markers is a new array reference.
+  const markersKey = JSON.stringify(
+    markers?.map(m => ({ lat: m.latitude, lng: m.longitude }))
+  );
   useEffect(() => {
-    // Always adjust the viewport to include every provided marker.
-    // The parent-supplied `region` is treated as a starting point only;
-    // once markers exist the map will reframe itself automatically.
-    if (markers && markers.length > 0 && mapRef.current) {
+    if (!mapRef.current) return;
+    if (markers && markers.length > 0) {
       mapRef.current.fitToCoordinates(markers, {
         edgePadding: { top: 80, right: 40, bottom: 220, left: 40 },
         animated: true
       });
+    } else {
+      // No markers — animate to the supplied region (e.g. user location)
+      mapRef.current.animateToRegion(region, 400);
     }
-  }, [markers]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [markersKey]);
+
+  // Zoom into a specific pin when focusCoordinate changes
+  useEffect(() => {
+    if (!mapRef.current || !focusCoordinate) return;
+    mapRef.current.animateToRegion(
+      {
+        latitude: focusCoordinate.latitude,
+        longitude: focusCoordinate.longitude,
+        latitudeDelta: 0.015,
+        longitudeDelta: 0.015
+      },
+      400
+    );
+  }, [focusCoordinate?.latitude, focusCoordinate?.longitude]);
 
   return (
     <View className="flex-1">
-      <MapView
-        ref={mapRef}
-        style={{ flex: 1 }}
-        region={region}
-        showsUserLocation
-      >
-        {markers?.map(marker => (
+      {/*
+        Use initialRegion (uncontrolled) instead of region (controlled).
+        Controlled `region` fights with fitToCoordinates — it snaps the map
+        back to place #1 on every re-render. initialRegion sets the starting
+        viewport once and then leaves the map free to pan/zoom.
+      */}
+      <MapView ref={mapRef} style={{ flex: 1 }} initialRegion={region}>
+        {routes?.map((route, index) => (
+          <Polyline
+            key={`route-${index}`}
+            coordinates={route.coords}
+            strokeColor={route.solid ? '#f97316' : '#94a3b8'}
+            strokeWidth={route.solid ? 4 : 2}
+            lineDashPattern={route.solid ? undefined : [6, 8]}
+          />
+        ))}
+        {markers?.map((marker, index) => (
           <Marker
-            key={`${marker.latitude}-${marker.longitude}`}
+            key={marker.id ?? `marker-${index}`}
             coordinate={{
               latitude: marker.latitude,
               longitude: marker.longitude
             }}
             title={marker.title}
+            pinColor={marker.pinColor}
           />
         ))}
       </MapView>

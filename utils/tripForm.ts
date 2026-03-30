@@ -1,5 +1,6 @@
 import { Area } from '@/features/place/place.types';
 import { PaceValue } from '@/constants/paceOptions';
+import { TransportMode } from '@/constants/transportOptions';
 
 function formatDate(date: Date) {
   return date.toISOString().split('T')[0]; // YYYY-MM-DD
@@ -16,7 +17,12 @@ export function buildTripPayload({
   pace,
   tripDate,
   startTime,
-  endTime
+  endTime,
+  groupType,
+  transportMode,
+  startLat,
+  startLng,
+  startLabel
 }: {
   itineraryName: string;
   area: Area | null;
@@ -25,6 +31,11 @@ export function buildTripPayload({
   tripDate?: Date | null;
   startTime?: Date | null;
   endTime?: Date | null;
+  groupType?: string;
+  transportMode?: TransportMode;
+  startLat?: number;
+  startLng?: number;
+  startLabel?: string;
 }) {
   const payload: Record<string, any> = {
     itineraryName: itineraryName.trim(),
@@ -33,9 +44,14 @@ export function buildTripPayload({
     pace
   };
 
+  if (groupType) payload.groupType = groupType;
   if (tripDate) payload.tripDate = formatDate(tripDate);
   if (startTime) payload.startTime = formatTime(startTime);
   if (endTime) payload.endTime = formatTime(endTime);
+  if (transportMode) payload.transportMode = transportMode;
+  if (startLat != null) payload.startLat = startLat;
+  if (startLng != null) payload.startLng = startLng;
+  if (startLabel) payload.startLabel = startLabel;
 
   return payload;
 }
