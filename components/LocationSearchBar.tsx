@@ -6,9 +6,9 @@ import { Ionicons } from '@expo/vector-icons';
 import colors from '@/theme/colors';
 import api from '@/config/api';
 import { Area } from '@/features/place/place.types';
-import * as Location from 'expo-location';
 import SelectableChips from './SelectableChips';
 import { QUICK_PICKS, QuickPick } from '@/constants/quickPicks';
+import { useUserLocation } from '@/hooks/review-trip/add-place/useUserLocation';
 
 type Prediction = {
   placeId: string;
@@ -49,6 +49,8 @@ export function LocationSearchBar({
 
   const inputRef = useRef<any>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const { requestLocation } = useUserLocation({ autoRequest: false });
 
   // ── API ──
   const fetchPredictions = useCallback(async (text: string) => {
@@ -106,18 +108,14 @@ export function LocationSearchBar({
   const handleUseMyLocation = async () => {
     setGpsLoading(true);
     try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') return;
-      const loc = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Balanced
-      });
+      const loc = await requestLocation();
+      if (!loc) return;
       onSelect({
-        lat: loc.coords.latitude,
-        lng: loc.coords.longitude,
+        lat: loc.lat,
+        lng: loc.lng,
         area: null,
-        formattedAddress: `${loc.coords.latitude.toFixed(5)}, ${loc.coords.longitude.toFixed(5)}`
+        formattedAddress: `${loc.lat.toFixed(5)}, ${loc.lng.toFixed(5)}`
       });
-    } catch {
     } finally {
       setGpsLoading(false);
     }

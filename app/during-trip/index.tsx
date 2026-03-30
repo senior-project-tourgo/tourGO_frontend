@@ -29,7 +29,7 @@ import {
 } from '@/services/directions.service';
 import colors from '@/theme/colors';
 import * as Haptics from 'expo-haptics';
-import * as Location from 'expo-location';
+import { useUserLocation } from '@/hooks/review-trip/add-place/useUserLocation';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, Animated, FlatList, PanResponder, View } from 'react-native';
@@ -76,6 +76,8 @@ export default function DuringTripScreen() {
   const stampScale = useRef(new Animated.Value(0.5)).current;
   const stampOpacity = useRef(new Animated.Value(0)).current;
   const dismissTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const { requestLocation } = useUserLocation({ autoRequest: false });
 
   // Bottom sheet animation — card slides up from the bottom
   const sheetTranslateY = useRef(new Animated.Value(700)).current;
@@ -132,10 +134,7 @@ export default function DuringTripScreen() {
   const load = useCallback(async () => {
     if (!tripId) return;
     try {
-      const [fetchedTrip, locationPerm] = await Promise.all([
-        getTripById(tripId),
-        Location.requestForegroundPermissionsAsync()
-      ]);
+      const fetchedTrip = await getTripById(tripId);
 
       const devLat = process.env.EXPO_PUBLIC_DEV_LATITUDE;
       const devLng = process.env.EXPO_PUBLIC_DEV_LONGITUDE;
@@ -145,17 +144,13 @@ export default function DuringTripScreen() {
           latitude: parseFloat(devLat),
           longitude: parseFloat(devLng)
         });
-      } else if (locationPerm.status === 'granted') {
-        try {
-          const pos = await Location.getCurrentPositionAsync({
-            accuracy: Location.Accuracy.Balanced
-          });
+      } else {
+        const coords = await requestLocation();
+        if (coords) {
           setUserLocation({
-            latitude: pos.coords.latitude,
-            longitude: pos.coords.longitude
+            latitude: coords.lat,
+            longitude: coords.lng
           });
-        } catch {
-          // Location unavailable — skip user→first segment
         }
       }
 
@@ -195,7 +190,7 @@ export default function DuringTripScreen() {
     } finally {
       setLoading(false);
     }
-  }, [tripId]);
+  }, [tripId, requestLocation]);
 
   useEffect(() => {
     load();

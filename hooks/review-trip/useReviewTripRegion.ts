@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import * as Location from 'expo-location';
 import { MapRegion } from '@/components/Map';
+import { useUserLocation } from '@/hooks/review-trip/add-place/useUserLocation';
 
 interface EditablePlace {
   place: {
@@ -23,6 +23,7 @@ export function useReviewTripRegion(editablePlaces: EditablePlace[]) {
   // Track whether we've already picked an initial region so that adding /
   // removing places later doesn't reset the map viewport.
   const initialised = useRef(false);
+  const { requestLocation } = useUserLocation({ autoRequest: false });
 
   useEffect(() => {
     // Only run once, or when places first arrive from an async load ([] → [...])
@@ -47,21 +48,20 @@ export function useReviewTripRegion(editablePlaces: EditablePlace[]) {
     async function initFromLocation() {
       if (initialised.current) return;
       try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
         if (!active || initialised.current) return;
 
-        if (status !== 'granted') {
+        const loc = await requestLocation();
+        if (!active || initialised.current) return;
+
+        if (!loc) {
           setRegion(FALLBACK_REGION);
           initialised.current = true;
           return;
         }
 
-        const loc = await Location.getCurrentPositionAsync({});
-        if (!active || initialised.current) return;
-
         setRegion({
-          latitude: loc.coords.latitude,
-          longitude: loc.coords.longitude,
+          latitude: loc.lat,
+          longitude: loc.lng,
           latitudeDelta: 0.05,
           longitudeDelta: 0.05
         });

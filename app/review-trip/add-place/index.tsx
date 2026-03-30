@@ -1,104 +1,22 @@
+// screens/AddPlaceScreen.tsx
+import { useEffect, useState, useRef } from 'react';
+import { View, FlatList, ActivityIndicator } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { router, useLocalSearchParams } from 'expo-router';
+
 import { AppText } from '@/components/AppText';
 import { AppTextInput } from '@/components/AppTextInput';
 import { HeaderWithBack } from '@/components/PageHeader';
+import { pendingPlaceStore } from '@/stores/pendingPlaceStore';
 import { searchPlaces, getActivePlaces } from '@/features/place/place.api';
 import type { Place } from '@/features/place/place.types';
-import { pendingPlaceStore } from '@/stores/pendingPlaceStore';
 import colors from '@/theme/colors';
 import { haversineKm } from '@/utils/distance';
-import { Ionicons } from '@expo/vector-icons';
-import * as Location from 'expo-location';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
-import {
-  ActivityIndicator,
-  FlatList,
-  Image,
-  Pressable,
-  View
-} from 'react-native';
+import PlaceRow from '@/components/PlaceRow';
+import Separator from '@/components/Separator';
+import { useUserLocation } from '@/hooks/review-trip/add-place/useUserLocation';
 
-// --- Place row ---
-function PlaceRow({
-  place,
-  distanceKm,
-  added,
-  onAdd
-}: {
-  place: Place;
-  distanceKm: number | null;
-  added: boolean;
-  onAdd: () => void;
-}) {
-  return (
-    <Pressable
-      onPress={added ? undefined : onAdd}
-      className={`flex-row items-center gap-3 px-5 py-3 ${
-        added ? 'bg-blue-50' : 'bg-white'
-      }`}
-    >
-      <Image
-        source={{ uri: place.image }}
-        className="h-14 w-14 rounded-xl bg-slate-100"
-        resizeMode="cover"
-      />
-
-      <View className="flex-1 gap-[2px]">
-        <AppText variant="subtitle" className="text-sm">
-          {place.placeName}
-        </AppText>
-
-        <View className="flex-row items-center gap-1.5">
-          <Ionicons name="location-outline" size={12} color="#94a3b8" />
-          <AppText variant="muted" className="text-xs">
-            {place.location.area}
-          </AppText>
-
-          {distanceKm !== null && (
-            <>
-              <AppText variant="muted" className="text-xs">
-                ·
-              </AppText>
-              <AppText variant="muted" className="text-xs">
-                {distanceKm < 1
-                  ? `${Math.round(distanceKm * 1000)} m away`
-                  : `${distanceKm.toFixed(1)} km away`}
-              </AppText>
-            </>
-          )}
-        </View>
-
-        <View className="flex-row items-center gap-1">
-          <Ionicons name="star" size={11} color={colors.brand.primary} />
-          <AppText variant="muted" className="text-xs">
-            {place.averageRating} · {place.priceRange}
-          </AppText>
-        </View>
-      </View>
-
-      <Pressable
-        onPress={added ? undefined : onAdd}
-        className={`h-[34px] w-[34px] items-center justify-center rounded-full ${
-          added ? 'bg-green-100' : ''
-        }`}
-        style={!added ? { backgroundColor: colors.brand.primary } : undefined}
-        hitSlop={8}
-      >
-        <Ionicons
-          name={added ? 'checkmark' : 'add'}
-          size={18}
-          color={added ? '#16a34a' : '#fff'}
-        />
-      </Pressable>
-    </Pressable>
-  );
-}
-
-// --- Separator ---
-function Separator() {
-  return <View className="mx-5 h-[1px] bg-slate-100" />;
-}
-
+// --- Main Screen ---
 export default function AddPlaceScreen() {
   const { addedIds } = useLocalSearchParams<{ addedIds?: string }>();
   const alreadyAdded = new Set(addedIds ? addedIds.split(',') : []);
@@ -106,25 +24,11 @@ export default function AddPlaceScreen() {
   const [query, setQuery] = useState('');
   const [places, setPlaces] = useState<Place[]>([]);
   const [loading, setLoading] = useState(true);
-  const [userCoords, setUserCoords] = useState<{
-    lat: number;
-    lng: number;
-  } | null>(null);
-
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
-    (async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status === 'granted') {
-        const loc = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.Balanced
-        });
-        setUserCoords({ lat: loc.coords.latitude, lng: loc.coords.longitude });
-      }
-    })();
-  }, []);
+  const { coords: userCoords } = useUserLocation();
 
+  // --- Load initial places ---
   useEffect(() => {
     loadPlaces('');
     return () => {
