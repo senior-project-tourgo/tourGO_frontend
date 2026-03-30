@@ -149,7 +149,6 @@ export default function EditTripScreen() {
 
   const handleSave = async () => {
     if (!tripId) return;
-
     if (!itineraryName.trim() || editablePlaces.length === 0) return;
 
     try {
@@ -163,11 +162,14 @@ export default function EditTripScreen() {
         }))
       });
 
-      // ✅ Sync state after save
+      // ✅ Sync state after successful save
       setInitialName(itineraryName.trim());
       setInitialPlaceIds(currentPlaceIds);
 
-      router.back();
+      router.back(); // only navigate if save succeeded
+    } catch (error) {
+      console.error('Failed to save trip:', error);
+      alert('Something went wrong while saving. Please try again.'); // user feedback
     } finally {
       setSaving(false);
     }

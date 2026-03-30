@@ -14,7 +14,6 @@ export function Button({
   isLoading?: boolean;
   disabled?: boolean;
   className?: string;
-  textClassName?: string;
   textColor?: string; // default white, can be changed
 }) {
   const isDisabled = disabled || isLoading;

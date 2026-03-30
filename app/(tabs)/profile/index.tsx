@@ -18,13 +18,7 @@ import {
   View
 } from 'react-native';
 import { useAuth } from '../../../context/AuthContext';
-
-const BADGE_THRESHOLDS = [
-  { badge: 'Legend', xp: 1000 },
-  { badge: 'Adventurer', xp: 500 },
-  { badge: 'Explorer', xp: 100 },
-  { badge: 'Newcomer', xp: 0 }
-];
+import { BADGE_THRESHOLDS } from '@/constants/badges';
 
 function XpProgressBar({ xp, badge }: { xp: number; badge: string }) {
   const idx = BADGE_THRESHOLDS.findIndex(b => b.badge === badge);

@@ -510,7 +510,7 @@ export default function DuringTripScreen() {
       <MapView
         ref={mapRef}
         style={{ flex: 1 }}
-        region={region}
+        initialRegion={region}
         showsUserLocation
         showsMyLocationButton={false}
         onMapReady={() => {
