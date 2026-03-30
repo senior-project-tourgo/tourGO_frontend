@@ -6,13 +6,16 @@ export function Button({
   onPress,
   isLoading = false,
   disabled = false,
-  className = ''
+  className = '',
+  textColor = '#fff'
 }: {
   title: string;
   onPress?: () => void;
   isLoading?: boolean;
   disabled?: boolean;
   className?: string;
+  textClassName?: string;
+  textColor?: string; // default white, can be changed
 }) {
   const isDisabled = disabled || isLoading;
 
@@ -25,9 +28,12 @@ export function Button({
       } ${className}`}
     >
       {isLoading ? (
-        <ActivityIndicator color="#fff" />
+        <ActivityIndicator color={textColor} />
       ) : (
-        <AppText className="text-center font-semibold text-colors-text-inverse">
+        <AppText
+          style={{ color: textColor }}
+          className={`text-center font-semibold`}
+        >
           {title}
         </AppText>
       )}

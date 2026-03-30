@@ -9,7 +9,7 @@ import {
   StampCelebrationOverlay,
   type StampModalData
 } from '@/components/during-trip/StampCelebrationOverlay';
-import { EndTripConfirmModal } from '@/components/EndTripConfirmModal';
+import { ConfirmActionModal } from '@/components/ConfirmActionModal';
 import { DuringTripPlaceCard } from '@/components/cards/variants/PlaceCard/DuringTripPlaceCard';
 import { getPlacesByIds } from '@/features/place/placeById.api';
 import type { Trip } from '@/features/trip/trip.types';
@@ -499,11 +499,16 @@ export default function DuringTripScreen() {
         visitedIds={visitedIds}
       />
 
-      <EndTripConfirmModal
+      <ConfirmActionModal
         visible={showEndModal}
+        icon="flag-outline"
+        title="End Trip?"
+        message="This will complete your trip and show a summary. You won't be able to check in after this."
+        confirmLabel="End Trip"
+        confirmPendingLabel="Ending…"
         onCancel={() => setShowEndModal(false)}
         onConfirm={doEndTrip}
-        ending={ending}
+        pending={ending}
       />
 
       {/* ── Map (full screen) ── */}

@@ -7,7 +7,7 @@ import { Screen } from '@/components/Screen';
 import { HeaderWithBack } from '@/components/PageHeader';
 import { Button } from '@/components/Button';
 import { TripSection } from '@/components/TripSection';
-import { DeleteConfirmModal } from '@/components/DeleteConfirmModal';
+import { ConfirmActionModal } from '@/components/ConfirmActionModal';
 import { AppText } from '@/components/AppText';
 import colors from '@/theme/colors';
 
@@ -178,11 +178,21 @@ export default function TripScreen() {
       <TripSection title="Saved Plans" trips={saved} cardProps={cardProps} />
       <TripSection title="Completed" trips={completed} cardProps={cardProps} />
 
-      <DeleteConfirmModal
-        trip={tripToDelete}
+      <ConfirmActionModal
+        visible={!!tripToDelete}
+        icon="trash-outline"
+        iconContainerClassName="bg-red-200"
+        title="Delete Trip?"
+        message={
+          <>
+            &quot;{tripToDelete?.itineraryName}&quot; will be permanently
+            deleted. This cannot be undone.
+          </>
+        }
+        confirmLabel="Delete"
         onCancel={() => setTripToDelete(null)}
         onConfirm={handleDelete}
-        deleting={deleting}
+        pending={deleting}
       />
     </Screen>
   );
