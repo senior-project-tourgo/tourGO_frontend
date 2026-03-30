@@ -1,10 +1,18 @@
 import { AppText } from '@/components/AppText';
-import { Badge } from '@/components/Badge';
+import { CenteredLoading } from '@/components/CenteredLoading';
+import { DuringTripMapHeader } from '@/components/during-trip/DuringTripMapHeader';
+import { DuringTripPlaceDetailSheet } from '@/components/during-trip/DuringTripPlaceDetailSheet';
+import type { PlaceWithPromos } from '@/components/during-trip/DuringTripPlaceDetailSheet';
+import { DuringTripTransportProgress } from '@/components/during-trip/DuringTripTransportProgress';
+import { JourneyStepDots } from '@/components/during-trip/JourneyStepDots';
+import {
+  StampCelebrationOverlay,
+  type StampModalData
+} from '@/components/during-trip/StampCelebrationOverlay';
+import { EndTripConfirmModal } from '@/components/EndTripConfirmModal';
 import { DuringTripPlaceCard } from '@/components/cards/variants/PlaceCard/DuringTripPlaceCard';
-import type { Place } from '@/features/place/place.types';
 import { getPlacesByIds } from '@/features/place/placeById.api';
 import type { Trip } from '@/features/trip/trip.types';
-import { getPlaceOpeningStatus } from '@/utils/openingHours';
 import {
   getAllPromotions,
   type ApiPromotion
@@ -20,36 +28,12 @@ import {
   type RouteSegment
 } from '@/services/directions.service';
 import colors from '@/theme/colors';
-import { mockVibes } from '@/mock/vibes.mock';
-import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import * as Location from 'expo-location';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import {
-  ActivityIndicator,
-  Alert,
-  Animated,
-  FlatList,
-  Modal,
-  PanResponder,
-  Pressable,
-  ScrollView,
-  TouchableOpacity,
-  View
-} from 'react-native';
+import { Alert, Animated, FlatList, PanResponder, View } from 'react-native';
 import MapView, { Marker, Polyline, Region } from 'react-native-maps';
-
-type PlaceWithPromos = {
-  place: Place;
-  promotions: ApiPromotion[];
-};
-
-type StampModalData = {
-  placeName: string;
-  visitCount: number;
-  isNew: boolean;
-};
 
 export default function DuringTripScreen() {
   const { tripId, startLat, startLng, startLabel } = useLocalSearchParams<{
@@ -429,14 +413,7 @@ export default function DuringTripScreen() {
   };
 
   if (loading || !region) {
-    return (
-      <View className="flex-1 items-center justify-center bg-colors-surface-background">
-        <ActivityIndicator size="large" color={colors.brand.primary} />
-        <AppText variant="muted" className="mt-3">
-          Loading trip…
-        </AppText>
-      </View>
-    );
+    return <CenteredLoading message="Loading trip…" />;
   }
 
   const visitedIds = new Set(
@@ -506,263 +483,28 @@ export default function DuringTripScreen() {
 
   return (
     <View className="flex-1">
-      {/* ── Stamp celebration overlay (non-blocking, auto-dismisses) ── */}
       {stampModal && (
-        <Animated.View
-          pointerEvents="none"
-          style={[
-            {
-              opacity: stampOpacity
-            }
-          ]}
-          className="absolute inset-0 z-[100] items-center justify-center bg-colors-text"
-        >
-          <Animated.View
-            style={{
-              transform: [{ scale: stampScale }]
-            }}
-            className="w-[260px] items-center gap-1.5 rounded-3xl bg-colors-surface-background p-7 shadow-lg"
-          >
-            {/* Stamp circle */}
-            <View
-              className="border-3 h-20 w-20 items-center justify-center rounded-full"
-              style={{
-                backgroundColor: colors.brand.primary + '18',
-                borderColor: colors.brand.primary,
-                borderStyle: 'dashed'
-              }}
-            >
-              <Ionicons
-                name="checkmark"
-                size={42}
-                color={colors.brand.primary}
-              />
-            </View>
-
-            <AppText
-              variant="subtitle"
-              className="text-center font-semibold"
-              style={{ marginTop: 4 }}
-            >
-              {stampModal.isNew ? 'Stamp Collected!' : 'Visited Again!'}
-            </AppText>
-
-            <AppText variant="muted" className="text-center">
-              {stampModal.placeName}
-            </AppText>
-
-            {stampModal.visitCount > 1 && (
-              <View
-                style={{
-                  backgroundColor: colors.brand.primary + '15',
-                  paddingHorizontal: 12,
-                  paddingVertical: 4,
-                  borderRadius: 12,
-                  marginTop: 2
-                }}
-              >
-                <AppText variant="caption" className="font-semibold">
-                  Visit #{stampModal.visitCount}
-                </AppText>
-              </View>
-            )}
-
-            <AppText variant="caption" className="mt-1 text-slate-400">
-              +10 XP earned
-            </AppText>
-          </Animated.View>
-        </Animated.View>
+        <StampCelebrationOverlay
+          data={stampModal}
+          stampScale={stampScale}
+          stampOpacity={stampOpacity}
+        />
       )}
 
-      {/* ── Place detail bottom sheet ── */}
-      {/* animationType="none" so we control card + overlay separately:
-          overlay fades in, card slides up — avoids the "whole screen slides" glitch */}
-      <Modal
-        visible={!!selectedPlace}
-        transparent
-        animationType="none"
-        onRequestClose={closeSheet}
-      >
-        {selectedPlace && (
-          <View className="flex-1 justify-end">
-            {/* Transparent dismiss area — map stays fully visible behind */}
-            <Pressable className="absolute inset-0" onPress={closeSheet} />
+      <DuringTripPlaceDetailSheet
+        selectedPlace={selectedPlace}
+        sheetTranslateY={sheetTranslateY}
+        panHandlers={sheetPanResponder.panHandlers}
+        onClose={closeSheet}
+        visitedIds={visitedIds}
+      />
 
-            {/* White card slides up from the bottom */}
-            <Animated.View
-              className="rounded-t-3xl bg-colors-surface-background"
-              style={{
-                maxHeight: '82%',
-                transform: [{ translateY: sheetTranslateY }]
-              }}
-            >
-              {/* Handle bar — drag down to dismiss */}
-              <View
-                className="items-center pb-2 pt-3"
-                {...sheetPanResponder.panHandlers}
-              >
-                <View className="h-1 w-10 rounded bg-slate-300" />
-              </View>
-
-              <ScrollView
-                contentContainerStyle={{ gap: 12 }}
-                className="px-5 py-5"
-                showsVerticalScrollIndicator={false}
-              >
-                {/* Name + rating row */}
-                <View className="flex-row items-center justify-between">
-                  <AppText
-                    variant="subtitle"
-                    className="mr-2 flex-1 font-semibold"
-                  >
-                    {selectedPlace.place.placeName}
-                  </AppText>
-                  <View className="flex-row items-center gap-1">
-                    <Ionicons
-                      name="star"
-                      size={14}
-                      color={colors.brand.primary}
-                    />
-                    <AppText variant="caption" className="font-semibold">
-                      {selectedPlace.place.averageRating}
-                    </AppText>
-                  </View>
-                </View>
-
-                {/* Meta */}
-                <AppText variant="muted">
-                  {selectedPlace.place.location.area} ·{' '}
-                  {selectedPlace.place.priceRange} · ~
-                  {selectedPlace.place.typicalTimeSpent}
-                </AppText>
-
-                {/* Opening status */}
-                {(() => {
-                  const hours = getPlaceOpeningStatus(
-                    selectedPlace.place.openingHours
-                  );
-                  return (
-                    <AppText
-                      variant="caption"
-                      className={
-                        hours.isOpenNow ? 'text-green-500' : 'text-red-500'
-                      }
-                    >
-                      {hours.isOpenNow ? 'Open Now' : 'Closed'}
-                      {hours.nextTime
-                        ? ` · ${hours.nextTime.type === 'close' ? 'Closes' : 'Opens'} at ${hours.nextTime.time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
-                        : ''}
-                    </AppText>
-                  );
-                })()}
-
-                {/* Vibe tags */}
-                <View className="flex-row flex-wrap gap-2">
-                  {selectedPlace.place.vibe
-                    .map(id => mockVibes.find(v => v.id === id)?.title)
-                    .filter(Boolean)
-                    .map((title, i) => (
-                      <Badge key={i} label={title as string} />
-                    ))}
-                </View>
-
-                {/* Visited badge */}
-                {visitedIds.has(selectedPlace.place.placeId) && (
-                  <View className="flex-row items-center gap-2 rounded-xl bg-green-50 p-3">
-                    <Ionicons
-                      name="checkmark-circle"
-                      size={20}
-                      color="#22c55e"
-                    />
-                    <AppText
-                      variant="caption"
-                      className="font-semibold text-green-700"
-                    >
-                      You visited this place!
-                    </AppText>
-                  </View>
-                )}
-
-                {/* Promotions */}
-                {selectedPlace.promotions.length > 0 && (
-                  <View className="gap-2">
-                    <AppText variant="subtitle" className="font-semibold">
-                      Deals Available
-                    </AppText>
-                    {selectedPlace.promotions.map(promo => (
-                      <View
-                        key={promo.promotionId}
-                        className="rounded-xl bg-gray-50 p-3"
-                      >
-                        <AppText variant="caption" className="font-semibold">
-                          {promo.promotionName}
-                        </AppText>
-                        <AppText
-                          variant="caption"
-                          className="mt-1 text-colors-text"
-                        >
-                          {promo.description}
-                        </AppText>
-                      </View>
-                    ))}
-                  </View>
-                )}
-
-                {/* Bottom spacing */}
-                <View className="h-4" />
-              </ScrollView>
-            </Animated.View>
-          </View>
-        )}
-      </Modal>
-
-      {/* ── End Trip confirmation modal ── */}
-      <Modal
+      <EndTripConfirmModal
         visible={showEndModal}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowEndModal(false)}
-      >
-        <Pressable
-          className="flex-1 items-center justify-center"
-          style={{ backgroundColor: 'rgba(0,0,0,0.55)', padding: 24 }}
-          onPress={() => setShowEndModal(false)}
-        >
-          <Pressable
-            className="w-full rounded-2xl bg-white p-6"
-            style={{ gap: 12 }}
-            onPress={() => {}}
-          >
-            <View className="items-center pb-1">
-              <View className="h-14 w-14 items-center justify-center rounded-full bg-red-100">
-                <Ionicons name="flag-outline" size={26} color="#ef4444" />
-              </View>
-            </View>
-            <AppText variant="subtitle" className="text-center font-semibold">
-              End Trip?
-            </AppText>
-            <AppText variant="muted" className="text-center">
-              This will complete your trip and show a summary. You won&apos;t be
-              able to check in after this.
-            </AppText>
-            <View className="mt-1 flex-row gap-2">
-              <Pressable
-                onPress={() => setShowEndModal(false)}
-                className="flex-1 items-center rounded-xl border border-slate-200 py-3"
-                style={{ borderWidth: 1.5 }}
-              >
-                <AppText className="font-semibold">Cancel</AppText>
-              </Pressable>
-              <Pressable
-                onPress={doEndTrip}
-                className="flex-1 items-center rounded-xl bg-red-500 py-3"
-              >
-                <AppText className="font-semibold text-white">End Trip</AppText>
-              </Pressable>
-            </View>
-          </Pressable>
-        </Pressable>
-      </Modal>
+        onCancel={() => setShowEndModal(false)}
+        onConfirm={doEndTrip}
+        ending={ending}
+      />
 
       {/* ── Map (full screen) ── */}
       <MapView
@@ -910,142 +652,28 @@ export default function DuringTripScreen() {
         )}
       </MapView>
 
-      {/* ── Header overlay ── */}
-      <View className="absolute left-0 right-0 top-0 z-10 flex-row items-center justify-between px-4 pb-3 pt-14">
-        <View className="flex-row items-center gap-2">
-          <TouchableOpacity
-            onPress={() => router.back()}
-            className="h-10 w-10 items-center justify-center rounded-full bg-colors-surface-background"
-          >
-            <Ionicons name="chevron-back" size={22} color="#111" />
-          </TouchableOpacity>
-          <View className="rounded-2xl bg-colors-surface-background px-3 py-1.5 shadow-sm">
-            <AppText
-              variant="subtitle"
-              className="font-semibold"
-              numberOfLines={1}
-            >
-              {trip?.itineraryName ?? 'Trip'}
-            </AppText>
-          </View>
-        </View>
+      <DuringTripMapHeader
+        tripName={trip?.itineraryName ?? 'Trip'}
+        onEndTrip={() => setShowEndModal(true)}
+        ending={ending}
+      />
 
-        <TouchableOpacity
-          onPress={() => setShowEndModal(true)}
-          disabled={ending}
-          className="rounded-full bg-red-500 px-5 py-2.5"
-        >
-          <AppText variant="body" className="font-semibold text-white">
-            {ending ? 'Ending…' : 'End Trip'}
-          </AppText>
-        </TouchableOpacity>
-      </View>
-
-      {/* ── Transport mode toggle + Progress pill ── */}
-      <View className="absolute left-4 right-4 z-10" style={{ top: 108 }}>
-        {/* Mode toggle */}
-        <View className="mb-2 flex-row gap-0.5 self-center rounded-full bg-white p-1 shadow-sm">
-          {(
-            [
-              { mode: 'driving', icon: 'car-outline' },
-              { mode: 'walking', icon: 'walk-outline' }
-            ] as { mode: TransportMode; icon: string }[]
-          ).map(({ mode, icon }) => (
-            <TouchableOpacity
-              key={mode}
-              onPress={() => setTransportMode(mode)}
-              className={`rounded-full px-[14px] py-[7px] ${
-                transportMode === mode ? 'bg-colors-brand-primary' : ''
-              }`}
-            >
-              <Ionicons
-                name={icon as any}
-                size={18}
-                color={transportMode === mode ? '#fff' : '#94a3b8'}
-              />
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Progress pill */}
-        <View className="rounded-xl bg-colors-surface-background px-4 pb-3 pt-[10px] shadow-sm">
-          {/* Stats row */}
-          <View className="flex-row items-center justify-between">
-            <View className="flex-row items-center gap-1">
-              <Ionicons name="star" size={14} color={colors.brand.primary} />
-              <AppText
-                variant="caption"
-                className="font-semibold"
-                style={{ color: colors.brand.primary }}
-              >
-                {tripXp} XP earned
-              </AppText>
-            </View>
-            <AppText variant="caption" className="font-semibold">
-              {visitedCount}/{totalCount} stops
-            </AppText>
-          </View>
-
-          {/* Progress bar */}
-          <View className="mt-2 h-1 overflow-hidden rounded bg-colors-brand-neutrals">
-            <View
-              style={{
-                height: 4,
-                width: `${Math.round(progress * 100)}%`,
-                backgroundColor: colors.brand.primary,
-                borderRadius: 2
-              }}
-            />
-          </View>
-        </View>
-      </View>
+      <DuringTripTransportProgress
+        transportMode={transportMode}
+        onTransportModeChange={setTransportMode}
+        tripXp={tripXp}
+        visitedCount={visitedCount}
+        totalCount={totalCount}
+        progress={progress}
+      />
 
       {/* ── Journey dots + Cards ── */}
       <View className="absolute bottom-6 z-10 w-full">
-        {/* Journey path dots — one per stop */}
-        <View className="mb-2.5 flex-row items-center justify-center gap-1.5 px-4">
-          {sortedPlaceData.map((pd, idx) => {
-            const isVisited = visitedIds.has(pd.place.placeId);
-            const isCurrent = pd.place.placeId === nextUnvisitedId;
-            return (
-              <View
-                key={pd.place.placeId}
-                className="items-center"
-                style={{ gap: 2 }}
-              >
-                {/* Connector line between dots */}
-                {idx > 0 && (
-                  <View
-                    className=""
-                    style={{
-                      position: 'absolute',
-                      right: '50%',
-                      top: isCurrent ? 4 : 3,
-                      width: 6,
-                      height: 2,
-                      backgroundColor: isVisited ? '#22c55e' : '#cbd5e1',
-                      transform: [{ translateX: -6 }]
-                    }}
-                  />
-                )}
-                <View
-                  style={{
-                    width: isCurrent ? 12 : 8,
-                    height: isCurrent ? 12 : 8,
-                    borderRadius: 6,
-                    backgroundColor: isVisited
-                      ? '#22c55e'
-                      : isCurrent
-                        ? colors.brand.primary
-                        : '#cbd5e1',
-                    borderWidth: isCurrent ? 2 : 0,
-                    borderColor: '#fff'
-                  }}
-                />
-              </View>
-            );
-          })}
-        </View>
+        <JourneyStepDots
+          sortedPlaceData={sortedPlaceData}
+          visitedIds={visitedIds}
+          nextUnvisitedId={nextUnvisitedId}
+        />
 
         {/* Place cards — horizontal FlatList with map sync on scroll */}
         <FlatList

@@ -1,10 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
-import {
-  ActivityIndicator,
-  Pressable,
-  ScrollView,
-  View
-} from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { AppText } from './AppText';
 import { AppTextInput } from './AppTextInput';
 import { Ionicons } from '@expo/vector-icons';
