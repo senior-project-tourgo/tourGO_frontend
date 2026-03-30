@@ -88,9 +88,11 @@ export function DuringTripPlaceDetailSheet({
                 return (
                   <AppText
                     variant="caption"
-                    className={
-                      hours.isOpenNow ? 'text-green-500' : 'text-red-500'
-                    }
+                    style={{
+                      color: hours.isOpenNow
+                        ? colors.status.success
+                        : colors.status.error
+                    }}
                   >
                     {hours.isOpenNow ? 'Open Now' : 'Closed'}
                     {hours.nextTime
@@ -110,11 +112,19 @@ export function DuringTripPlaceDetailSheet({
               </View>
 
               {visitedIds.has(selectedPlace.place.placeId) && (
-                <View className="flex-row items-center gap-2 rounded-xl bg-green-50 p-3">
-                  <Ionicons name="checkmark-circle" size={20} color="#22c55e" />
+                <View
+                  className="flex-row items-center gap-2 rounded-xl p-3"
+                  style={{ backgroundColor: colors.status.success + '1A' }}
+                >
+                  <Ionicons
+                    name="checkmark-circle"
+                    size={20}
+                    color={colors.status.success}
+                  />
                   <AppText
                     variant="caption"
-                    className="font-semibold text-green-700"
+                    className="font-semibold"
+                    style={{ color: colors.status.success }}
                   >
                     You visited this place!
                   </AppText>

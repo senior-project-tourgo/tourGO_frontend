@@ -54,7 +54,7 @@ export function ConfirmActionModal({
             <View
               className={`h-14 w-14 items-center justify-center rounded-full ${iconContainerClassName}`}
             >
-              <Ionicons name={icon} size={26} color="#ef4444" />
+              <Ionicons name={icon} size={26} color={colors.status.error} />
             </View>
           </View>
 

@@ -135,7 +135,7 @@ export function LocationSearchBar({
       <AppText className="font-semibold">
         {label}{' '}
         {required && (
-          <AppText variant="caption" className="text-red-500">
+          <AppText variant="caption" style={{ color: colors.status.error }}>
             *
           </AppText>
         )}

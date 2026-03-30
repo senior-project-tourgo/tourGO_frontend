@@ -63,9 +63,11 @@ export function DuringTripPlaceCard({
             <AppText>
               <AppText
                 variant="muted"
-                className={
-                  openingHours.isOpenNow ? 'text-green-500' : 'text-red-500'
-                }
+                style={{
+                  color: openingHours.isOpenNow
+                    ? colors.status.success
+                    : colors.status.error
+                }}
               >
                 {openingHours.isOpenNow ? 'Open' : 'Closed'}
               </AppText>
@@ -95,10 +97,15 @@ export function DuringTripPlaceCard({
             {/* Visited badge */}
             {isVisited && (
               <View className="mt-1 flex-row items-center gap-1">
-                <Ionicons name="checkmark-circle" size={14} color="#22c55e" />
+                <Ionicons
+                  name="checkmark-circle"
+                  size={14}
+                  color={colors.status.success}
+                />
                 <AppText
                   variant="caption"
-                  className="font-semibold text-green-500"
+                  className="font-semibold"
+                  style={{ color: colors.status.success }}
                 >
                   Visited
                 </AppText>
@@ -143,10 +150,15 @@ export function DuringTripPlaceCard({
         {activeTab === 'checkin' &&
           (isVisited ? (
             <View className="flex-row items-center gap-2">
-              <Ionicons name="checkmark-circle" size={20} color="#22c55e" />
+              <Ionicons
+                name="checkmark-circle"
+                size={20}
+                color={colors.status.success}
+              />
               <AppText
                 variant="subtitle"
-                className="font-semibold text-green-500"
+                className="font-semibold"
+                style={{ color: colors.status.success }}
               >
                 Checked In · +10 XP
               </AppText>

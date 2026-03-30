@@ -84,10 +84,17 @@ export function TripActionModal({
           className="flex-row items-center gap-3 rounded-2xl bg-red-50 px-4 py-4"
         >
           <View className="h-9 w-9 items-center justify-center rounded-full bg-red-100">
-            <Ionicons name="trash-outline" size={18} color="#ef4444" />
+            <Ionicons
+              name="trash-outline"
+              size={18}
+              color={colors.status.error}
+            />
           </View>
           <View className="flex-1">
-            <AppText className="font-semibold text-red-500">
+            <AppText
+              className="font-semibold"
+              style={{ color: colors.status.error }}
+            >
               Delete Trip
             </AppText>
             <AppText variant="muted">This cannot be undone</AppText>

@@ -9,6 +9,7 @@ import {
   TIME_WINDOW_RANGES,
   type TimeWindowValue
 } from '@/constants/timeOptions';
+import colors from '@/theme/colors';
 
 type TripTimeSectionProps = {
   tripDate: Date | null;
@@ -89,7 +90,7 @@ export default function TripTimeSection({
       <View className="space-y-1.5">
         <AppText className="font-medium text-colors-text">
           Time of Day
-          <AppText className="text-red-500"> *</AppText>
+          <AppText style={{ color: colors.status.error }}> *</AppText>
         </AppText>
         <View className="flex-row flex-wrap gap-2.5">
           {TIME_WINDOW_OPTIONS.map(option => (
@@ -106,7 +107,7 @@ export default function TripTimeSection({
           ))}
         </View>
         {timeWindowError && (
-          <AppText variant="caption" className="text-red-500">
+          <AppText variant="caption" style={{ color: colors.status.error }}>
             {timeWindowError}
           </AppText>
         )}

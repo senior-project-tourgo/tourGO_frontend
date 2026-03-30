@@ -29,7 +29,9 @@ export function OptionSelector<T extends string>({
       {label && (
         <AppText className="text-base font-medium">
           {label}
-          {required && <AppText className="text-red-500"> *</AppText>}
+          {required && (
+            <AppText style={{ color: colors.status.error }}> *</AppText>
+          )}
         </AppText>
       )}
 
@@ -40,7 +42,7 @@ export function OptionSelector<T extends string>({
           const containerStyle = selected
             ? 'border-colors-brand-primary bg-colors-brand-primary/10'
             : hasError
-              ? 'border-red-400 bg-red-50'
+              ? 'border-gray-300 bg-white'
               : !hasSelection
                 ? 'border-gray-300 bg-gray-100' // none selected
                 : 'border-gray-300 bg-white'; // others when one is selected
@@ -50,6 +52,14 @@ export function OptionSelector<T extends string>({
               key={option.value}
               onPress={() => onChange(option.value)}
               className={`flex-row items-center gap-3 rounded-full border px-4 py-3 ${containerStyle}`}
+              style={
+                hasError && !selected
+                  ? {
+                      borderColor: colors.status.error,
+                      backgroundColor: colors.status.error + '1A'
+                    }
+                  : undefined
+              }
             >
               {option.icon && (
                 <Ionicons
@@ -87,7 +97,7 @@ export function OptionSelector<T extends string>({
         })}
 
         {hasError && (
-          <AppText className="text-sm text-red-500">
+          <AppText className="text-sm" style={{ color: colors.status.error }}>
             {error || 'Please select an option'}
           </AppText>
         )}
