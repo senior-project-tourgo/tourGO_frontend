@@ -3,9 +3,10 @@ import { Button } from '@/components/Button';
 import { Screen } from '@/components/Screen';
 import colors from '@/theme/colors';
 import { totalRouteKm } from '@/utils/distance';
-import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { View } from 'react-native';
+import { StatCard } from '@/components/cards/variants/StatCard';
+import { XpBar } from '@/components/Xpbar';
 
 type SummaryParams = {
   tripName: string;
@@ -16,87 +17,6 @@ type SummaryParams = {
   totalPlaces: number;
   totalDuration: number | null;
 };
-
-const BADGE_THRESHOLDS = [
-  { badge: 'Legend', xp: 1000 },
-  { badge: 'Adventurer', xp: 500 },
-  { badge: 'Explorer', xp: 100 },
-  { badge: 'Newcomer', xp: 0 }
-];
-
-function XpBar({ current, badge }: { current: number; badge: string }) {
-  const idx = BADGE_THRESHOLDS.findIndex(b => b.badge === badge);
-  const next = BADGE_THRESHOLDS[idx - 1];
-  const prev = BADGE_THRESHOLDS[idx];
-
-  if (idx === -1) {
-    return (
-      <AppText variant="muted" className="text-center">
-        Progress unavailable
-      </AppText>
-    );
-  }
-
-  if (!next) {
-    return (
-      <AppText variant="muted" className="text-center">
-        Maximum badge reached — Legend!
-      </AppText>
-    );
-  }
-
-  const progress = Math.min((current - prev.xp) / (next.xp - prev.xp), 1);
-
-  return (
-    <View className="w-full gap-1">
-      <View className="flex-row justify-between">
-        <AppText variant="caption">{badge}</AppText>
-        <AppText variant="caption">
-          {current} / {next.xp} XP → {next.badge}
-        </AppText>
-      </View>
-      <View
-        className="h-3 overflow-hidden rounded-full"
-        style={{ backgroundColor: colors.brand.neutrals }}
-      >
-        <View
-          className="h-3 rounded-full"
-          style={{
-            width: `${Math.round(progress * 100)}%`,
-            backgroundColor: colors.brand.primary
-          }}
-        />
-      </View>
-    </View>
-  );
-}
-
-function StatCard({
-  icon,
-  value,
-  label,
-  color
-}: {
-  icon: React.ComponentProps<typeof Ionicons>['name'];
-  value: string;
-  label: string;
-  color?: string;
-}) {
-  return (
-    <View
-      className="flex-1 items-center gap-1 rounded-2xl p-4 shadow-sm"
-      style={{ backgroundColor: colors.surface.background }}
-    >
-      <Ionicons name={icon} size={24} color={color ?? colors.brand.primary} />
-      <AppText variant="subtitle" className="font-semibold">
-        {value}
-      </AppText>
-      <AppText variant="caption" className="text-center">
-        {label}
-      </AppText>
-    </View>
-  );
-}
 
 export default function TripSummaryScreen() {
   const params = useLocalSearchParams<{

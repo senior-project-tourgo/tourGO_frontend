@@ -80,7 +80,7 @@ export default function ReviewTripScreen() {
     )
       .then(setRouteSegments)
       .catch(() => {});
-  }, [editablePlaces, startCoords?.latitude, startCoords?.longitude]);
+  }, [editablePlaces, startCoords]);
 
   // Convert segments to MapRoute, marking the one leading to the focused card as solid
   const solidSegmentIndex = startCoords ? focusedIndex : focusedIndex - 1;
