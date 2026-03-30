@@ -510,44 +510,24 @@ export default function DuringTripScreen() {
       {stampModal && (
         <Animated.View
           pointerEvents="none"
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 100,
-            backgroundColor: 'rgba(0,0,0,0.35)',
-            alignItems: 'center',
-            justifyContent: 'center',
-            opacity: stampOpacity
-          }}
+          style={[
+            {
+              opacity: stampOpacity
+            }
+          ]}
+          className="absolute inset-0 z-[100] items-center justify-center bg-colors-text"
         >
           <Animated.View
             style={{
-              transform: [{ scale: stampScale }],
-              backgroundColor: '#fff',
-              borderRadius: 24,
-              padding: 28,
-              alignItems: 'center',
-              gap: 6,
-              width: 260,
-              shadowColor: '#000',
-              shadowOpacity: 0.18,
-              shadowRadius: 24,
-              elevation: 12
+              transform: [{ scale: stampScale }]
             }}
+            className="w-[260px] items-center gap-1.5 rounded-3xl bg-colors-surface-background p-7 shadow-lg"
           >
             {/* Stamp circle */}
             <View
+              className="border-3 h-20 w-20 items-center justify-center rounded-full"
               style={{
-                width: 80,
-                height: 80,
-                borderRadius: 40,
                 backgroundColor: colors.brand.primary + '18',
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderWidth: 3,
                 borderColor: colors.brand.primary,
                 borderStyle: 'dashed'
               }}
@@ -581,20 +561,13 @@ export default function DuringTripScreen() {
                   marginTop: 2
                 }}
               >
-                <AppText
-                  variant="caption"
-                  className="font-semibold"
-                  style={{ color: colors.brand.primary }}
-                >
+                <AppText variant="caption" className="font-semibold">
                   Visit #{stampModal.visitCount}
                 </AppText>
               </View>
             )}
 
-            <AppText
-              variant="caption"
-              style={{ color: '#94a3b8', marginTop: 4 }}
-            >
+            <AppText variant="caption" className="mt-1 text-slate-400">
               +10 XP earned
             </AppText>
           </Animated.View>
@@ -611,74 +584,40 @@ export default function DuringTripScreen() {
         onRequestClose={closeSheet}
       >
         {selectedPlace && (
-          <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+          <View className="flex-1 justify-end">
             {/* Transparent dismiss area — map stays fully visible behind */}
-            <Pressable
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0
-              }}
-              onPress={closeSheet}
-            />
+            <Pressable className="absolute inset-0" onPress={closeSheet} />
 
             {/* White card slides up from the bottom */}
             <Animated.View
+              className="rounded-t-3xl bg-colors-surface-background"
               style={{
-                backgroundColor: '#fff',
-                borderTopLeftRadius: 24,
-                borderTopRightRadius: 24,
                 maxHeight: '82%',
                 transform: [{ translateY: sheetTranslateY }]
               }}
             >
               {/* Handle bar — drag down to dismiss */}
               <View
-                style={{
-                  alignItems: 'center',
-                  paddingTop: 12,
-                  paddingBottom: 8
-                }}
+                className="items-center pb-2 pt-3"
                 {...sheetPanResponder.panHandlers}
               >
-                <View
-                  style={{
-                    width: 40,
-                    height: 4,
-                    borderRadius: 2,
-                    backgroundColor: '#cbd5e1'
-                  }}
-                />
+                <View className="h-1 w-10 rounded bg-slate-300" />
               </View>
 
               <ScrollView
-                contentContainerStyle={{ padding: 20, gap: 12 }}
+                contentContainerStyle={{ gap: 12 }}
+                className="px-5 py-5"
                 showsVerticalScrollIndicator={false}
               >
                 {/* Name + rating row */}
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between'
-                  }}
-                >
+                <View className="flex-row items-center justify-between">
                   <AppText
                     variant="subtitle"
-                    className="font-semibold"
-                    style={{ flex: 1, marginRight: 8 }}
+                    className="mr-2 flex-1 font-semibold"
                   >
                     {selectedPlace.place.placeName}
                   </AppText>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: 4
-                    }}
-                  >
+                  <View className="flex-row items-center gap-1">
                     <Ionicons
                       name="star"
                       size={14}
@@ -705,7 +644,9 @@ export default function DuringTripScreen() {
                   return (
                     <AppText
                       variant="caption"
-                      style={{ color: hours.isOpenNow ? '#22c55e' : '#ef4444' }}
+                      className={
+                        hours.isOpenNow ? 'text-green-500' : 'text-red-500'
+                      }
                     >
                       {hours.isOpenNow ? 'Open Now' : 'Closed'}
                       {hours.nextTime
@@ -716,9 +657,7 @@ export default function DuringTripScreen() {
                 })()}
 
                 {/* Vibe tags */}
-                <View
-                  style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}
-                >
+                <View className="flex-row flex-wrap gap-2">
                   {selectedPlace.place.vibe
                     .map(id => mockVibes.find(v => v.id === id)?.title)
                     .filter(Boolean)
@@ -745,7 +684,6 @@ export default function DuringTripScreen() {
                 )}
 
                 {/* Promotions */}
-                {/* Promotions */}
                 {selectedPlace.promotions.length > 0 && (
                   <View className="gap-2">
                     <AppText variant="subtitle" className="font-semibold">
@@ -771,7 +709,7 @@ export default function DuringTripScreen() {
                 )}
 
                 {/* Bottom spacing */}
-                <View style={{ height: 16 }} />
+                <View className="h-4" />
               </ScrollView>
             </Animated.View>
           </View>
@@ -786,36 +724,17 @@ export default function DuringTripScreen() {
         onRequestClose={() => setShowEndModal(false)}
       >
         <Pressable
-          style={{
-            flex: 1,
-            backgroundColor: 'rgba(0,0,0,0.55)',
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: 24
-          }}
+          className="flex-1 items-center justify-center"
+          style={{ backgroundColor: 'rgba(0,0,0,0.55)', padding: 24 }}
           onPress={() => setShowEndModal(false)}
         >
           <Pressable
-            style={{
-              width: '100%',
-              backgroundColor: '#fff',
-              borderRadius: 20,
-              padding: 24,
-              gap: 12
-            }}
+            className="w-full rounded-2xl bg-white p-6"
+            style={{ gap: 12 }}
             onPress={() => {}}
           >
-            <View style={{ alignItems: 'center', paddingBottom: 4 }}>
-              <View
-                style={{
-                  width: 56,
-                  height: 56,
-                  borderRadius: 28,
-                  backgroundColor: '#fee2e2',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
+            <View className="items-center pb-1">
+              <View className="h-14 w-14 items-center justify-center rounded-full bg-red-100">
                 <Ionicons name="flag-outline" size={26} color="#ef4444" />
               </View>
             </View>
@@ -826,33 +745,19 @@ export default function DuringTripScreen() {
               This will complete your trip and show a summary. You won&apos;t be
               able to check in after this.
             </AppText>
-            <View style={{ flexDirection: 'row', gap: 10, marginTop: 4 }}>
+            <View className="mt-1 flex-row gap-2">
               <Pressable
                 onPress={() => setShowEndModal(false)}
-                style={{
-                  flex: 1,
-                  borderRadius: 12,
-                  borderWidth: 1.5,
-                  borderColor: '#e2e8f0',
-                  paddingVertical: 12,
-                  alignItems: 'center'
-                }}
+                className="flex-1 items-center rounded-xl border border-slate-200 py-3"
+                style={{ borderWidth: 1.5 }}
               >
                 <AppText className="font-semibold">Cancel</AppText>
               </Pressable>
               <Pressable
                 onPress={doEndTrip}
-                style={{
-                  flex: 1,
-                  borderRadius: 12,
-                  backgroundColor: '#ef4444',
-                  paddingVertical: 12,
-                  alignItems: 'center'
-                }}
+                className="flex-1 items-center rounded-xl bg-red-500 py-3"
               >
-                <AppText style={{ color: '#fff' }} className="font-semibold">
-                  End Trip
-                </AppText>
+                <AppText className="font-semibold text-white">End Trip</AppText>
               </Pressable>
             </View>
           </Pressable>
@@ -920,12 +825,9 @@ export default function DuringTripScreen() {
               tracksViewChanges={false}
             >
               <View
+                className="rounded-xl border bg-white px-[7px] py-[3px]"
                 style={{
-                  backgroundColor: '#fff',
-                  borderRadius: 10,
-                  paddingHorizontal: 7,
-                  paddingVertical: 3,
-                  borderWidth: 1.5,
+                  borderWidth: 1.5, // for thick border
                   borderColor: userSegmentColor,
                   shadowColor: '#000',
                   shadowOpacity: 0.1,
@@ -957,11 +859,8 @@ export default function DuringTripScreen() {
               tracksViewChanges={false}
             >
               <View
+                className="rounded-xl border bg-white px-[7px] py-[3px]"
                 style={{
-                  backgroundColor: '#fff',
-                  borderRadius: 10,
-                  paddingHorizontal: 7,
-                  paddingVertical: 3,
                   borderWidth: 1.5,
                   borderColor: segmentStyles[i].strokeColor,
                   shadowColor: '#000',
@@ -1045,21 +944,7 @@ export default function DuringTripScreen() {
       {/* ── Transport mode toggle + Progress pill ── */}
       <View className="absolute left-4 right-4 z-10" style={{ top: 108 }}>
         {/* Mode toggle */}
-        <View
-          style={{
-            flexDirection: 'row',
-            alignSelf: 'center',
-            backgroundColor: '#fff',
-            borderRadius: 24,
-            padding: 4,
-            gap: 2,
-            marginBottom: 8,
-            shadowColor: '#000',
-            shadowOpacity: 0.06,
-            shadowRadius: 8,
-            elevation: 3
-          }}
-        >
+        <View className="mb-2 flex-row gap-0.5 self-center rounded-full bg-white p-1 shadow-sm">
           {(
             [
               { mode: 'driving', icon: 'car-outline' },
@@ -1069,13 +954,9 @@ export default function DuringTripScreen() {
             <TouchableOpacity
               key={mode}
               onPress={() => setTransportMode(mode)}
-              style={{
-                paddingHorizontal: 14,
-                paddingVertical: 7,
-                borderRadius: 20,
-                backgroundColor:
-                  transportMode === mode ? colors.brand.primary : 'transparent'
-              }}
+              className={`rounded-full px-[14px] py-[7px] ${
+                transportMode === mode ? 'bg-colors-brand-primary' : ''
+              }`}
             >
               <Ionicons
                 name={icon as any}
@@ -1087,30 +968,10 @@ export default function DuringTripScreen() {
         </View>
 
         {/* Progress pill */}
-        <View
-          style={{
-            backgroundColor: '#fff',
-            borderRadius: 16,
-            paddingHorizontal: 16,
-            paddingTop: 10,
-            paddingBottom: 12,
-            shadowColor: '#000',
-            shadowOpacity: 0.06,
-            shadowRadius: 8,
-            elevation: 3
-          }}
-        >
+        <View className="rounded-xl bg-colors-surface-background px-4 pb-3 pt-[10px] shadow-sm">
           {/* Stats row */}
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between'
-            }}
-          >
-            <View
-              style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}
-            >
+          <View className="flex-row items-center justify-between">
+            <View className="flex-row items-center gap-1">
               <Ionicons name="star" size={14} color={colors.brand.primary} />
               <AppText
                 variant="caption"
@@ -1120,22 +981,13 @@ export default function DuringTripScreen() {
                 {tripXp} XP earned
               </AppText>
             </View>
-
             <AppText variant="caption" className="font-semibold">
               {visitedCount}/{totalCount} stops
             </AppText>
           </View>
 
           {/* Progress bar */}
-          <View
-            style={{
-              height: 4,
-              backgroundColor: colors.brand.neutrals,
-              borderRadius: 2,
-              marginTop: 8,
-              overflow: 'hidden'
-            }}
-          >
+          <View className="mt-2 h-1 overflow-hidden rounded bg-colors-brand-neutrals">
             <View
               style={{
                 height: 4,
@@ -1151,27 +1003,20 @@ export default function DuringTripScreen() {
       {/* ── Journey dots + Cards ── */}
       <View className="absolute bottom-6 z-10 w-full">
         {/* Journey path dots — one per stop */}
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 6,
-            marginBottom: 10,
-            paddingHorizontal: 16
-          }}
-        >
+        <View className="mb-2.5 flex-row items-center justify-center gap-1.5 px-4">
           {sortedPlaceData.map((pd, idx) => {
             const isVisited = visitedIds.has(pd.place.placeId);
             const isCurrent = pd.place.placeId === nextUnvisitedId;
             return (
               <View
                 key={pd.place.placeId}
-                style={{ alignItems: 'center', gap: 2 }}
+                className="items-center"
+                style={{ gap: 2 }}
               >
                 {/* Connector line between dots */}
                 {idx > 0 && (
                   <View
+                    className=""
                     style={{
                       position: 'absolute',
                       right: '50%',
