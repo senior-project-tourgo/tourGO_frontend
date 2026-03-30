@@ -1,4 +1,6 @@
 import { AppText } from '@/components/AppText';
+import { AppTextInput } from '@/components/AppTextInput';
+import { HeaderWithBack } from '@/components/PageHeader';
 import { searchPlaces, getActivePlaces } from '@/features/place/place.api';
 import type { Place } from '@/features/place/place.types';
 import { pendingPlaceStore } from '@/stores/pendingPlaceStore';
@@ -13,7 +15,6 @@ import {
   FlatList,
   Image,
   Pressable,
-  TextInput,
   View
 } from 'react-native';
 
@@ -32,43 +33,33 @@ function PlaceRow({
   return (
     <Pressable
       onPress={added ? undefined : onAdd}
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 20,
-        paddingVertical: 12,
-        gap: 12,
-        backgroundColor: added ? '#f8faff' : '#fff'
-      }}
+      className={`flex-row items-center gap-3 px-5 py-3 ${
+        added ? 'bg-blue-50' : 'bg-white'
+      }`}
     >
-      {/* Thumbnail */}
       <Image
         source={{ uri: place.image }}
-        style={{
-          width: 56,
-          height: 56,
-          borderRadius: 12,
-          backgroundColor: '#f1f5f9'
-        }}
+        className="h-14 w-14 rounded-xl bg-slate-100"
         resizeMode="cover"
       />
 
-      {/* Text */}
-      <View style={{ flex: 1, gap: 2 }}>
-        <AppText variant="subtitle" style={{ fontSize: 14 }}>
+      <View className="flex-1 gap-[2px]">
+        <AppText variant="subtitle" className="text-sm">
           {place.placeName}
         </AppText>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+
+        <View className="flex-row items-center gap-1.5">
           <Ionicons name="location-outline" size={12} color="#94a3b8" />
-          <AppText variant="muted" style={{ fontSize: 12 }}>
+          <AppText variant="muted" className="text-xs">
             {place.location.area}
           </AppText>
+
           {distanceKm !== null && (
             <>
-              <AppText variant="muted" style={{ fontSize: 12 }}>
+              <AppText variant="muted" className="text-xs">
                 ·
               </AppText>
-              <AppText variant="muted" style={{ fontSize: 12 }}>
+              <AppText variant="muted" className="text-xs">
                 {distanceKm < 1
                   ? `${Math.round(distanceKm * 1000)} m away`
                   : `${distanceKm.toFixed(1)} km away`}
@@ -76,25 +67,21 @@ function PlaceRow({
             </>
           )}
         </View>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+
+        <View className="flex-row items-center gap-1">
           <Ionicons name="star" size={11} color={colors.brand.primary} />
-          <AppText variant="muted" style={{ fontSize: 12 }}>
+          <AppText variant="muted" className="text-xs">
             {place.averageRating} · {place.priceRange}
           </AppText>
         </View>
       </View>
 
-      {/* Add / Added button */}
       <Pressable
         onPress={added ? undefined : onAdd}
-        style={{
-          width: 34,
-          height: 34,
-          borderRadius: 17,
-          backgroundColor: added ? '#dcfce7' : colors.brand.primary,
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}
+        className={`h-[34px] w-[34px] items-center justify-center rounded-full ${
+          added ? 'bg-green-100' : ''
+        }`}
+        style={!added ? { backgroundColor: colors.brand.primary } : undefined}
         hitSlop={8}
       >
         <Ionicons
@@ -109,15 +96,10 @@ function PlaceRow({
 
 // --- Separator ---
 function Separator() {
-  return (
-    <View
-      style={{ height: 1, backgroundColor: '#f1f5f9', marginHorizontal: 20 }}
-    />
-  );
+  return <View className="mx-5 h-[1px] bg-slate-100" />;
 }
 
 export default function AddPlaceScreen() {
-  // existing place IDs passed from parent so we can show checkmarks
   const { addedIds } = useLocalSearchParams<{ addedIds?: string }>();
   const alreadyAdded = new Set(addedIds ? addedIds.split(',') : []);
 
@@ -131,7 +113,6 @@ export default function AddPlaceScreen() {
 
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Request location once
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
@@ -144,7 +125,6 @@ export default function AddPlaceScreen() {
     })();
   }, []);
 
-  // Load nearby places on mount (empty query = all active)
   useEffect(() => {
     loadPlaces('');
     return () => {
@@ -158,7 +138,6 @@ export default function AddPlaceScreen() {
       const results = await searchPlaces(q, 50);
       setPlaces(results);
     } catch {
-      // fallback: fetch all
       try {
         const all = await getActivePlaces(50);
         setPlaces(all);
@@ -179,7 +158,6 @@ export default function AddPlaceScreen() {
     router.back();
   }
 
-  // Sort by distance if we have user coords and no active text search
   const displayPlaces =
     userCoords && !query.trim()
       ? [...places].sort((a, b) => {
@@ -200,84 +178,35 @@ export default function AddPlaceScreen() {
       : places;
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#fff' }}>
+    <View className="flex-1 bg-white">
       {/* Header */}
-      <View
-        style={{
-          paddingTop: 56,
-          paddingBottom: 12,
-          paddingHorizontal: 20,
-          backgroundColor: '#fff',
-          borderBottomWidth: 1,
-          borderBottomColor: '#f1f5f9',
-          gap: 12
-        }}
-      >
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-          <Pressable
-            onPress={() => router.back()}
-            hitSlop={8}
-            style={{
-              width: 36,
-              height: 36,
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: 18,
-              backgroundColor: '#f1f5f9'
-            }}
-          >
-            <Ionicons
-              name="chevron-back"
-              size={20}
-              color={colors.text.DEFAULT}
-            />
-          </Pressable>
-          <AppText
-            variant="subtitle"
-            style={{ fontSize: 17, fontWeight: '600', flex: 1 }}
-          >
-            Add a Place
-          </AppText>
-        </View>
+      <View className="border-b border-slate-100 bg-white px-5 pt-14">
+        <HeaderWithBack title="Add a Place" backBg />
 
-        {/* Search input */}
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            backgroundColor: '#f8fafc',
-            borderRadius: 14,
-            paddingHorizontal: 12,
-            paddingVertical: 10,
-            gap: 8,
-            borderWidth: 1,
-            borderColor: '#e2e8f0'
-          }}
-        >
-          <Ionicons name="search-outline" size={18} color="#94a3b8" />
-          <TextInput
+        {/* Search */}
+        <View className="mt-3 px-3">
+          <AppTextInput
             value={query}
             onChangeText={onChangeQuery}
             placeholder="Search places..."
-            placeholderTextColor="#94a3b8"
-            style={{
-              flex: 1,
-              fontSize: 15,
-              color: colors.text.DEFAULT,
-              fontFamily: 'Inter'
-            }}
             autoFocus
             returnKeyType="search"
-            clearButtonMode="while-editing"
+            rightIcon={
+              loading ? (
+                <ActivityIndicator size="small" color={colors.brand.primary} />
+              ) : (
+                <Ionicons
+                  name="search"
+                  size={18}
+                  color={colors.brand.primary}
+                />
+              )
+            }
           />
-          {loading && (
-            <ActivityIndicator size="small" color={colors.brand.primary} />
-          )}
         </View>
 
-        {/* Near me label */}
         {!query.trim() && userCoords && (
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+          <View className="my-2 flex-row items-center gap-1">
             <Ionicons
               name="navigate-outline"
               size={13}
@@ -285,7 +214,8 @@ export default function AddPlaceScreen() {
             />
             <AppText
               variant="muted"
-              style={{ fontSize: 12, color: colors.brand.primary }}
+              className="text-xs"
+              style={{ color: colors.brand.primary }}
             >
               Sorted by distance from you
             </AppText>
@@ -293,22 +223,13 @@ export default function AddPlaceScreen() {
         )}
       </View>
 
-      {/* Results */}
+      {/* Content */}
       {loading && places.length === 0 ? (
-        <View
-          style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
-        >
+        <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color={colors.brand.primary} />
         </View>
       ) : displayPlaces.length === 0 ? (
-        <View
-          style={{
-            flex: 1,
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 8
-          }}
-        >
+        <View className="flex-1 items-center justify-center gap-2">
           <Ionicons name="search-outline" size={40} color="#cbd5e1" />
           <AppText variant="muted">
             No places found for &quot;{query}&quot;
