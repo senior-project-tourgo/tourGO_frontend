@@ -8,22 +8,22 @@ export const TRANSPORT_OPTIONS = [
     icon: 'walk-outline'
   },
   {
-    value: 'cycling',
-    label: 'Cycling',
+    value: 'bicycling',
+    label: 'Bicycling',
     description: 'Up to ~8 km radius',
     icon: 'bicycle-outline'
   },
   {
-    value: 'motorbike',
-    label: 'Motorbike',
-    description: 'Up to ~20 km radius',
-    icon: 'speedometer-outline'
-  },
-  {
-    value: 'car',
-    label: 'Car',
+    value: 'driving',
+    label: 'Driving',
     description: 'Up to ~35 km radius',
     icon: 'car-outline'
+  },
+  {
+    value: 'transit',
+    label: 'Transit',
+    description: 'Public transportation options',
+    icon: 'train-outline'
   }
 ] as const satisfies readonly SelectorOption[];
 

@@ -1,7 +1,6 @@
 import api from '@/config/api';
 import { decodePolyline, type LatLng } from '@/utils/decodePolyline';
-
-export type TransportMode = 'driving' | 'walking' | 'bicycling' | 'transit';
+import { TransportMode } from '@/constants/transportOptions';
 
 export type RouteSegment = {
   coords: LatLng[];
@@ -44,3 +43,4 @@ export async function fetchRouteSegment(
     };
   }
 }
+export { TransportMode };
