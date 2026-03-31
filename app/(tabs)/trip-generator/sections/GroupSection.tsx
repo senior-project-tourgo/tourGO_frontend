@@ -1,7 +1,7 @@
 import { Accordion } from '@/components/Accordion';
-import { Stepper } from '@/components/Stepper';
 import SelectableChips from '@/components/SelectableChips';
-import { GROUP_TYPES, type GroupType } from '@/mock/groupTypes.mock';
+import { Stepper } from '@/components/Stepper';
+import { GROUP_TYPES, type GroupType } from '@/constants/groupType';
 
 type GroupSectionProps = {
   groupType: GroupType | null;
