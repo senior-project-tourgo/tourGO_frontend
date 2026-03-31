@@ -7,11 +7,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { mockVibes } from '@/mock/vibes.mock';
 import { Badge } from '@/components/Badge';
 import { Place } from '@/features/place/place.types';
-import { Promotion } from '@/features/promotion/promotion.types';
+import type { ApiPromotion } from '@/services/promotion.service';
 
 type PlaceInfoProps = {
   place: Place;
-  promotions: Promotion[];
+  promotions: ApiPromotion[];
 };
 
 export function PlaceInfoCard({ place, promotions }: PlaceInfoProps) {
@@ -67,7 +67,7 @@ export function PlaceInfoCard({ place, promotions }: PlaceInfoProps) {
 
         <View className="flex-row flex-wrap gap-2">
           {(Array.isArray(place.vibe) ? place.vibe : []).map(
-            (id: string | number, index: number) => {
+            (id: string | number) => {
               const vibeObj = mockVibes.find(v => v.id === id);
               if (!vibeObj) return null;
               return (
@@ -81,20 +81,18 @@ export function PlaceInfoCard({ place, promotions }: PlaceInfoProps) {
       </View>
 
       {/* Promotions */}
-      {promotions.length > 0 && (
+      {promotions.length > 0 ? (
         <>
           <AppText className="mt-8 text-lg font-semibold">
             Available Promotions
           </AppText>
           <View className="gap-4">
-            {promotions.map((promo: any) => (
-              <PromotionCard key={promo.promotionId} promotion={promo} />
+            {promotions.map(promo => (
+              <PromotionCard key={promo.promotionId} promo={promo} />
             ))}
           </View>
         </>
-      )}
-
-      {promotions.length === 0 && (
+      ) : (
         <AppText className="text-muted-foreground mt-6 text-sm">
           No promotions available right now.
         </AppText>
