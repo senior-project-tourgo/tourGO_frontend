@@ -1,5 +1,5 @@
-import colors from '@/theme/colors';
 import type { Trip } from '@/features/trip/trip.types';
+import colors from '@/theme/colors';
 
 export const STATUS_LABEL: Record<Trip['status'], string> = {
   current: 'Active',
@@ -8,7 +8,7 @@ export const STATUS_LABEL: Record<Trip['status'], string> = {
 };
 
 export const STATUS_COLOR: Record<Trip['status'], string> = {
-  current: '#22c55e',
+  current: colors.status.success,
   saved: colors.brand.primary,
-  completed: '#94a3b8'
+  completed: colors.status.complete
 };

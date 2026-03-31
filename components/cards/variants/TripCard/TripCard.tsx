@@ -5,9 +5,10 @@ import { AppText } from '@/components/AppText';
 import { Button } from '@/components/Button';
 import colors from '@/theme/colors';
 import type { Trip } from '@/features/trip/trip.types';
-import { STATUS_LABEL, STATUS_COLOR } from '@/constants/trip';
+import { STATUS_LABEL, STATUS_COLOR } from '@/constants/tripStatus';
 import { PlacePhotoCarousel } from './PlacePhotoCarousel';
 import { CARD_WIDTH } from '@/constants/place-card/carousel';
+import { Badge } from '@/components/Badge';
 
 export function TripCard({
   trip,
@@ -50,7 +51,7 @@ export function TripCard({
       className="rounded-2xl bg-colors-surface-background shadow-sm"
     >
       {/* Image section */}
-      <View className="overflow-hidden rounded-t-2xl">
+      <View className="relative overflow-hidden rounded-t-2xl">
         <PlacePhotoCarousel placeIds={placeIds} placeImages={placeImages} />
 
         {/* Actions */}
@@ -82,17 +83,11 @@ export function TripCard({
 
         {/* Status */}
         <View className="absolute bottom-7 left-2">
-          <View
-            className="rounded-full px-2 py-[3px]"
-            style={{ backgroundColor: STATUS_COLOR[trip.status] + 'dd' }}
-          >
-            <AppText
-              variant="caption"
-              className="text-[10px] font-bold text-white"
-            >
-              {STATUS_LABEL[trip.status]}
-            </AppText>
-          </View>
+          <Badge
+            label={STATUS_LABEL[trip.status]}
+            bgColor={STATUS_COLOR[trip.status] + 'dd'}
+            textColor={colors.text.inverse}
+          />
         </View>
       </View>
 

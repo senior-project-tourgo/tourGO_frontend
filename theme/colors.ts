@@ -14,7 +14,8 @@ const colors = {
   },
   status: {
     success: '#28A745', // green for correct/right
-    error: '#DC3545' // red for wrong/error
+    error: '#DC3545', // red for wrong/error
+    complete: '#808080'
   }
 };
 

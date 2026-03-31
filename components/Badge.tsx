@@ -1,8 +1,25 @@
+import colors from '@/theme/colors';
 import { AppText } from './AppText';
 
-export function Badge({ label }: { label: string }) {
+interface BadgeProps {
+  label: string;
+  bgColor?: string; // background color
+  textColor?: string; // text color
+}
+
+export function Badge({
+  label,
+  bgColor = colors.brand.neutrals,
+  textColor = colors.text.DEFAULT
+}: BadgeProps) {
+  // Default padding
+  const padding = 'px-2 py-1';
+
   return (
-    <AppText className="rounded-full bg-colors-brand-neutrals px-2 py-1 text-xs">
+    <AppText
+      className={`rounded-full ${padding} text-xs font-bold`}
+      style={{ backgroundColor: bgColor, color: textColor }}
+    >
       {label}
     </AppText>
   );
