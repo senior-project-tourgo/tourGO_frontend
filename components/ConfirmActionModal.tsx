@@ -79,7 +79,7 @@ export function ConfirmActionModal({
               onPress={onConfirm}
               isLoading={pending && !confirmPendingLabel}
               disabled={pending}
-              className="flex-1 bg-red-500 font-semibold"
+              className="flex-1 bg-colors-status-error font-semibold"
             />
           </View>
         </Pressable>

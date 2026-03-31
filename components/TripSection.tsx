@@ -1,7 +1,6 @@
 import { View, FlatList } from 'react-native';
 import { AppText } from '@/components/AppText';
-import colors from '@/theme/colors';
-import { TripCard } from './cards/variants/TripCard';
+import { TripCard } from './cards/variants/TripCard/TripCard';
 import type { Trip } from '@/features/trip/trip.types';
 
 export function TripSection({
@@ -16,43 +15,32 @@ export function TripSection({
   if (!trips.length) return null;
 
   return (
-    <View style={{ marginBottom: 24 }}>
-      {/* Header — Screen already provides 24px horizontal padding */}
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: 8,
-          marginBottom: 12
-        }}
-      >
-        <AppText variant="subtitle" style={{ flex: 1, fontWeight: '600' }}>
+    <View className="mb-6">
+      {/* Header */}
+      <View className="mb-3 flex-row items-center gap-2">
+        <AppText variant="subtitle" className="flex-1 font-semibold">
           {title}
         </AppText>
-        <View
-          style={{
-            backgroundColor: colors.brand.primary + '18',
-            borderRadius: 12,
-            paddingHorizontal: 8,
-            paddingVertical: 2
-          }}
-        >
-          <AppText
-            variant="caption"
-            style={{ color: colors.brand.primary, fontWeight: '600' }}
-          >
+
+        <View className="rounded-xl bg-colors-brand-primary/10 px-2 py-[2px]">
+          <AppText variant="caption" className="font-semibold text-orange-500">
             {trips.length}
           </AppText>
         </View>
       </View>
 
-      {/* Cards start flush with the Screen's 24px left padding; right padding gives breathing room at end of scroll */}
+      {/* Cards */}
       <FlatList
         horizontal
         data={trips}
         keyExtractor={t => t._id}
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingRight: 24, gap: 12 }}
+        contentContainerStyle={{
+          paddingLeft: 1,
+          paddingRight: 24,
+          paddingBottom: 8
+        }}
+        ItemSeparatorComponent={() => <View className="w-3" />}
         renderItem={({ item }) => <TripCard trip={item} {...cardProps(item)} />}
       />
     </View>
