@@ -4,7 +4,7 @@ export interface Vibe {
   image: string;
 }
 
-export const mockVibes: Vibe[] = [
+export const VIBES: Vibe[] = [
   {
     id: 'thrill',
     title: 'Thrill Seeker',

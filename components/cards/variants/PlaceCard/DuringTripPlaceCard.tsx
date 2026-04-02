@@ -6,7 +6,7 @@ import type { Place } from '@/features/place/place.types';
 import colors from '@/theme/colors';
 import { getPlaceOpeningStatus } from '@/utils/openingHours';
 import { Ionicons } from '@expo/vector-icons';
-import { mockVibes } from '@/mock/vibes.mock';
+import { VIBES } from '@/constants/vibes';
 import { useState } from 'react';
 import { Pressable, TouchableOpacity, View } from 'react-native';
 import { ImageWithFallback } from './ImageWithFallback';
@@ -84,7 +84,7 @@ export function DuringTripPlaceCard({
             <View className="flex-row flex-wrap gap-2">
               {place.vibe
                 .flatMap(id => {
-                  const title = mockVibes.find(v => v.id === id)?.title;
+                  const title = VIBES.find(v => v.id === id)?.title;
                   return title ? [{ id, title }] : [];
                 })
                 .map(({ id, title }) => (

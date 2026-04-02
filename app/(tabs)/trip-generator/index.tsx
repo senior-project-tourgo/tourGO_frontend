@@ -1,23 +1,23 @@
-import { KeyboardAvoidingView, Platform, View } from 'react-native';
-import { useState } from 'react';
 import { useRouter } from 'expo-router';
+import { useState } from 'react';
+import { KeyboardAvoidingView, Platform, View } from 'react-native';
 
-import { Screen } from '@/components/Screen';
-import { HeaderWithBack } from '@/components/PageHeader';
 import { Button } from '@/components/Button';
+import { HeaderWithBack } from '@/components/PageHeader';
+import { Screen } from '@/components/Screen';
 
-import TripNameSection from './sections/TripNameSection';
-import LocationSection from './sections/LocationSection';
-import TripTimeSection from './sections/TripTimeSection';
-import TripStyleSection from './sections/TripStyleSection';
 import GroupSection from './sections/GroupSection';
+import LocationSection from './sections/LocationSection';
+import TripNameSection from './sections/TripNameSection';
+import TripStyleSection from './sections/TripStyleSection';
+import TripTimeSection from './sections/TripTimeSection';
 
-import { buildTripPayload } from '@/utils/tripForm';
+import { type GroupType } from '@/constants/groupType';
+import { type PaceValue } from '@/constants/paceOptions';
 import { type TimeWindowValue } from '@/constants/timeOptions';
 import { type TransportMode } from '@/constants/transportOptions';
-import { type PaceValue } from '@/constants/paceOptions';
-import { type GroupType } from '@/mock/groupTypes.mock';
 import type { Area } from '@/features/place/place.types';
+import { buildTripPayload } from '@/utils/tripForm';
 
 export default function TripGeneratorScreen() {
   const router = useRouter();
