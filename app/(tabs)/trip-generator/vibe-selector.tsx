@@ -5,7 +5,7 @@ import { HeaderWithBack } from '@/components/PageHeader';
 import { PaceValue } from '@/constants/paceOptions';
 import { TRANSPORT_OPTIONS, TransportMode } from '@/constants/transportOptions';
 import { Area, Place } from '@/features/place/place.types';
-import { mockVibes } from '@/mock/vibes.mock';
+import { VIBES } from '@/constants/vibes';
 import { generateRecommendation } from '@/services/trip.service';
 import colors from '@/theme/colors';
 import { Ionicons } from '@expo/vector-icons';
@@ -139,7 +139,7 @@ export default function VibeSelectorScreen() {
     <SafeAreaView className="flex-1 bg-colors-surface-background">
       {/* Scrollable content */}
       <FlatList
-        data={mockVibes}
+        data={VIBES}
         keyExtractor={item => item.id}
         numColumns={2}
         showsVerticalScrollIndicator={false}

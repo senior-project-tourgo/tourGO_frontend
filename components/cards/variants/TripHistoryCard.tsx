@@ -41,7 +41,7 @@ export function TripHistoryCard({
           {
             name: 'checkmark-circle-outline' as keyof typeof Ionicons.glyphMap,
             label: `${visitedCount}/${totalCount} visited`,
-            color: '#22c55e'
+            color: colors.status.complete
           }
         ]
       : []),

@@ -4,7 +4,7 @@ import { PromotionCard } from '../PromotionCard';
 import { getPlaceOpeningStatus } from '@/utils/openingHours';
 import colors from '@/theme/colors';
 import { Ionicons } from '@expo/vector-icons';
-import { mockVibes } from '@/mock/vibes.mock';
+import { VIBES } from '@/constants/vibes';
 import { Badge } from '@/components/Badge';
 import { Place } from '@/features/place/place.types';
 import type { ApiPromotion } from '@/services/promotion.service';
@@ -68,7 +68,7 @@ export function PlaceInfoCard({ place, promotions }: PlaceInfoProps) {
         <View className="flex-row flex-wrap gap-2">
           {(Array.isArray(place.vibe) ? place.vibe : []).map(
             (id: string | number) => {
-              const vibeObj = mockVibes.find(v => v.id === id);
+              const vibeObj = VIBES.find(v => v.id === id);
               if (!vibeObj) return null;
               return (
                 <View key={id}>

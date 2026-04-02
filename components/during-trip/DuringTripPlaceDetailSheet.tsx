@@ -1,7 +1,7 @@
 import { AppText } from '@/components/AppText';
 import { Badge } from '@/components/Badge';
 import type { Place } from '@/features/place/place.types';
-import { mockVibes } from '@/mock/vibes.mock';
+import { VIBES } from '@/constants/vibes';
 import type { ApiPromotion } from '@/services/promotion.service';
 import { getPlaceOpeningStatus } from '@/utils/openingHours';
 import colors from '@/theme/colors';
@@ -104,7 +104,7 @@ export function DuringTripPlaceDetailSheet({
 
               <View className="flex-row flex-wrap gap-2">
                 {selectedPlace.place.vibe
-                  .map(id => mockVibes.find(v => v.id === id)?.title)
+                  .map(id => VIBES.find(v => v.id === id)?.title)
                   .filter(Boolean)
                   .map((title, i) => (
                     <Badge key={i} label={title as string} />
