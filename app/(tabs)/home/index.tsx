@@ -4,7 +4,7 @@ import { PlaceCard } from '@/components/cards/variants/PlaceCard/PlaceCard';
 import { HomeSuggestionCard } from '@/components/cards/variants/HomeSuggestionCard';
 import { VIBES } from '@/constants/vibes';
 import { router } from 'expo-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -69,9 +69,6 @@ export default function HomeScreen() {
   // Surprise Me loading state
   const [loadingSurprise, setLoadingSurprise] = useState(false);
 
-  // Track current vibe to reset on vibe change
-  const currentVibeRef = useRef(selectedVibe);
-
   // Fetch saved places on mount
   useEffect(() => {
     getUserProfile()
@@ -112,7 +109,6 @@ export default function HomeScreen() {
 
   // Initial load
   useEffect(() => {
-    currentVibeRef.current = selectedVibe;
     setPage(0);
     fetchFeed(selectedVibe, 0, false);
   }, [selectedVibe, fetchFeed]);

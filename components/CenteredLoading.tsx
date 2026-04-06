@@ -1,7 +1,7 @@
 import { AppText } from '@/components/AppText';
 import colors from '@/theme/colors';
 import { useEffect, useRef } from 'react';
-import { Animated, Easing, View } from 'react-native';
+import { ActivityIndicator, Animated, Easing, View } from 'react-native';
 
 /**
  * variant="default"  — white background, standard spinner
@@ -20,16 +20,7 @@ export function CenteredLoading({
 
   return (
     <View className="flex-1 items-center justify-center bg-colors-surface-background">
-      <View
-        style={{
-          width: 48,
-          height: 48,
-          borderRadius: 24,
-          borderWidth: 4,
-          borderColor: colors.brand.primary,
-          borderTopColor: 'transparent'
-        }}
-      />
+      <ActivityIndicator size="large" color={colors.brand.primary} />
       <AppText variant="muted" className="mt-3">
         {message}
       </AppText>
@@ -44,16 +35,16 @@ function MapLoadingScreen({ message }: { message: string }) {
   const pulse = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    Animated.loop(
+    const spinAnim = Animated.loop(
       Animated.timing(spin, {
         toValue: 1,
         duration: 1000,
         easing: Easing.linear,
         useNativeDriver: true
       })
-    ).start();
+    );
 
-    Animated.loop(
+    const pulseAnim = Animated.loop(
       Animated.sequence([
         Animated.timing(pulse, {
           toValue: 1.18,
@@ -68,7 +59,15 @@ function MapLoadingScreen({ message }: { message: string }) {
           useNativeDriver: true
         })
       ])
-    ).start();
+    );
+
+    spinAnim.start();
+    pulseAnim.start();
+
+    return () => {
+      spinAnim.stop();
+      pulseAnim.stop();
+    };
   }, [spin, pulse]);
 
   const rotation = spin.interpolate({

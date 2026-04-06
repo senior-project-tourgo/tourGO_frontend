@@ -109,7 +109,7 @@ export function Map({
             }}
             title="You are here"
             anchor={{ x: 0.5, y: 0.5 }}
-            tracksViewChanges={false}
+            tracksViewChanges={!!userAvatarMarker.imageUrl}
           >
             <UserAvatarPin
               imageUrl={userAvatarMarker.imageUrl}

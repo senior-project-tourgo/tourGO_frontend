@@ -169,7 +169,7 @@ export function PlaceInfoCard({
   };
 
   const sm = place.socialMedia;
-  const waNumber = (sm?.whatsapp as any)?.number ?? sm?.whatsapp?.handle;
+  const waNumber = sm?.whatsapp?.number ?? sm?.whatsapp?.handle;
 
   type SocialLink = {
     platform: string;

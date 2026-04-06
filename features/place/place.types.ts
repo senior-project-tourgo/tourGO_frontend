@@ -49,13 +49,18 @@ export type SocialMedia = {
   instagram?: SocialPlatform | null;
   tiktok?: SocialPlatform | null;
   facebook?: SocialPlatform | null;
-  whatsapp?: SocialPlatform | null;
+  whatsapp?: WhatsAppPlatform | null;
 };
 
 export type SocialPlatform = {
   handle?: string;
   page?: string;
   likes: number;
+};
+
+export type WhatsAppPlatform = {
+  number?: string;
+  handle?: string;
 };
 
 export type PriceRange = '$' | '$$' | '$$$' | '$$$$';
