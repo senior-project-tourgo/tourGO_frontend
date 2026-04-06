@@ -6,11 +6,50 @@ import { useActivePlaces } from '@/hooks/review-trip/useActivePlaces';
 import { router } from 'expo-router';
 import { ActivityIndicator, View } from 'react-native';
 import { useAuth } from '../../../context/AuthContext';
+import { useEffect, useState } from 'react';
+import { getUserProfile, toggleSavePlace } from '@/services/user.service';
 
 export default function HomeScreen() {
   const { data: activePlaces, loading, error } = useActivePlaces(3);
-
   const { user } = useAuth();
+
+  const [savedPlaces, setSavedPlaces] = useState<string[]>([]);
+  const [savingId, setSavingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    getUserProfile()
+      .then(profile => {
+        console.log('[Home] savedPlaces:', profile.savedPlaces);
+        setSavedPlaces(profile.savedPlaces);
+      })
+      .catch(err => console.warn('[Home] getUserProfile failed:', err.message));
+  }, []);
+
+  const handleToggleSave = async (placeId: string) => {
+    if (savingId) return;
+    console.log('[Home] toggling save for:', placeId);
+    setSavingId(placeId);
+    setSavedPlaces(prev =>
+      prev.includes(placeId)
+        ? prev.filter(id => id !== placeId)
+        : [...prev, placeId]
+    );
+    try {
+      const result = await toggleSavePlace(placeId);
+      console.log('[Home] toggleSave result:', result);
+      setSavedPlaces(result.savedPlaces);
+    } catch (err: any) {
+      console.error('[Home] toggleSave failed:', err.message);
+      // revert optimistic update on failure
+      setSavedPlaces(prev =>
+        prev.includes(placeId)
+          ? prev.filter(id => id !== placeId)
+          : [...prev, placeId]
+      );
+    } finally {
+      setSavingId(null);
+    }
+  };
 
   const username = user?.username ?? '';
   const formattedUsername =
@@ -50,6 +89,8 @@ export default function HomeScreen() {
                 key={place.placeId}
                 place={place}
                 onPress={() => router.push(`/places/${place.placeId}`)}
+                isSaved={savedPlaces.includes(place.placeId)}
+                onToggleSave={p => handleToggleSave(p.placeId)}
               />
             ))
           )}

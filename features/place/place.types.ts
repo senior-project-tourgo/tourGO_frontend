@@ -17,6 +17,8 @@ export type Place = {
   specialFacilities: string[];
   contactNumber: string | null;
   socialMedia: SocialMedia;
+  description?: string;
+  address?: string;
 };
 
 export type OpeningHours = {
