@@ -122,7 +122,7 @@ export function Map({
   );
 }
 
-function UserAvatarPin({
+export function UserAvatarPin({
   imageUrl,
   initials
 }: {

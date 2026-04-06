@@ -33,16 +33,9 @@ import { useUserLocation } from '@/hooks/review-trip/add-place/useUserLocation';
 import { getUserProfile } from '@/services/user.service';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import {
-  Alert,
-  Animated,
-  FlatList,
-  Image,
-  PanResponder,
-  Text,
-  View
-} from 'react-native';
+import { Alert, Animated, FlatList, PanResponder, View } from 'react-native';
 import MapView, { Marker, Polyline, Region } from 'react-native-maps';
+import { UserAvatarPin } from '@/components/Map';
 
 export default function DuringTripScreen() {
   const { tripId, startLat, startLng, startLabel } = useLocalSearchParams<{
@@ -694,68 +687,12 @@ export default function DuringTripScreen() {
             coordinate={userLocation}
             title="You are here"
             anchor={{ x: 0.5, y: 1 }}
-            tracksViewChanges={false}
+            tracksViewChanges={!!userProfilePicture}
           >
-            <View style={{ alignItems: 'center' }}>
-              <View
-                style={{
-                  width: 46,
-                  height: 46,
-                  borderRadius: 23,
-                  backgroundColor: colors.brand.primary,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  shadowColor: '#000',
-                  shadowOpacity: 0.25,
-                  shadowRadius: 6,
-                  elevation: 6
-                }}
-              >
-                <View
-                  style={{
-                    width: 38,
-                    height: 38,
-                    borderRadius: 19,
-                    backgroundColor: colors.brand.neutrals,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    overflow: 'hidden',
-                    borderWidth: 2,
-                    borderColor: 'white'
-                  }}
-                >
-                  {userProfilePicture ? (
-                    <Image
-                      source={{ uri: userProfilePicture }}
-                      style={{ width: 38, height: 38, borderRadius: 19 }}
-                    />
-                  ) : (
-                    <Text
-                      style={{
-                        fontSize: 13,
-                        fontWeight: '700',
-                        color: colors.brand.secondary
-                      }}
-                    >
-                      {userInitials}
-                    </Text>
-                  )}
-                </View>
-              </View>
-              <View
-                style={{
-                  width: 0,
-                  height: 0,
-                  borderLeftWidth: 6,
-                  borderRightWidth: 6,
-                  borderTopWidth: 8,
-                  borderLeftColor: 'transparent',
-                  borderRightColor: 'transparent',
-                  borderTopColor: colors.brand.primary,
-                  marginTop: -1
-                }}
-              />
-            </View>
+            <UserAvatarPin
+              imageUrl={userProfilePicture}
+              initials={userInitials}
+            />
           </Marker>
         )}
       </MapView>
