@@ -31,32 +31,21 @@ export default function PlaceDetails() {
     setLoading(true);
     setError(null);
 
-    console.log('[PlaceDetails] fetching placeId:', placeId);
-
     Promise.all([
       getPlaceById(placeId),
-      getPromotionsByPlace(placeId).catch(err => {
-        console.warn('[PlaceDetails] promotions failed:', err.message);
+      getPromotionsByPlace(placeId).catch(() => {
         return [] as ApiPromotion[];
       }),
-      getUserProfile().catch(err => {
-        console.warn('[PlaceDetails] getUserProfile failed:', err.message);
+      getUserProfile().catch(() => {
         return null;
       })
     ])
       .then(([placeData, promos, profile]) => {
-        console.log(
-          '[PlaceDetails] place:',
-          JSON.stringify(placeData, null, 2)
-        );
-        console.log('[PlaceDetails] promotions count:', promos.length);
-        console.log('[PlaceDetails] savedPlaces:', profile?.savedPlaces);
         setPlace(placeData);
         setPromotions(promos);
         if (profile) setIsSaved(profile.savedPlaces.includes(placeId));
       })
       .catch(err => {
-        console.error('[PlaceDetails] fatal error:', err.message);
         setError(err.message || 'Failed to load place');
       })
       .finally(() => setLoading(false));
