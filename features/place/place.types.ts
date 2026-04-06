@@ -19,6 +19,7 @@ export type Place = {
   socialMedia: SocialMedia;
   description?: string;
   address?: string;
+  reviews?: PlaceReview[];
 };
 
 export type OpeningHours = {
@@ -58,3 +59,10 @@ export type SocialPlatform = {
 };
 
 export type PriceRange = '$' | '$$' | '$$$' | '$$$$';
+
+export type PlaceReview = {
+  text: string;
+  rating: number;
+  author: string;
+  time: string;
+};

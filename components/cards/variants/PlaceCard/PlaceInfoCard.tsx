@@ -2,7 +2,7 @@ import { AppText } from '@/components/AppText';
 import { Badge } from '@/components/Badge';
 import { Button } from '@/components/Button';
 import { Accordion } from '@/components/Accordion';
-import { Place, OpeningHours } from '@/features/place/place.types';
+import { Place, OpeningHours, PriceRange } from '@/features/place/place.types';
 import colors from '@/theme/colors';
 import { VIBES } from '@/constants/vibes';
 import { Ionicons } from '@expo/vector-icons';
@@ -301,7 +301,10 @@ export function PlaceInfoCard({
           </AppText>
           <AppText style={{ fontSize: 12, color: '#cbd5e1' }}> · </AppText>
           <AppText style={{ fontSize: 13, color: '#64748b' }}>
-            {place.priceRange}
+            {place.priceRange === '$' && 'रु 500'}
+            {place.priceRange === '$$' && 'रु 500–1,500'}
+            {place.priceRange === '$$$' && 'रु 1,500–4,000'}
+            {place.priceRange === '$$$$' && 'रु 4,000+'}
           </AppText>
         </View>
 
@@ -427,6 +430,85 @@ export function PlaceInfoCard({
             >
               {place.typicalTimeSpent}
             </AppText>
+          </View>
+        </View>
+      )}
+
+      {/* ── Price Range ── */}
+      {!!place.priceRange && (
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 12,
+            backgroundColor: colors.brand.neutrals,
+            padding: 14,
+            borderRadius: 14
+          }}
+        >
+          <View
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 12,
+              backgroundColor: colors.brand.secondary + '20',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <Ionicons
+              name="wallet-outline"
+              size={20}
+              color={colors.brand.secondary}
+            />
+          </View>
+          <View style={{ flex: 1 }}>
+            <AppText style={{ fontSize: 11, color: colors.brand.secondary }}>
+              Price Range
+            </AppText>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 6,
+                marginTop: 2
+              }}
+            >
+              {(['$', '$$', '$$$', '$$$$'] as PriceRange[]).map(tier => {
+                const active = place.priceRange === tier;
+                return (
+                  <View
+                    key={tier}
+                    style={{
+                      paddingHorizontal: 10,
+                      paddingVertical: 4,
+                      borderRadius: 8,
+                      backgroundColor: active
+                        ? colors.brand.primary
+                        : colors.brand.secondary + '15'
+                    }}
+                  >
+                    <AppText
+                      style={{
+                        fontSize: 13,
+                        fontWeight: active ? '700' : '400',
+                        color: active ? 'white' : colors.brand.secondary + '80'
+                      }}
+                    >
+                      {tier}
+                    </AppText>
+                  </View>
+                );
+              })}
+              <AppText
+                style={{ fontSize: 12, color: '#94a3b8', marginLeft: 4 }}
+              >
+                {place.priceRange === '$' && 'Under रु 500'}
+                {place.priceRange === '$$' && 'रु 500 – 1,500'}
+                {place.priceRange === '$$$' && 'रु 1,500 – 4,000'}
+                {place.priceRange === '$$$$' && 'रु 4,000+'}
+              </AppText>
+            </View>
           </View>
         </View>
       )}
@@ -853,6 +935,13 @@ export function PlaceInfoCard({
               <AppText style={{ fontSize: 15, fontWeight: '600' }}>
                 Traveller Reviews
               </AppText>
+              {googleData.totalRatings ? (
+                <AppText
+                  style={{ fontSize: 12, color: '#94a3b8', marginLeft: 'auto' }}
+                >
+                  {googleData.totalRatings.toLocaleString()} total
+                </AppText>
+              ) : null}
             </View>
             <ScrollView
               horizontal
@@ -910,6 +999,178 @@ export function PlaceInfoCard({
                   <AppText style={{ fontSize: 11, color: '#94a3b8' }}>
                     {review.relative_time_description}
                   </AppText>
+                </View>
+              ))}
+            </ScrollView>
+          </View>
+        </>
+      )}
+
+      {/* ── Community Reviews (from our database) ── */}
+      {place.reviews && place.reviews.length > 0 && (
+        <>
+          <Separator />
+          <View>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 8,
+                marginBottom: 14
+              }}
+            >
+              <Ionicons
+                name="people-circle-outline"
+                size={16}
+                color={colors.brand.secondary}
+              />
+              <AppText style={{ fontSize: 15, fontWeight: '600' }}>
+                Community Reviews
+              </AppText>
+              <AppText
+                style={{ fontSize: 12, color: '#94a3b8', marginLeft: 'auto' }}
+              >
+                {place.reviews.length} review
+                {place.reviews.length !== 1 ? 's' : ''}
+              </AppText>
+            </View>
+
+            {/* Average rating bar */}
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 10,
+                backgroundColor: colors.brand.neutrals + '60',
+                padding: 14,
+                borderRadius: 14,
+                marginBottom: 12
+              }}
+            >
+              <AppText
+                style={{
+                  fontSize: 36,
+                  fontWeight: '800',
+                  color: colors.brand.primary
+                }}
+              >
+                {(
+                  place.reviews.reduce((s, r) => s + r.rating, 0) /
+                  place.reviews.length
+                ).toFixed(1)}
+              </AppText>
+              <View style={{ flex: 1, gap: 4 }}>
+                <View style={{ flexDirection: 'row', gap: 3 }}>
+                  {Array.from({ length: 5 }).map((_, si) => {
+                    const avg =
+                      place.reviews!.reduce((s, r) => s + r.rating, 0) /
+                      place.reviews!.length;
+                    return (
+                      <Ionicons
+                        key={si}
+                        name={si < Math.round(avg) ? 'star' : 'star-outline'}
+                        size={16}
+                        color={colors.brand.primary}
+                      />
+                    );
+                  })}
+                </View>
+                <AppText style={{ fontSize: 12, color: '#64748b' }}>
+                  Based on {place.reviews.length} review
+                  {place.reviews.length !== 1 ? 's' : ''}
+                </AppText>
+              </View>
+            </View>
+
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ gap: 12, paddingRight: 4 }}
+            >
+              {place.reviews.slice(0, 5).map((review, i) => (
+                <View
+                  key={i}
+                  style={{
+                    width: 260,
+                    backgroundColor: colors.brand.neutrals + '60',
+                    padding: 14,
+                    borderRadius: 14,
+                    gap: 8,
+                    borderWidth: 1,
+                    borderColor: colors.brand.neutrals
+                  }}
+                >
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
+                    }}
+                  >
+                    {/* Author avatar */}
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 8,
+                        flex: 1
+                      }}
+                    >
+                      <View
+                        style={{
+                          width: 32,
+                          height: 32,
+                          borderRadius: 16,
+                          backgroundColor: colors.brand.primary,
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        <AppText
+                          style={{
+                            fontSize: 12,
+                            fontWeight: '700',
+                            color: 'white'
+                          }}
+                        >
+                          {review.author?.charAt(0)?.toUpperCase() ?? '?'}
+                        </AppText>
+                      </View>
+                      <AppText
+                        style={{ fontWeight: '600', fontSize: 13, flex: 1 }}
+                        numberOfLines={1}
+                      >
+                        {review.author ?? 'Anonymous'}
+                      </AppText>
+                    </View>
+                    <View style={{ flexDirection: 'row', gap: 2 }}>
+                      {Array.from({ length: 5 }).map((_, si) => (
+                        <Ionicons
+                          key={si}
+                          name={si < review.rating ? 'star' : 'star-outline'}
+                          size={11}
+                          color={colors.brand.primary}
+                        />
+                      ))}
+                    </View>
+                  </View>
+                  {review.text ? (
+                    <AppText
+                      style={{ fontSize: 12, lineHeight: 18, color: '#555' }}
+                      numberOfLines={5}
+                    >
+                      {review.text}
+                    </AppText>
+                  ) : null}
+                  {review.time ? (
+                    <AppText style={{ fontSize: 11, color: '#94a3b8' }}>
+                      {new Date(review.time).toLocaleDateString([], {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric'
+                      })}
+                    </AppText>
+                  ) : null}
                 </View>
               ))}
             </ScrollView>

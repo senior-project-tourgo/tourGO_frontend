@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
-import { View } from 'react-native';
+import { Image, Text, View } from 'react-native';
 import MapView, { Marker, Polyline, Region } from 'react-native-maps';
+import colors from '@/theme/colors';
 
 export type MapRegion = Region;
 
@@ -20,19 +21,33 @@ export type MapRoute = {
   solid?: boolean;
 };
 
+export type UserAvatarMarker = {
+  latitude: number;
+  longitude: number;
+  /** Remote image URL for the avatar. Falls back to initials. */
+  imageUrl?: string | null;
+  /** Shown as initials fallback text */
+  initials?: string;
+};
+
 type Props = {
   region: MapRegion;
   markers?: MapMarker[];
   focusCoordinate?: { latitude: number; longitude: number };
   routes?: MapRoute[];
+  /** If provided, renders a circular avatar pin at the user's location */
+  userAvatarMarker?: UserAvatarMarker;
 };
 
-export function Map({ region, markers, focusCoordinate, routes }: Props) {
+export function Map({
+  region,
+  markers,
+  focusCoordinate,
+  routes,
+  userAvatarMarker
+}: Props) {
   const mapRef = useRef<MapView>(null);
 
-  // Fit all markers into view whenever the set of markers changes.
-  // We use a JSON-stringified key so this only fires when coordinates actually
-  // change, not on every parent re-render where markers is a new array reference.
   const markersKey = JSON.stringify(
     markers?.map(m => ({ lat: m.latitude, lng: m.longitude }))
   );
@@ -44,13 +59,11 @@ export function Map({ region, markers, focusCoordinate, routes }: Props) {
         animated: true
       });
     } else {
-      // No markers — animate to the supplied region (e.g. user location)
       mapRef.current.animateToRegion(region, 400);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [markersKey]);
 
-  // Zoom into a specific pin when focusCoordinate changes
   useEffect(() => {
     if (!mapRef.current || !focusCoordinate) return;
     mapRef.current.animateToRegion(
@@ -62,16 +75,10 @@ export function Map({ region, markers, focusCoordinate, routes }: Props) {
       },
       400
     );
-  }, [focusCoordinate?.latitude, focusCoordinate?.longitude]);
+  }, [focusCoordinate]);
 
   return (
     <View className="flex-1">
-      {/*
-        Use initialRegion (uncontrolled) instead of region (controlled).
-        Controlled `region` fights with fitToCoordinates — it snaps the map
-        back to place #1 on every re-render. initialRegion sets the starting
-        viewport once and then leaves the map free to pan/zoom.
-      */}
       <MapView ref={mapRef} style={{ flex: 1 }} initialRegion={region}>
         {routes?.map((route, index) => (
           <Polyline
@@ -93,7 +100,102 @@ export function Map({ region, markers, focusCoordinate, routes }: Props) {
             pinColor={marker.pinColor}
           />
         ))}
+        {userAvatarMarker && (
+          <Marker
+            key="user-avatar"
+            coordinate={{
+              latitude: userAvatarMarker.latitude,
+              longitude: userAvatarMarker.longitude
+            }}
+            title="You are here"
+            anchor={{ x: 0.5, y: 0.5 }}
+            tracksViewChanges={false}
+          >
+            <UserAvatarPin
+              imageUrl={userAvatarMarker.imageUrl}
+              initials={userAvatarMarker.initials}
+            />
+          </Marker>
+        )}
       </MapView>
+    </View>
+  );
+}
+
+function UserAvatarPin({
+  imageUrl,
+  initials
+}: {
+  imageUrl?: string | null;
+  initials?: string;
+}) {
+  return (
+    <View
+      style={{
+        alignItems: 'center'
+      }}
+    >
+      {/* Outer ring */}
+      <View
+        style={{
+          width: 46,
+          height: 46,
+          borderRadius: 23,
+          backgroundColor: colors.brand.primary,
+          alignItems: 'center',
+          justifyContent: 'center',
+          shadowColor: '#000',
+          shadowOpacity: 0.25,
+          shadowRadius: 6,
+          elevation: 6
+        }}
+      >
+        {/* Avatar circle */}
+        <View
+          style={{
+            width: 38,
+            height: 38,
+            borderRadius: 19,
+            backgroundColor: colors.brand.neutrals,
+            alignItems: 'center',
+            justifyContent: 'center',
+            overflow: 'hidden',
+            borderWidth: 2,
+            borderColor: 'white'
+          }}
+        >
+          {imageUrl ? (
+            <Image
+              source={{ uri: imageUrl }}
+              style={{ width: 38, height: 38, borderRadius: 19 }}
+            />
+          ) : (
+            <Text
+              style={{
+                fontSize: 13,
+                fontWeight: '700',
+                color: colors.brand.secondary
+              }}
+            >
+              {initials ?? '?'}
+            </Text>
+          )}
+        </View>
+      </View>
+      {/* Pointer triangle */}
+      <View
+        style={{
+          width: 0,
+          height: 0,
+          borderLeftWidth: 6,
+          borderRightWidth: 6,
+          borderTopWidth: 8,
+          borderLeftColor: 'transparent',
+          borderRightColor: 'transparent',
+          borderTopColor: colors.brand.primary,
+          marginTop: -1
+        }}
+      />
     </View>
   );
 }

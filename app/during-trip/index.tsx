@@ -30,9 +30,18 @@ import {
 import colors from '@/theme/colors';
 import * as Haptics from 'expo-haptics';
 import { useUserLocation } from '@/hooks/review-trip/add-place/useUserLocation';
+import { getUserProfile } from '@/services/user.service';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Alert, Animated, FlatList, PanResponder, View } from 'react-native';
+import {
+  Alert,
+  Animated,
+  FlatList,
+  Image,
+  PanResponder,
+  Text,
+  View
+} from 'react-native';
 import MapView, { Marker, Polyline, Region } from 'react-native-maps';
 
 export default function DuringTripScreen() {
@@ -65,6 +74,10 @@ export default function DuringTripScreen() {
     latitude: number;
     longitude: number;
   } | null>(null);
+  const [userProfilePicture, setUserProfilePicture] = useState<string | null>(
+    null
+  );
+  const [userInitials, setUserInitials] = useState<string>('Me');
   const [userRouteSegment, setUserRouteSegment] = useState<RouteSegment | null>(
     null
   );
@@ -130,6 +143,24 @@ export default function DuringTripScreen() {
       }
     }
   ).current;
+
+  // Fetch user profile for avatar on map
+  useEffect(() => {
+    getUserProfile()
+      .then(profile => {
+        setUserProfilePicture(profile.profilePicture);
+        const initials = profile.name
+          ? profile.name
+              .split(' ')
+              .map(n => n[0])
+              .join('')
+              .toUpperCase()
+              .slice(0, 2)
+          : (profile.username?.slice(0, 2).toUpperCase() ?? 'Me');
+        setUserInitials(initials);
+      })
+      .catch(() => {});
+  }, []);
 
   const load = useCallback(async () => {
     if (!tripId) return;
@@ -413,7 +444,7 @@ export default function DuringTripScreen() {
   };
 
   if (loading || !region) {
-    return <CenteredLoading message="Loading trip…" />;
+    return <CenteredLoading message="Loading trip…" variant="map" />;
   }
 
   const visitedIds = new Set(
@@ -654,6 +685,78 @@ export default function DuringTripScreen() {
             }
             pinColor="#22c55e"
           />
+        )}
+
+        {/* User avatar marker */}
+        {userLocation && (
+          <Marker
+            key="user-avatar"
+            coordinate={userLocation}
+            title="You are here"
+            anchor={{ x: 0.5, y: 1 }}
+            tracksViewChanges={false}
+          >
+            <View style={{ alignItems: 'center' }}>
+              <View
+                style={{
+                  width: 46,
+                  height: 46,
+                  borderRadius: 23,
+                  backgroundColor: colors.brand.primary,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  shadowColor: '#000',
+                  shadowOpacity: 0.25,
+                  shadowRadius: 6,
+                  elevation: 6
+                }}
+              >
+                <View
+                  style={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: 19,
+                    backgroundColor: colors.brand.neutrals,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    overflow: 'hidden',
+                    borderWidth: 2,
+                    borderColor: 'white'
+                  }}
+                >
+                  {userProfilePicture ? (
+                    <Image
+                      source={{ uri: userProfilePicture }}
+                      style={{ width: 38, height: 38, borderRadius: 19 }}
+                    />
+                  ) : (
+                    <Text
+                      style={{
+                        fontSize: 13,
+                        fontWeight: '700',
+                        color: colors.brand.secondary
+                      }}
+                    >
+                      {userInitials}
+                    </Text>
+                  )}
+                </View>
+              </View>
+              <View
+                style={{
+                  width: 0,
+                  height: 0,
+                  borderLeftWidth: 6,
+                  borderRightWidth: 6,
+                  borderTopWidth: 8,
+                  borderLeftColor: 'transparent',
+                  borderRightColor: 'transparent',
+                  borderTopColor: colors.brand.primary,
+                  marginTop: -1
+                }}
+              />
+            </View>
+          </Marker>
         )}
       </MapView>
 

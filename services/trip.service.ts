@@ -97,6 +97,7 @@ export type GenerateTripInput = {
   endTime: string;
   itineraryName?: string;
   budgetLevel?: number;
+  priceRange?: '$' | '$$' | '$$$' | '$$$$';
   numberOfPeople?: number;
   groupType?: string;
   startLat?: number;
@@ -122,6 +123,67 @@ export async function generateRecommendation(
   } catch (error: any) {
     throw new Error(
       error.response?.data?.message || 'Failed to generate recommendation'
+    );
+  }
+}
+
+// ── Home recommendations ──────────────────────────────────────────────────────
+
+export type HomeTripSuggestion = {
+  reason: string;
+  vibe: string;
+  places: import('@/features/place/place.types').Place[];
+};
+
+export type HomeRecommendationResult = {
+  places: import('@/features/place/place.types').Place[];
+  tripSuggestions: HomeTripSuggestion[];
+  topVibes: string[];
+  hasMore: boolean;
+  page: number;
+};
+
+export async function getHomeRecommendations(
+  vibe: string = 'all',
+  page: number = 0,
+  limit: number = 10
+): Promise<HomeRecommendationResult> {
+  try {
+    const response = await api.get<HomeRecommendationResult>(
+      '/recommend/home',
+      {
+        params: { vibe, page, limit }
+      }
+    );
+    return response.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || 'Failed to fetch home recommendations'
+    );
+  }
+}
+
+// ── Surprise recommendation ───────────────────────────────────────────────────
+
+export type SurpriseRecommendationResult = {
+  recommendedPlaces: import('@/features/place/place.types').Place[];
+  vibes: string[];
+  startTime: string;
+  endTime: string;
+  area: string;
+  pace: string;
+  tagline: string;
+};
+
+export async function getSurpriseRecommendation(): Promise<SurpriseRecommendationResult> {
+  try {
+    const response = await api.post<SurpriseRecommendationResult>(
+      '/recommend/surprise'
+    );
+    return response.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || 'Failed to generate surprise trip'
     );
   }
 }
