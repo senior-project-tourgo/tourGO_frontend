@@ -11,6 +11,7 @@ import { Image, Linking, Pressable, ScrollView, View } from 'react-native';
 import { PromotionCard } from '../PromotionCard';
 import { getPlaceOpeningStatus } from '@/utils/openingHours';
 import type { ApiPromotion } from '@/services/promotion.service';
+import { getPlaceGoogleDetails } from '@/services/place.service';
 
 type PlaceInfoProps = {
   place: Place;
@@ -121,8 +122,6 @@ function formatVibeLabel(id: string): string {
     .replace(' And ', ' & ');
 }
 
-const GOOGLE_KEY = process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY2;
-
 export function PlaceInfoCard({
   place,
   promotions,
@@ -136,21 +135,14 @@ export function PlaceInfoCard({
   const [googleData, setGoogleData] = useState<GoogleData>({});
 
   useEffect(() => {
-    if (!place.mapsLinkKey || !GOOGLE_KEY) return;
-    fetch(
-      `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.mapsLinkKey}&fields=editorial_summary,user_ratings_total,reviews,formatted_address&key=${GOOGLE_KEY}`
-    )
-      .then(r => r.json())
+    if (!place.mapsLinkKey) return;
+    getPlaceGoogleDetails(place.mapsLinkKey)
       .then(data => {
-        const result = data?.result ?? {};
         setGoogleData({
-          description:
-            result.editorial_summary?.overview ??
-            place.description ??
-            undefined,
-          address: result.formatted_address ?? place.address ?? undefined,
-          totalRatings: result.user_ratings_total,
-          reviews: result.reviews?.slice(0, 3)
+          description: data.description ?? place.description ?? undefined,
+          address: data.address ?? place.address ?? undefined,
+          totalRatings: data.totalRatings ?? undefined,
+          reviews: data.reviews
         });
       })
       .catch(() => {});
@@ -220,9 +212,7 @@ export function PlaceInfoCard({
     });
   }
 
-  const staticMapUrl = GOOGLE_KEY
-    ? `https://maps.googleapis.com/maps/api/staticmap?center=${place.location.lat},${place.location.lng}&zoom=15&size=600x300&scale=2&markers=color:0xFF7D00|${place.location.lat},${place.location.lng}&key=${GOOGLE_KEY}`
-    : null;
+  const staticMapUrl = `${process.env.EXPO_PUBLIC_API_URL}/places/static-map?lat=${place.location.lat}&lng=${place.location.lng}`;
 
   const Separator = () => (
     <View
