@@ -3,7 +3,11 @@ import { HeaderWithBack } from '@/components/PageHeader';
 import { Screen } from '@/components/Screen';
 import { PlaceCard } from '@/components/cards/variants/PlaceCard/PlaceCard';
 import type { Place } from '@/features/place/place.types';
-import { getSavedPlaces } from '@/services/user.service';
+import {
+  getSavedPlaces,
+  getUserProfile,
+  toggleSavePlace
+} from '@/services/user.service';
 import colors from '@/theme/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -14,6 +18,36 @@ export default function SavedPlacesScreen() {
   const [places, setPlaces] = useState<Place[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [savedPlaces, setSavedPlaces] = useState<string[]>([]);
+  const [savingId, setSavingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    getUserProfile()
+      .then(profile => setSavedPlaces(profile.savedPlaces))
+      .catch(() => {});
+  }, []);
+
+  const handleToggleSave = async (placeId: string) => {
+    if (savingId) return;
+    setSavingId(placeId);
+    setSavedPlaces(prev =>
+      prev.includes(placeId)
+        ? prev.filter(id => id !== placeId)
+        : [...prev, placeId]
+    );
+    try {
+      const result = await toggleSavePlace(placeId);
+      setSavedPlaces(result.savedPlaces);
+    } catch {
+      setSavedPlaces(prev =>
+        prev.includes(placeId)
+          ? prev.filter(id => id !== placeId)
+          : [...prev, placeId]
+      );
+    } finally {
+      setSavingId(null);
+    }
+  };
   useEffect(() => {
     getSavedPlaces()
       .then(setPlaces)
@@ -52,6 +86,8 @@ export default function SavedPlacesScreen() {
               key={place.placeId}
               place={place}
               onPress={() => router.push(`/places/${place.placeId}`)}
+              isSaved={savedPlaces.includes(place.placeId)}
+              onToggleSave={p => handleToggleSave(p.placeId)}
             />
           ))}
         </View>
