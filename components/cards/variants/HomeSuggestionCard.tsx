@@ -4,6 +4,7 @@ import { Place } from '@/features/place/place.types';
 import colors from '@/theme/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { Image, Pressable, View } from 'react-native';
+import { ImageWithFallback } from './PlaceCard/ImageWithFallback';
 
 type Props = {
   reason: string;
@@ -54,70 +55,64 @@ export function HomeSuggestionCard({ reason, places, onPress }: Props) {
             />
           </View>
         ) : images.length === 1 ? (
-          <Image
-            source={{ uri: images[0] }}
-            style={{ flex: 1 }}
-            resizeMode="cover"
+          <ImageWithFallback
+            primaryImageUrl={images[0]}
+            className="w-full"
+            resizeMode="stretch"
           />
         ) : images.length === 2 ? (
           <>
-            <Image
-              source={{ uri: images[0] }}
-              style={{ flex: 1 }}
-              resizeMode="cover"
+            <ImageWithFallback
+              primaryImageUrl={images[0]}
+              className="w-full"
+              resizeMode="stretch"
             />
-            <Image
-              source={{ uri: images[1] }}
-              style={{ flex: 1 }}
-              resizeMode="cover"
+            <ImageWithFallback
+              primaryImageUrl={images[1]}
+              className="w-full"
+              resizeMode="stretch"
             />
           </>
         ) : images.length === 3 ? (
           <>
-            <Image
-              source={{ uri: images[0] }}
-              style={{ flex: 1 }}
-              resizeMode="cover"
+            <ImageWithFallback
+              primaryImageUrl={images[0]}
+              className="w-full"
+              resizeMode="stretch"
             />
-            <View style={{ flex: 1, gap: 2 }}>
-              <Image
-                source={{ uri: images[1] }}
-                style={{ flex: 1 }}
-                resizeMode="cover"
-              />
-              <Image
-                source={{ uri: images[2] }}
-                style={{ flex: 1 }}
-                resizeMode="cover"
-              />
-            </View>
+            <ImageWithFallback
+              primaryImageUrl={images[1]}
+              className="w-full"
+              resizeMode="stretch"
+            />
+            <ImageWithFallback
+              primaryImageUrl={images[2]}
+              className="w-full"
+              resizeMode="stretch"
+            />
           </>
         ) : (
           <>
-            <View style={{ flex: 1, gap: 2 }}>
-              <Image
-                source={{ uri: images[0] }}
-                style={{ flex: 1 }}
-                resizeMode="cover"
-              />
-              <Image
-                source={{ uri: images[2] }}
-                style={{ flex: 1 }}
-                resizeMode="cover"
-              />
-            </View>
-            <View style={{ flex: 1, gap: 2 }}>
-              <Image
-                source={{ uri: images[1] }}
-                style={{ flex: 1 }}
-                resizeMode="cover"
-              />
-              <Image
-                source={{ uri: images[3] }}
-                style={{ flex: 1 }}
-                resizeMode="cover"
-              />
-            </View>
+            <ImageWithFallback
+              primaryImageUrl={images[0]}
+              className="w-full"
+              resizeMode="stretch"
+            />
+            <ImageWithFallback
+              primaryImageUrl={images[1]}
+              className="w-full"
+              resizeMode="stretch"
+            />
+            <ImageWithFallback
+              primaryImageUrl={images[2]}
+              className="w-full"
+              resizeMode="stretch"
+            />
+            <ImageWithFallback
+              primaryImageUrl={images[3]}
+              className="w-full"
+              resizeMode="stretch"
+            />
           </>
         )}
 
