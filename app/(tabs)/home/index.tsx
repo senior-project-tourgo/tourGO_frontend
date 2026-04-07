@@ -280,14 +280,16 @@ export default function HomeScreen() {
           <AppText className="px-4 text-lg font-semibold text-colors-text">
             Picked For You
           </AppText>
-          {tripSuggestions.map((s, i) => (
-            <HomeSuggestionCard
-              key={i}
-              reason={s.reason}
-              places={s.places}
-              onPress={() => handleSuggestionPress(s)}
-            />
-          ))}
+          <View className="mb-5 gap-3 shadow-sm">
+            {tripSuggestions.map((s, i) => (
+              <HomeSuggestionCard
+                key={i}
+                reason={s.reason}
+                places={s.places}
+                onPress={() => handleSuggestionPress(s)}
+              />
+            ))}
+          </View>
         </View>
       )}
 
