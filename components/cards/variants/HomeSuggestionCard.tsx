@@ -3,7 +3,7 @@ import { Button } from '@/components/Button';
 import { Place } from '@/features/place/place.types';
 import colors from '@/theme/colors';
 import { Ionicons } from '@expo/vector-icons';
-import { Image, Pressable, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { ImageWithFallback } from './PlaceCard/ImageWithFallback';
 
 type Props = {
