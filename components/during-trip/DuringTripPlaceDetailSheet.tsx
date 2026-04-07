@@ -1,10 +1,10 @@
 import { AppText } from '@/components/AppText';
 import { Badge } from '@/components/Badge';
+import { VIBES } from '@/constants/vibes/vibes';
 import type { Place } from '@/features/place/place.types';
-import { VIBES } from '@/constants/vibes';
 import type { ApiPromotion } from '@/services/promotion.service';
-import { getPlaceOpeningStatus } from '@/utils/openingHours';
 import colors from '@/theme/colors';
+import { getPlaceOpeningStatus } from '@/utils/openingHours';
 import { Ionicons } from '@expo/vector-icons';
 import type { PanResponderInstance } from 'react-native';
 import { Animated, Modal, Pressable, ScrollView, View } from 'react-native';

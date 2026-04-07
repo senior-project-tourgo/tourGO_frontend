@@ -1,13 +1,13 @@
 import { AppText } from '@/components/AppText';
+import { Badge } from '@/components/Badge';
+import { VIBES } from '@/constants/vibes/vibes';
 import type { Place } from '@/features/place/place.types';
 import colors from '@/theme/colors';
+import { getPlaceOpeningStatus } from '@/utils/openingHours';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, View } from 'react-native';
 import { BaseCardProps } from '../../BaseCard';
 import { ImageWithFallback } from './ImageWithFallback';
-import { getPlaceOpeningStatus } from '@/utils/openingHours';
-import { Badge } from '@/components/Badge';
-import { VIBES } from '@/constants/vibes';
 
 function formatVibeLabel(id: string) {
   return id

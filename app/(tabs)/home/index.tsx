@@ -1,8 +1,17 @@
 import { AppText } from '@/components/AppText';
 import { Button } from '@/components/Button';
-import { PlaceCard } from '@/components/cards/variants/PlaceCard/PlaceCard';
 import { HomeSuggestionCard } from '@/components/cards/variants/HomeSuggestionCard';
-import { VIBES } from '@/constants/vibes';
+import { PlaceCard } from '@/components/cards/variants/PlaceCard/PlaceCard';
+import { VIBES } from '@/constants/vibes/vibes';
+import type { Place } from '@/features/place/place.types';
+import {
+  getHomeRecommendations,
+  getSurpriseRecommendation,
+  type HomeTripSuggestion
+} from '@/services/trip.service';
+import { getUserProfile, toggleSavePlace } from '@/services/user.service';
+import colors from '@/theme/colors';
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
@@ -13,36 +22,9 @@ import {
   ScrollView,
   View
 } from 'react-native';
-import { useAuth } from '../../../context/AuthContext';
-import { getUserProfile, toggleSavePlace } from '@/services/user.service';
-import {
-  getHomeRecommendations,
-  getSurpriseRecommendation,
-  type HomeTripSuggestion
-} from '@/services/trip.service';
-import type { Place } from '@/features/place/place.types';
-import colors from '@/theme/colors';
-import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-const VIBE_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
-  thrill: 'rocket-outline',
-  mountain: 'triangle-outline',
-  spiritual: 'leaf-outline',
-  culture: 'book-outline',
-  nature: 'leaf-outline',
-  foodie: 'restaurant-outline',
-  chill: 'moon-outline',
-  social: 'people-outline',
-  photo: 'camera-outline',
-  budget: 'wallet-outline',
-  luxury: 'star-outline',
-  family: 'home-outline',
-  romantic: 'heart-outline',
-  solo: 'person-outline',
-  offbeat: 'compass-outline',
-  wellness: 'fitness-outline'
-};
+import { useAuth } from '../../../context/AuthContext';
+import { VIBE_ICONS } from '@/constants/vibes/vibesIcon';
 
 export default function HomeScreen() {
   const { user } = useAuth();
@@ -187,21 +169,12 @@ export default function HomeScreen() {
 
   // ── List header ─────────────────────────────────────────────────────────────
   const ListHeader = (
-    <View style={{ gap: 0 }}>
+    <View className="gap-0">
       {/* ── Top bar ── */}
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'flex-start',
-          justifyContent: 'space-between',
-          paddingHorizontal: 16,
-          paddingTop: 12,
-          paddingBottom: 8
-        }}
-      >
-        <View style={{ flex: 1 }}>
+      <View className="flex-row items-start justify-between px-4 pb-2 pt-3">
+        <View className="flex-1">
           <AppText variant="title">Namaste! {formattedUsername}</AppText>
-          <AppText variant="subtitle" style={{ marginTop: 2 }}>
+          <AppText variant="subtitle" className="mt-[2px]">
             Where to today?
           </AppText>
         </View>
@@ -210,31 +183,24 @@ export default function HomeScreen() {
         <Pressable
           onPress={handleSurpriseMe}
           disabled={loadingSurprise}
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 6,
-            backgroundColor: colors.brand.primary,
-            paddingHorizontal: 14,
-            paddingVertical: 10,
-            borderRadius: 20,
-            marginTop: 4,
-            opacity: loadingSurprise ? 0.7 : 1
-          }}
+          className={`mt-1 flex-row items-center gap-1.5 rounded-full px-3.5 py-2.5 bg-colors-brand-primary${
+            loadingSurprise ? 'opacity-70' : 'opacity-100'
+          }`}
         >
           {loadingSurprise ? (
             <ActivityIndicator size="small" color="white" />
           ) : (
             <Ionicons name="shuffle-outline" size={16} color="white" />
           )}
-          <AppText style={{ color: 'white', fontWeight: '700', fontSize: 13 }}>
+
+          <AppText className="text-[13px] font-bold text-white">
             {loadingSurprise ? 'Thinking…' : 'Surprise Me'}
           </AppText>
         </Pressable>
       </View>
 
       {/* ── Curate trip CTA ── */}
-      <View style={{ paddingHorizontal: 16, paddingBottom: 16 }}>
+      <View className="px-4 pb-4">
         <Button
           title="Curate New Trip"
           onPress={() => router.push('/(tabs)/trip-generator')}
@@ -242,29 +208,26 @@ export default function HomeScreen() {
       </View>
 
       {/* ── Vibe selector ── */}
-      <View style={{ paddingBottom: 16 }}>
+      <View className="pb-4">
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: 16, gap: 10 }}
+          contentContainerClassName="px-4 gap-2.5"
         >
           {vibeChips.map(chip => {
             const isSelected = selectedVibe === chip.id;
+
             return (
               <Pressable
                 key={chip.id}
                 onPress={() => setSelectedVibe(chip.id)}
+                className={`flex-row items-center gap-2 rounded-full border-[1.5px] px-3.5 py-2 ${
+                  isSelected ? 'opacity-100' : 'opacity-100'
+                }`}
                 style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: 8,
-                  paddingHorizontal: 14,
-                  paddingVertical: 8,
-                  borderRadius: 24,
                   backgroundColor: isSelected
                     ? colors.brand.primary
                     : colors.brand.neutrals,
-                  borderWidth: 1.5,
                   borderColor: isSelected
                     ? colors.brand.primary
                     : colors.brand.neutrals
@@ -273,12 +236,8 @@ export default function HomeScreen() {
                 {chip.id !== 'all' && chip.image ? (
                   <Image
                     source={{ uri: chip.image }}
-                    style={{
-                      width: 22,
-                      height: 22,
-                      borderRadius: 11,
-                      opacity: isSelected ? 1 : 0.85
-                    }}
+                    className="h-[22px] w-[22px] rounded-full"
+                    style={{ opacity: isSelected ? 1 : 0.85 }}
                   />
                 ) : chip.id === 'all' ? (
                   <Ionicons
@@ -293,27 +252,21 @@ export default function HomeScreen() {
                     color={isSelected ? 'white' : colors.brand.secondary}
                   />
                 )}
+
                 <AppText
+                  className="text-[13px] font-semibold"
                   style={{
-                    fontSize: 13,
-                    fontWeight: '600',
                     color: isSelected ? 'white' : colors.brand.secondary
                   }}
                 >
                   {chip.title}
                 </AppText>
-                {/* "For you" badge on top vibes */}
+
+                {/* "For you" badge */}
                 {!isSelected &&
                   chip.id !== 'all' &&
                   topVibes.includes(chip.id) && (
-                    <View
-                      style={{
-                        backgroundColor: colors.brand.primary,
-                        width: 7,
-                        height: 7,
-                        borderRadius: 3.5
-                      }}
-                    />
+                    <View className="h-[7px] w-[7px] rounded-full bg-colors-brand-primary" />
                   )}
               </Pressable>
             );
@@ -323,15 +276,8 @@ export default function HomeScreen() {
 
       {/* ── Trip suggestions ── */}
       {tripSuggestions.length > 0 && (
-        <View style={{ gap: 12, marginBottom: 20 }}>
-          <AppText
-            style={{
-              fontSize: 16,
-              fontWeight: '700',
-              paddingHorizontal: 16,
-              color: colors.text.DEFAULT
-            }}
-          >
+        <View className="mb-5 gap-3">
+          <AppText className="px-4 text-lg font-semibold text-colors-text">
             Picked For You
           </AppText>
           {tripSuggestions.map((s, i) => (
@@ -346,34 +292,14 @@ export default function HomeScreen() {
       )}
 
       {/* ── Section title for the place feed ── */}
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          paddingHorizontal: 16,
-          marginBottom: 10
-        }}
-      >
-        <AppText
-          style={{
-            fontSize: 16,
-            fontWeight: '700',
-            color: colors.text.DEFAULT
-          }}
-        >
+      <View className="mb-2.5 flex-row items-center justify-between px-4">
+        <AppText className="text-lg font-semibold text-colors-text">
           {selectedVibe === 'all'
             ? 'Explore Places'
             : `${VIBES.find(v => v.id === selectedVibe)?.title ?? selectedVibe} Spots`}
         </AppText>
         <Pressable onPress={() => router.push('/(tabs)/home/gems')}>
-          <AppText
-            style={{
-              fontSize: 13,
-              color: colors.brand.primary,
-              fontWeight: '600'
-            }}
-          >
+          <AppText className="text-sm font-semibold text-colors-brand-primary">
             See all
           </AppText>
         </Pressable>
@@ -382,15 +308,11 @@ export default function HomeScreen() {
   );
 
   return (
-    <SafeAreaView
-      style={{ flex: 1, backgroundColor: colors.surface.background }}
-    >
+    <SafeAreaView className="flex-1 bg-colors-surface-background">
       {loadingFeed ? (
-        <View style={{ flex: 1 }}>
+        <View className="flex-1">
           {ListHeader}
-          <View
-            style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
-          >
+          <View className="flex-1 items-center justify-center">
             <ActivityIndicator size="large" color={colors.brand.primary} />
           </View>
         </View>
@@ -399,7 +321,7 @@ export default function HomeScreen() {
           data={places}
           keyExtractor={item => item.placeId}
           renderItem={({ item: place }) => (
-            <View style={{ paddingHorizontal: 16, marginBottom: 12 }}>
+            <View className="mb-3 px-4">
               <PlaceCard
                 place={place}
                 onPress={() => router.push(`/places/${place.placeId}`)}
@@ -410,42 +332,28 @@ export default function HomeScreen() {
           )}
           ListHeaderComponent={ListHeader}
           ListEmptyComponent={
-            <View
-              style={{
-                alignItems: 'center',
-                paddingVertical: 40,
-                paddingHorizontal: 16,
-                gap: 10
-              }}
-            >
+            <View className="items-center gap-2.5 p-4">
               <Ionicons
                 name="map-outline"
                 size={48}
                 color={colors.brand.neutrals}
               />
-              <AppText style={{ color: '#94a3b8', textAlign: 'center' }}>
+              <AppText className="py-5 text-center text-sm text-colors-text/60">
                 No places found for this vibe yet.{'\n'}Try a different filter!
               </AppText>
             </View>
           }
           ListFooterComponent={
             loadingMore ? (
-              <View style={{ paddingVertical: 20, alignItems: 'center' }}>
+              <View className="items-center py-5">
                 <ActivityIndicator size="small" color={colors.brand.primary} />
               </View>
             ) : hasMore ? (
-              <View style={{ paddingHorizontal: 16, paddingVertical: 12 }}>
+              <View className="px-4 py-3">
                 <Button title="Load More" onPress={handleLoadMore} />
               </View>
             ) : places.length > 0 ? (
-              <AppText
-                style={{
-                  textAlign: 'center',
-                  color: '#94a3b8',
-                  fontSize: 12,
-                  paddingVertical: 20
-                }}
-              >
+              <AppText className="py-5 text-center text-sm text-colors-text/60">
                 {"You've seen it all ✓"}
               </AppText>
             ) : null

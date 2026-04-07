@@ -4,8 +4,8 @@ import { VibeCard } from '@/components/cards/variants/VibeCard';
 import { HeaderWithBack } from '@/components/PageHeader';
 import { PaceValue } from '@/constants/paceOptions';
 import { TRANSPORT_OPTIONS, TransportMode } from '@/constants/transportOptions';
+import { VIBES } from '@/constants/vibes/vibes';
 import { Area, Place } from '@/features/place/place.types';
-import { VIBES } from '@/constants/vibes';
 import {
   generateRecommendation,
   getSurpriseRecommendation

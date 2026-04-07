@@ -1,16 +1,16 @@
+import { Accordion } from '@/components/Accordion';
 import { AppText } from '@/components/AppText';
 import { Badge } from '@/components/Badge';
 import { Button } from '@/components/Button';
-import { Accordion } from '@/components/Accordion';
-import { Place, OpeningHours, PriceRange } from '@/features/place/place.types';
+import { VIBES } from '@/constants/vibes/vibes';
+import { OpeningHours, Place, PriceRange } from '@/features/place/place.types';
+import type { ApiPromotion } from '@/services/promotion.service';
 import colors from '@/theme/colors';
-import { VIBES } from '@/constants/vibes';
+import { getPlaceOpeningStatus } from '@/utils/openingHours';
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { Image, Linking, Pressable, ScrollView, View } from 'react-native';
 import { PromotionCard } from '../PromotionCard';
-import { getPlaceOpeningStatus } from '@/utils/openingHours';
-import type { ApiPromotion } from '@/services/promotion.service';
 
 type PlaceInfoProps = {
   place: Place;
