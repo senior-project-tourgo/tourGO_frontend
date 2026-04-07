@@ -183,7 +183,7 @@ export default function HomeScreen() {
         <Pressable
           onPress={handleSurpriseMe}
           disabled={loadingSurprise}
-          className={`mt-1 flex-row items-center gap-1.5 rounded-full px-3.5 py-2.5 bg-colors-brand-primary${
+          className={`mt-1 flex-row items-center gap-1.5 rounded-full bg-colors-brand-primary px-3.5 py-2.5 ${
             loadingSurprise ? 'opacity-70' : 'opacity-100'
           }`}
         >
