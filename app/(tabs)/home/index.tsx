@@ -12,19 +12,12 @@ import {
 import colors from '@/theme/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import {
-  ActivityIndicator,
-  FlatList,
-  Image,
-  Pressable,
-  ScrollView,
-  View
-} from 'react-native';
+import { useCallback, useEffect, useState, useMemo } from 'react';
+import { ActivityIndicator, FlatList, Pressable, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../../../context/AuthContext';
-import { VIBE_ICONS } from '@/constants/vibes/vibesIcon';
 import { useSavedPlaces } from '@/hooks/place/useSavedPlaces';
+import { VibeSelector } from '@/components/VibeSelector';
 
 export default function HomeScreen() {
   const { user } = useAuth();
@@ -50,9 +43,11 @@ export default function HomeScreen() {
   // Surprise Me loading state
   const [loadingSurprise, setLoadingSurprise] = useState(false);
 
-  // Track current vibe to reset on vibe change
-  const currentVibeRef = useRef(selectedVibe);
+  const filteredPlaces = useMemo(() => {
+    if (selectedVibe === 'all') return places;
 
+    return places.filter(place => place.vibe?.includes(selectedVibe));
+  }, [places, selectedVibe]);
   // Fetch first page of feed + trip suggestions
   const fetchFeed = useCallback(
     async (vibe: string, pageNum: number, append: boolean) => {
@@ -86,16 +81,14 @@ export default function HomeScreen() {
 
   // Initial load
   useEffect(() => {
-    currentVibeRef.current = selectedVibe;
-    setPage(0);
-    fetchFeed(selectedVibe, 0, false);
-  }, [selectedVibe, fetchFeed]);
+    fetchFeed('all', 0, false);
+  }, [fetchFeed]);
 
   const handleLoadMore = () => {
     if (loadingMore || !hasMore) return;
     const next = page + 1;
     setPage(next);
-    fetchFeed(selectedVibe, next, true);
+    fetchFeed('all', next, true);
   };
 
   const handleSurpriseMe = async () => {
@@ -129,13 +122,6 @@ export default function HomeScreen() {
   const username = user?.username ?? '';
   const formattedUsername =
     username.charAt(0).toUpperCase() + username.slice(1);
-
-  // All vibe chips: "All" + user's top vibes from history + rest of VIBES
-  const vibeChips = [
-    { id: 'all', title: 'All', image: null },
-    ...topVibes.map(id => VIBES.find(v => v.id === id)).filter(Boolean),
-    ...VIBES.filter(v => !topVibes.includes(v.id))
-  ] as { id: string; title: string; image: string | null }[];
 
   // ── List header ─────────────────────────────────────────────────────────────
   const ListHeader = (
@@ -178,71 +164,11 @@ export default function HomeScreen() {
       </View>
 
       {/* ── Vibe selector ── */}
-      <View className="pb-4">
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerClassName="px-4 gap-2.5"
-        >
-          {vibeChips.map(chip => {
-            const isSelected = selectedVibe === chip.id;
-
-            return (
-              <Pressable
-                key={chip.id}
-                onPress={() => setSelectedVibe(chip.id)}
-                className={`flex-row items-center gap-2 rounded-full border-[1.5px] px-3.5 py-2 ${
-                  isSelected ? 'opacity-100' : 'opacity-100'
-                }`}
-                style={{
-                  backgroundColor: isSelected
-                    ? colors.brand.primary
-                    : colors.brand.neutrals,
-                  borderColor: isSelected
-                    ? colors.brand.primary
-                    : colors.brand.neutrals
-                }}
-              >
-                {chip.id !== 'all' && chip.image ? (
-                  <Image
-                    source={{ uri: chip.image }}
-                    className="h-[22px] w-[22px] rounded-full"
-                    style={{ opacity: isSelected ? 1 : 0.85 }}
-                  />
-                ) : chip.id === 'all' ? (
-                  <Ionicons
-                    name="apps-outline"
-                    size={16}
-                    color={isSelected ? 'white' : colors.brand.secondary}
-                  />
-                ) : (
-                  <Ionicons
-                    name={VIBE_ICONS[chip.id] ?? 'sparkles-outline'}
-                    size={16}
-                    color={isSelected ? 'white' : colors.brand.secondary}
-                  />
-                )}
-
-                <AppText
-                  className="text-[13px] font-semibold"
-                  style={{
-                    color: isSelected ? 'white' : colors.brand.secondary
-                  }}
-                >
-                  {chip.title}
-                </AppText>
-
-                {/* "For you" badge */}
-                {!isSelected &&
-                  chip.id !== 'all' &&
-                  topVibes.includes(chip.id) && (
-                    <View className="h-[7px] w-[7px] rounded-full bg-colors-brand-primary" />
-                  )}
-              </Pressable>
-            );
-          })}
-        </ScrollView>
-      </View>
+      <VibeSelector
+        selectedVibe={selectedVibe}
+        setSelectedVibe={setSelectedVibe}
+        topVibes={topVibes}
+      />
 
       {/* ── Trip suggestions ── */}
       {tripSuggestions.length > 0 && (
@@ -290,7 +216,7 @@ export default function HomeScreen() {
         </View>
       ) : (
         <FlatList
-          data={places}
+          data={filteredPlaces}
           keyExtractor={item => item.placeId}
           renderItem={({ item: place }) => (
             <View className="mb-3 px-4">
@@ -325,7 +251,7 @@ export default function HomeScreen() {
               <View className="px-4 py-3">
                 <Button title="Load More" onPress={handleLoadMore} />
               </View>
-            ) : places.length > 0 ? (
+            ) : filteredPlaces.length > 0 ? (
               <AppText className="py-5 text-center text-sm text-colors-text/60">
                 {"You've seen it all ✓"}
               </AppText>

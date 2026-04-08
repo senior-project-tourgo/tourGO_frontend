@@ -5,6 +5,7 @@ import { VIBES } from '@/constants/vibes/vibes';
 import { VIBE_ICONS } from '@/constants/vibes/vibesIcon';
 import colors from '@/theme/colors';
 import { Badge } from '@/components/Badge';
+import { useMemo } from 'react';
 
 interface Props {
   selectedVibe: string;
@@ -17,11 +18,27 @@ export function VibeSelector({
   setSelectedVibe,
   topVibes
 }: Props) {
-  const vibeChips = [
-    { id: 'all', title: 'All' },
-    ...topVibes.map(id => VIBES.find(v => v.id === id)).filter(Boolean),
-    ...VIBES.filter(v => !topVibes.includes(v.id))
-  ] as { id: string; title: string }[];
+  // ✅ Dedup + stable ordering
+  const vibeChips = useMemo(() => {
+    const map = new Map<string, { id: string; title: string }>();
+
+    map.set('all', { id: 'all', title: 'All' });
+
+    // Top vibes first
+    topVibes.forEach(id => {
+      const vibe = VIBES.find(v => v.id === id);
+      if (vibe) map.set(vibe.id, vibe);
+    });
+
+    // Then the rest
+    VIBES.forEach(vibe => {
+      if (!map.has(vibe.id)) {
+        map.set(vibe.id, vibe);
+      }
+    });
+
+    return Array.from(map.values());
+  }, [topVibes]);
 
   return (
     <View className="pb-4">
@@ -38,6 +55,7 @@ export function VibeSelector({
             <Pressable
               key={chip.id}
               onPress={() => setSelectedVibe(chip.id)}
+              android_ripple={{ color: 'rgba(0,0,0,0.05)', borderless: true }}
               className="flex-row items-center gap-2 rounded-full border-[1.5px] px-3.5 py-2"
               style={{
                 backgroundColor: isSelected
@@ -69,13 +87,15 @@ export function VibeSelector({
                 {chip.title}
               </AppText>
 
-              {/* 🔥 Badge instead of dot */}
+              {/* 🔥 Top vibe badge */}
               {!isSelected && chip.id !== 'all' && isTopVibe && (
-                <Badge
-                  iconName="sparkles"
-                  bgColor={colors.brand.primary}
-                  textColor="white"
-                />
+                <View className="ml-1">
+                  <Badge
+                    iconName="flame"
+                    bgColor={colors.brand.primary}
+                    textColor="white"
+                  />
+                </View>
               )}
             </Pressable>
           );
