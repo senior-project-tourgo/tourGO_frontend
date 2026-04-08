@@ -23,6 +23,7 @@ interface PlaceCardProps extends BaseCardProps {
   showCross?: boolean;
   onPressCross?: (place: Place) => void;
   isSaved?: boolean;
+  isSaving?: boolean;
   onToggleSave?: (place: Place) => void;
 }
 
@@ -32,7 +33,8 @@ export function PlaceCard({
   showCross = false,
   onPressCross,
   isSaved = false,
-  onToggleSave
+  onToggleSave,
+  isSaving
 }: PlaceCardProps) {
   const openingHours = getPlaceOpeningStatus(place.openingHours);
 
@@ -56,12 +58,22 @@ export function PlaceCard({
               {place.placeName}
             </AppText>
             {onToggleSave && (
-              <Pressable hitSlop={8} onPress={() => onToggleSave(place)}>
-                <Ionicons
-                  name={isSaved ? 'bookmark' : 'bookmark-outline'}
-                  size={18}
-                  color={isSaved ? colors.brand.primary : '#94a3b8'}
-                />
+              <Pressable
+                hitSlop={8}
+                onPress={() => onToggleSave(place)}
+                disabled={isSaving}
+                style={{ opacity: isSaving ? 0.6 : 1 }}
+              >
+                {isSaving ? (
+                  <Ionicons name="time-outline" size={18} color="#94a3b8" />
+                ) : (
+                  // or ActivityIndicator if you prefer
+                  <Ionicons
+                    name={isSaved ? 'bookmark' : 'bookmark-outline'}
+                    size={18}
+                    color={isSaved ? colors.brand.primary : '#94a3b8'}
+                  />
+                )}
               </Pressable>
             )}
           </View>

@@ -9,7 +9,6 @@ import {
   getSurpriseRecommendation,
   type HomeTripSuggestion
 } from '@/services/trip.service';
-import { getUserProfile, toggleSavePlace } from '@/services/user.service';
 import colors from '@/theme/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -25,12 +24,12 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../../../context/AuthContext';
 import { VIBE_ICONS } from '@/constants/vibes/vibesIcon';
+import { useSavedPlaces } from '@/hooks/place/useSavedPlaces';
 
 export default function HomeScreen() {
   const { user } = useAuth();
 
-  const [savedPlaces, setSavedPlaces] = useState<string[]>([]);
-  const [savingId, setSavingId] = useState<string | null>(null);
+  const { savedPlaces, handleToggleSave, savingId } = useSavedPlaces();
 
   // Vibe filter — 'all' means use history-based algo
   const [selectedVibe, setSelectedVibe] = useState<string>('all');
@@ -53,13 +52,6 @@ export default function HomeScreen() {
 
   // Track current vibe to reset on vibe change
   const currentVibeRef = useRef(selectedVibe);
-
-  // Fetch saved places on mount
-  useEffect(() => {
-    getUserProfile()
-      .then(profile => setSavedPlaces(profile.savedPlaces))
-      .catch(() => {});
-  }, []);
 
   // Fetch first page of feed + trip suggestions
   const fetchFeed = useCallback(
@@ -104,28 +96,6 @@ export default function HomeScreen() {
     const next = page + 1;
     setPage(next);
     fetchFeed(selectedVibe, next, true);
-  };
-
-  const handleToggleSave = async (placeId: string) => {
-    if (savingId) return;
-    setSavingId(placeId);
-    setSavedPlaces(prev =>
-      prev.includes(placeId)
-        ? prev.filter(id => id !== placeId)
-        : [...prev, placeId]
-    );
-    try {
-      const result = await toggleSavePlace(placeId);
-      setSavedPlaces(result.savedPlaces);
-    } catch {
-      setSavedPlaces(prev =>
-        prev.includes(placeId)
-          ? prev.filter(id => id !== placeId)
-          : [...prev, placeId]
-      );
-    } finally {
-      setSavingId(null);
-    }
   };
 
   const handleSurpriseMe = async () => {
@@ -328,6 +298,7 @@ export default function HomeScreen() {
                 place={place}
                 onPress={() => router.push(`/places/${place.placeId}`)}
                 isSaved={savedPlaces.includes(place.placeId)}
+                isSaving={savingId === place.placeId} // 👈 add this
                 onToggleSave={p => handleToggleSave(p.placeId)}
               />
             </View>
