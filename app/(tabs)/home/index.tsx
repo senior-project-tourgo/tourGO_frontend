@@ -163,13 +163,6 @@ export default function HomeScreen() {
         />
       </View>
 
-      {/* ── Vibe selector ── */}
-      <VibeSelector
-        selectedVibe={selectedVibe}
-        setSelectedVibe={setSelectedVibe}
-        topVibes={topVibes}
-      />
-
       {/* ── Trip suggestions ── */}
       {tripSuggestions.length > 0 && (
         <View className="mb-5 gap-3">
@@ -188,6 +181,13 @@ export default function HomeScreen() {
           </View>
         </View>
       )}
+
+      {/* ── Vibe selector ── */}
+      <VibeSelector
+        selectedVibe={selectedVibe}
+        setSelectedVibe={setSelectedVibe}
+        topVibes={topVibes}
+      />
 
       {/* ── Section title for the place feed ── */}
       <View className="mb-2.5 flex-row items-center justify-between px-4">
