@@ -73,7 +73,6 @@ export function VibeSelector({
               {!isSelected && chip.id !== 'all' && isTopVibe && (
                 <Badge
                   iconName="sparkles"
-                  size="sm"
                   bgColor={colors.brand.primary}
                   textColor="white"
                 />

@@ -38,7 +38,7 @@ export default function CommunityGemsScreen() {
               place={place}
               onPress={() => router.push(`/places/${place.placeId}`)}
               isSaved={savedPlaces.includes(place.placeId)}
-              isSaving={savingId === place.placeId} // 👈 add this
+              isSaving={savingId === place.placeId}
               onToggleSave={p => handleToggleSave(p.placeId)}
             />
           ))
