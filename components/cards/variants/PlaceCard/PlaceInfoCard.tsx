@@ -11,6 +11,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { Image, Linking, Pressable, ScrollView, View } from 'react-native';
 import { PromotionCard } from '../PromotionCard';
+import { FACILITY_ICONS } from '@/constants/place-info/facilityIcons';
+import { VIBE_ICONS } from '@/constants/vibes/vibesIcon';
 
 type PlaceInfoProps = {
   place: Place;
@@ -43,48 +45,6 @@ const DAYS: (keyof OpeningHours)[] = [
   'saturday',
   'sunday'
 ];
-
-const FACILITY_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
-  parking: 'car-outline',
-  wifi: 'wifi-outline',
-  wheelchair: 'accessibility-outline',
-  restroom: 'water-outline',
-  atm: 'card-outline',
-  restaurant: 'restaurant-outline',
-  'kid-friendly': 'happy-outline',
-  photography: 'camera-outline',
-  'guided tour': 'person-outline',
-  souvenir: 'bag-outline',
-  prayer: 'book-outline',
-  meditation: 'leaf-outline'
-};
-
-const VIBE_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
-  thrill: 'rocket-outline',
-  mountain: 'triangle-outline',
-  spiritual: 'leaf-outline',
-  culture: 'book-outline',
-  nature: 'leaf-outline',
-  foodie: 'restaurant-outline',
-  chill: 'moon-outline',
-  social: 'people-outline',
-  photo: 'camera-outline',
-  budget: 'wallet-outline',
-  luxury: 'star-outline',
-  family: 'home-outline',
-  romantic: 'heart-outline',
-  solo: 'person-outline',
-  offbeat: 'compass-outline',
-  wellness: 'fitness-outline',
-  nightlife: 'moon-outline',
-  bars_and_pubs: 'wine-outline',
-  shopping: 'bag-outline',
-  arts: 'color-palette-outline',
-  music: 'musical-notes-outline',
-  sports: 'football-outline',
-  history: 'library-outline',
-  beaches: 'sunny-outline'
-};
 
 function getFacilityIcon(facility: string): keyof typeof Ionicons.glyphMap {
   return FACILITY_ICONS[facility.toLowerCase()] ?? 'checkmark-circle-outline';
@@ -353,34 +313,16 @@ export function PlaceInfoCard({
             {(Array.isArray(place.vibe) ? place.vibe : []).map((id: string) => {
               const label =
                 VIBES.find(v => v.id === id)?.title ?? formatVibeLabel(id);
+
               return (
-                <View
+                <Badge
                   key={id}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: 5,
-                    backgroundColor: colors.brand.neutrals,
-                    paddingHorizontal: 10,
-                    paddingVertical: 5,
-                    borderRadius: 20
-                  }}
-                >
-                  <Ionicons
-                    name={getVibeIcon(id)}
-                    size={12}
-                    color={colors.brand.secondary}
-                  />
-                  <AppText
-                    style={{
-                      fontSize: 12,
-                      color: colors.brand.secondary,
-                      fontWeight: '600'
-                    }}
-                  >
-                    #{label}
-                  </AppText>
-                </View>
+                  iconName={getVibeIcon(id)}
+                  label={label}
+                  bgColor={colors.brand.neutrals}
+                  textColor={colors.brand.secondary}
+                  size="md"
+                />
               );
             })}
           </View>
@@ -391,26 +333,8 @@ export function PlaceInfoCard({
 
       {/* ── Typical Time Spent ── */}
       {!!place.typicalTimeSpent && (
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 12,
-            backgroundColor: colors.brand.neutrals,
-            padding: 14,
-            borderRadius: 14
-          }}
-        >
-          <View
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 12,
-              backgroundColor: colors.brand.secondary + '20',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
+        <View className="flex-row items-center gap-3 rounded-xl bg-colors-brand-neutrals p-4">
+          <View className="h-10 w-10 items-center justify-center rounded-lg bg-colors-brand-secondary/20">
             <Ionicons
               name="time-outline"
               size={20}
@@ -418,16 +342,10 @@ export function PlaceInfoCard({
             />
           </View>
           <View>
-            <AppText style={{ fontSize: 11, color: colors.brand.secondary }}>
+            <AppText className="text-xs text-colors-brand-secondary">
               Typical Time Spent
             </AppText>
-            <AppText
-              style={{
-                fontSize: 14,
-                fontWeight: '600',
-                color: colors.text.DEFAULT
-              }}
-            >
+            <AppText className="text-sm font-semibold text-colors-text">
               {place.typicalTimeSpent}
             </AppText>
           </View>
@@ -436,73 +354,39 @@ export function PlaceInfoCard({
 
       {/* ── Price Range ── */}
       {!!place.priceRange && (
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 12,
-            backgroundColor: colors.brand.neutrals,
-            padding: 14,
-            borderRadius: 14
-          }}
-        >
-          <View
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 12,
-              backgroundColor: colors.brand.secondary + '20',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
+        <View className="flex-row items-center gap-3 rounded-xl bg-colors-brand-neutrals p-4">
+          <View className="h-10 w-10 items-center justify-center rounded-lg bg-colors-brand-secondary/20">
             <Ionicons
               name="wallet-outline"
               size={20}
               color={colors.brand.secondary}
             />
           </View>
-          <View style={{ flex: 1 }}>
-            <AppText style={{ fontSize: 11, color: colors.brand.secondary }}>
+          <View className="flex-1">
+            <AppText className="text-xs text-colors-brand-secondary">
               Price Range
             </AppText>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 6,
-                marginTop: 2
-              }}
-            >
+            <View className="mt-1 flex-row items-center gap-1">
               {(['$', '$$', '$$$', '$$$$'] as PriceRange[]).map(tier => {
                 const active = place.priceRange === tier;
                 return (
                   <View
                     key={tier}
-                    style={{
-                      paddingHorizontal: 10,
-                      paddingVertical: 4,
-                      borderRadius: 8,
-                      backgroundColor: active
-                        ? colors.brand.primary
-                        : colors.brand.secondary + '15'
-                    }}
+                    className={`rounded-lg px-3 py-1 ${
+                      active
+                        ? 'bg-colors-brand-primary'
+                        : 'bg-colors-brand-secondary/15'
+                    }`}
                   >
                     <AppText
-                      style={{
-                        fontSize: 13,
-                        fontWeight: active ? '700' : '400',
-                        color: active ? 'white' : colors.brand.secondary + '80'
-                      }}
+                      className={`text-sm ${active ? 'font-bold text-white' : 'font-normal text-colors-brand-secondary/80'}`}
                     >
                       {tier}
                     </AppText>
                   </View>
                 );
               })}
-              <AppText
-                style={{ fontSize: 12, color: '#94a3b8', marginLeft: 4 }}
-              >
+              <AppText className="ml-1 text-xs text-colors-text">
                 {place.priceRange === '$' && 'Under रु 500'}
                 {place.priceRange === '$$' && 'रु 500 – 1,500'}
                 {place.priceRange === '$$$' && 'रु 1,500 – 4,000'}
@@ -633,31 +517,17 @@ export function PlaceInfoCard({
                 Facilities
               </AppText>
             </View>
+
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
               {place.specialFacilities.map(f => (
-                <View
+                <Badge
                   key={f}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: 6,
-                    backgroundColor: colors.brand.neutrals,
-                    paddingHorizontal: 12,
-                    paddingVertical: 8,
-                    borderRadius: 10
-                  }}
-                >
-                  <Ionicons
-                    name={getFacilityIcon(f)}
-                    size={14}
-                    color={colors.brand.secondary}
-                  />
-                  <AppText
-                    style={{ fontSize: 12, color: colors.brand.secondary }}
-                  >
-                    {capitalize(f)}
-                  </AppText>
-                </View>
+                  iconName={getFacilityIcon(f)}
+                  label={capitalize(f)}
+                  bgColor={colors.brand.neutrals}
+                  textColor={colors.brand.secondary}
+                  size="md"
+                />
               ))}
             </View>
           </View>
@@ -688,7 +558,12 @@ export function PlaceInfoCard({
             </View>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
               {place.suitableFor.map(s => (
-                <Badge key={s} label={capitalize(s)} />
+                <Badge
+                  key={s}
+                  label={capitalize(s)}
+                  textColor={colors.brand.secondary}
+                  size="md"
+                />
               ))}
             </View>
           </View>
