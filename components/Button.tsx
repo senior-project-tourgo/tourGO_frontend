@@ -27,11 +27,14 @@ export function Button({
       } ${className}`}
     >
       {isLoading ? (
-        <ActivityIndicator color={textColor} />
+        <>
+          <ActivityIndicator color={textColor} />
+          <AppText className="absolute opacity-0">{title}</AppText>
+        </>
       ) : (
         <AppText
           style={{ color: textColor }}
-          className={`text-center font-semibold`}
+          className="text-center font-semibold"
         >
           {title}
         </AppText>

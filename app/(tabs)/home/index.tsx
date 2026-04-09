@@ -136,23 +136,12 @@ export default function HomeScreen() {
         </View>
 
         {/* Surprise Me pill button */}
-        <Pressable
+        <Button
+          title={loadingSurprise ? 'Thinking…' : 'Surprise!'}
           onPress={handleSurpriseMe}
-          disabled={loadingSurprise}
-          className={`mt-1 flex-row items-center gap-1.5 rounded-full bg-colors-brand-primary px-3.5 py-2.5 ${
-            loadingSurprise ? 'opacity-70' : 'opacity-100'
-          }`}
-        >
-          {loadingSurprise ? (
-            <ActivityIndicator size="small" color="white" />
-          ) : (
-            <Ionicons name="shuffle-outline" size={16} color="white" />
-          )}
-
-          <AppText className="text-[13px] font-bold text-white">
-            {loadingSurprise ? 'Thinking…' : 'Surprise Me'}
-          </AppText>
-        </Pressable>
+          isLoading={loadingSurprise}
+          className="mt-1 h-12 min-w-[100px] bg-colors-brand-secondary p-2.5"
+        />
       </View>
 
       {/* ── Curate trip CTA ── */}
