@@ -8,11 +8,12 @@ import type { ApiPromotion } from '@/services/promotion.service';
 import colors from '@/theme/colors';
 import { getPlaceOpeningStatus } from '@/utils/openingHours';
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect, useState } from 'react';
 import { Image, Linking, Pressable, ScrollView, View } from 'react-native';
 import { PromotionCard } from '../PromotionCard';
 import { FACILITY_ICONS } from '@/constants/place-info/facilityIcons';
 import { VIBE_ICONS } from '@/constants/vibes/vibesIcon';
+import { useGooglePlace } from '@/hooks/place/useGooglePlace';
+import { SocialLink } from '@/components/SocialLinks';
 
 type PlaceInfoProps = {
   place: Place;
@@ -20,20 +21,6 @@ type PlaceInfoProps = {
   isSaved: boolean;
   saving: boolean;
   onToggleSave: () => void;
-};
-
-type GoogleReview = {
-  author_name: string;
-  rating: number;
-  text: string;
-  relative_time_description: string;
-};
-
-type GoogleData = {
-  description?: string;
-  address?: string;
-  totalRatings?: number;
-  reviews?: GoogleReview[];
 };
 
 const DAYS: (keyof OpeningHours)[] = [
@@ -93,28 +80,7 @@ export function PlaceInfoCard({
   const openingStatus = getPlaceOpeningStatus(place.openingHours);
   const todayName =
     DAYS[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1];
-  const [googleData, setGoogleData] = useState<GoogleData>({});
-
-  useEffect(() => {
-    if (!place.mapsLinkKey || !GOOGLE_KEY) return;
-    fetch(
-      `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.mapsLinkKey}&fields=editorial_summary,user_ratings_total,reviews,formatted_address&key=${GOOGLE_KEY}`
-    )
-      .then(r => r.json())
-      .then(data => {
-        const result = data?.result ?? {};
-        setGoogleData({
-          description:
-            result.editorial_summary?.overview ??
-            place.description ??
-            undefined,
-          address: result.formatted_address ?? place.address ?? undefined,
-          totalRatings: result.user_ratings_total,
-          reviews: result.reviews?.slice(0, 3)
-        });
-      })
-      .catch(() => {});
-  }, [place.mapsLinkKey, place.description, place.address]);
+  const googleData = useGooglePlace(place);
 
   const openMaps = () => {
     const { lat, lng } = place.location;
@@ -129,25 +95,24 @@ export function PlaceInfoCard({
   };
 
   const sm = place.socialMedia;
+  const socialLinks: SocialLink[] = [];
+
+  // WhatsApp number (handle either from number or handle)
   const waNumber = (sm?.whatsapp as any)?.number ?? sm?.whatsapp?.handle;
 
-  type SocialLink = {
-    platform: string;
-    icon: keyof typeof Ionicons.glyphMap;
-    url: string;
-    subtitle: string;
-  };
-  const socialLinks: SocialLink[] = [];
+  // Instagram
   if (sm?.instagram?.handle || sm?.instagram?.page) {
-    const url =
-      sm.instagram?.page ?? `https://www.instagram.com/${sm.instagram?.handle}`;
     socialLinks.push({
       platform: 'Instagram',
       icon: 'logo-instagram',
-      url,
+      url:
+        sm.instagram?.page ??
+        `https://www.instagram.com/${sm.instagram?.handle}`,
       subtitle: sm.instagram?.handle ? `@${sm.instagram.handle}` : 'Instagram'
     });
   }
+
+  // Facebook
   if (sm?.facebook?.page) {
     const shortPage = sm.facebook.page.replace(
       /https?:\/\/(www\.)?facebook\.com\//,
@@ -160,6 +125,8 @@ export function PlaceInfoCard({
       subtitle: `/${shortPage}`
     });
   }
+
+  // TikTok
   if (sm?.tiktok?.handle || sm?.tiktok?.page) {
     const url =
       sm.tiktok?.page ?? `https://www.tiktok.com/@${sm.tiktok?.handle}`;
@@ -170,16 +137,19 @@ export function PlaceInfoCard({
       subtitle: sm.tiktok?.handle ? `@${sm.tiktok.handle}` : 'TikTok'
     });
   }
+
+  // WhatsApp
   if (waNumber) {
-    const cleanNumber = String(waNumber).replace(/\s/g, '');
+    const cleanNumber = String(waNumber).replace(/\s/g, '').replace('+', '');
     socialLinks.push({
       platform: 'WhatsApp',
       icon: 'logo-whatsapp',
-      url: `https://wa.me/${cleanNumber.replace('+', '')}`,
+      url: `https://wa.me/${cleanNumber}`,
       subtitle: waNumber
     });
   }
 
+  // Static Map URL
   const staticMapUrl = GOOGLE_KEY
     ? `https://maps.googleapis.com/maps/api/staticmap?center=${place.location.lat},${place.location.lng}&zoom=15&size=600x300&scale=2&markers=color:0xFF7D00|${place.location.lat},${place.location.lng}&key=${GOOGLE_KEY}`
     : null;
