@@ -1,4 +1,4 @@
-import { Area } from '@/features/place/place.types';
+import { Area, PriceRange } from '@/features/place/place.types';
 import { PaceValue } from '@/constants/paceOptions';
 import { TransportMode } from '@/constants/transportOptions';
 
@@ -20,6 +20,7 @@ export function buildTripPayload({
   endTime,
   groupType,
   transportMode,
+  budgetTier,
   startLat,
   startLng,
   startLabel
@@ -33,6 +34,7 @@ export function buildTripPayload({
   endTime?: Date | null;
   groupType?: string;
   transportMode?: TransportMode;
+  budgetTier?: PriceRange;
   startLat?: number;
   startLng?: number;
   startLabel?: string;
@@ -49,6 +51,7 @@ export function buildTripPayload({
   if (startTime) payload.startTime = formatTime(startTime);
   if (endTime) payload.endTime = formatTime(endTime);
   if (transportMode) payload.transportMode = transportMode;
+  if (budgetTier) payload.priceRange = budgetTier;
   if (startLat != null) payload.startLat = startLat;
   if (startLng != null) payload.startLng = startLng;
   if (startLabel) payload.startLabel = startLabel;

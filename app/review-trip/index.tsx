@@ -1,5 +1,6 @@
 import { AppText } from '@/components/AppText';
 import { Button } from '@/components/Button';
+import { CenteredLoading } from '@/components/CenteredLoading';
 import { Map } from '@/components/Map';
 import type { MapRoute } from '@/components/Map';
 import { HeaderWithBack } from '@/components/PageHeader';
@@ -117,11 +118,7 @@ export default function ReviewTripScreen() {
   );
 
   if (!region) {
-    return (
-      <View className="flex-1 items-center justify-center">
-        <AppText>Loading map...</AppText>
-      </View>
-    );
+    return <CenteredLoading message="Loading map…" variant="map" />;
   }
 
   return (

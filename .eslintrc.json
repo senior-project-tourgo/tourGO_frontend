@@ -1,9 +1,0 @@
-{
-  "extends": ["expo", "prettier"],
-  "plugins": ["@typescript-eslint", "unused-imports", "prettier"],
-  "rules": {
-    "no-console": "warn",
-    "@typescript-eslint/no-unused-vars": "error",
-    "unused-imports/no-unused-imports": "warn"
-  }
-}

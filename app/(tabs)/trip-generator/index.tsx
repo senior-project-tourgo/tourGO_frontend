@@ -1,10 +1,20 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, View } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  View,
+  ActivityIndicator
+} from 'react-native';
 
 import { Button } from '@/components/Button';
+import { AppText } from '@/components/AppText';
 import { HeaderWithBack } from '@/components/PageHeader';
 import { Screen } from '@/components/Screen';
+import { getSurpriseRecommendation } from '@/services/trip.service';
+import colors from '@/theme/colors';
+import { Ionicons } from '@expo/vector-icons';
 
 import GroupSection from './sections/GroupSection';
 import LocationSection from './sections/LocationSection';
@@ -16,11 +26,30 @@ import { type GroupType } from '@/constants/groupType';
 import { type PaceValue } from '@/constants/paceOptions';
 import { type TimeWindowValue } from '@/constants/timeOptions';
 import { type TransportMode } from '@/constants/transportOptions';
-import type { Area } from '@/features/place/place.types';
+import type { Area, PriceRange } from '@/features/place/place.types';
 import { buildTripPayload } from '@/utils/tripForm';
 
 export default function TripGeneratorScreen() {
   const router = useRouter();
+
+  const [loadingSurprise, setLoadingSurprise] = useState(false);
+
+  const handleSurpriseMe = async () => {
+    if (loadingSurprise) return;
+    setLoadingSurprise(true);
+    try {
+      const result = await getSurpriseRecommendation();
+      const placeIds = result.recommendedPlaces.map(p => p.placeId).join(',');
+      router.push({
+        pathname: '/review-trip',
+        params: { placeIds, itineraryName: 'Surprise Trip ✨' }
+      });
+    } catch {
+      // silently ignore
+    } finally {
+      setLoadingSurprise(false);
+    }
+  };
 
   // --- Trip Name ---
   const [itineraryName, setItineraryName] = useState<string>('');
@@ -48,6 +77,7 @@ export default function TripGeneratorScreen() {
   const [transportMode, setTransportMode] = useState<TransportMode | null>(
     null
   );
+  const [budgetTier, setBudgetTier] = useState<PriceRange | null>(null);
   const [groupType, setGroupType] = useState<GroupType | null>(null);
   const [people, setPeople] = useState<number>(1);
 
@@ -80,6 +110,7 @@ export default function TripGeneratorScreen() {
       endTime,
       groupType: groupType?.id,
       transportMode: transportMode ?? undefined,
+      budgetTier: budgetTier ?? undefined,
       startLat: startCoords?.lat,
       startLng: startCoords?.lng,
       startLabel: locationLabel ?? undefined
@@ -135,6 +166,8 @@ export default function TripGeneratorScreen() {
             setPace={setPace}
             transportMode={transportMode}
             setTransportMode={setTransportMode}
+            budgetTier={budgetTier}
+            setBudgetTier={setBudgetTier}
           />
 
           <GroupSection
@@ -144,8 +177,43 @@ export default function TripGeneratorScreen() {
             setPeople={setPeople}
           />
 
-          <View className="mt-4">
+          <View className="mt-4" style={{ gap: 10 }}>
             <Button title="Choose Your Vibes" onPress={handleContinue} />
+
+            <Pressable
+              onPress={handleSurpriseMe}
+              disabled={loadingSurprise}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8,
+                paddingVertical: 14,
+                borderRadius: 14,
+                borderWidth: 2,
+                borderColor: colors.brand.primary,
+                opacity: loadingSurprise ? 0.6 : 1
+              }}
+            >
+              {loadingSurprise ? (
+                <ActivityIndicator size="small" color={colors.brand.primary} />
+              ) : (
+                <Ionicons
+                  name="shuffle-outline"
+                  size={18}
+                  color={colors.brand.primary}
+                />
+              )}
+              <AppText
+                style={{
+                  color: colors.brand.primary,
+                  fontWeight: '700',
+                  fontSize: 15
+                }}
+              >
+                {loadingSurprise ? 'Generating…' : 'Surprise Me'}
+              </AppText>
+            </Pressable>
           </View>
         </View>
       </Screen>

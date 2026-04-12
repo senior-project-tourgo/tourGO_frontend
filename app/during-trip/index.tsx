@@ -30,10 +30,12 @@ import {
 import colors from '@/theme/colors';
 import * as Haptics from 'expo-haptics';
 import { useUserLocation } from '@/hooks/review-trip/add-place/useUserLocation';
+import { getUserProfile } from '@/services/user.service';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, Animated, FlatList, PanResponder, View } from 'react-native';
 import MapView, { Marker, Polyline, Region } from 'react-native-maps';
+import { UserAvatarPin } from '@/components/Map';
 
 export default function DuringTripScreen() {
   const { tripId, startLat, startLng, startLabel } = useLocalSearchParams<{
@@ -65,6 +67,10 @@ export default function DuringTripScreen() {
     latitude: number;
     longitude: number;
   } | null>(null);
+  const [userProfilePicture, setUserProfilePicture] = useState<string | null>(
+    null
+  );
+  const [userInitials, setUserInitials] = useState<string>('Me');
   const [userRouteSegment, setUserRouteSegment] = useState<RouteSegment | null>(
     null
   );
@@ -130,6 +136,24 @@ export default function DuringTripScreen() {
       }
     }
   ).current;
+
+  // Fetch user profile for avatar on map
+  useEffect(() => {
+    getUserProfile()
+      .then(profile => {
+        setUserProfilePicture(profile.profilePicture);
+        const initials = profile.name
+          ? profile.name
+              .split(' ')
+              .map(n => n[0])
+              .join('')
+              .toUpperCase()
+              .slice(0, 2)
+          : (profile.username?.slice(0, 2).toUpperCase() ?? 'Me');
+        setUserInitials(initials);
+      })
+      .catch(() => {});
+  }, []);
 
   const load = useCallback(async () => {
     if (!tripId) return;
@@ -413,7 +437,7 @@ export default function DuringTripScreen() {
   };
 
   if (loading || !region) {
-    return <CenteredLoading message="Loading trip…" />;
+    return <CenteredLoading message="Loading trip…" variant="map" />;
   }
 
   const visitedIds = new Set(
@@ -654,6 +678,22 @@ export default function DuringTripScreen() {
             }
             pinColor="#22c55e"
           />
+        )}
+
+        {/* User avatar marker */}
+        {userLocation && (
+          <Marker
+            key="user-avatar"
+            coordinate={userLocation}
+            title="You are here"
+            anchor={{ x: 0.5, y: 1 }}
+            tracksViewChanges={!!userProfilePicture}
+          >
+            <UserAvatarPin
+              imageUrl={userProfilePicture}
+              initials={userInitials}
+            />
+          </Marker>
         )}
       </MapView>
 

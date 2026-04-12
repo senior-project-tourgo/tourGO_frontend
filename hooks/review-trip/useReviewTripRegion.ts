@@ -81,7 +81,7 @@ export function useReviewTripRegion(editablePlaces: EditablePlace[]) {
       active = false;
       clearTimeout(timer);
     };
-  }, []);
+  }, [requestLocation]);
 
   return { region };
 }

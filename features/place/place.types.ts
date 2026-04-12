@@ -17,6 +17,9 @@ export type Place = {
   specialFacilities: string[];
   contactNumber: string | null;
   socialMedia: SocialMedia;
+  description?: string;
+  address?: string;
+  reviews?: PlaceReview[];
 };
 
 export type OpeningHours = {
@@ -46,7 +49,7 @@ export type SocialMedia = {
   instagram?: SocialPlatform | null;
   tiktok?: SocialPlatform | null;
   facebook?: SocialPlatform | null;
-  whatsapp?: SocialPlatform | null;
+  whatsapp?: WhatsAppPlatform | null;
 };
 
 export type SocialPlatform = {
@@ -55,4 +58,16 @@ export type SocialPlatform = {
   likes: number;
 };
 
+export type WhatsAppPlatform = {
+  number?: string;
+  handle?: string;
+};
+
 export type PriceRange = '$' | '$$' | '$$$' | '$$$$';
+
+export type PlaceReview = {
+  text: string;
+  rating: number;
+  author: string;
+  time: string;
+};
