@@ -3,11 +3,23 @@ import { PlaceCard } from '@/components/cards/variants/PlaceCard/PlaceCard';
 import { HeaderWithBack } from '@/components/PageHeader';
 import { Screen } from '@/components/Screen';
 import { useActivePlaces } from '@/hooks/review-trip/useActivePlaces';
+import { useSavePlace } from '@/hooks/place/useSavePlace'; // ✅ NEW
+import { getUserProfile } from '@/services/user.service'; // ✅ NEW
 import { router } from 'expo-router';
 import { ActivityIndicator, View } from 'react-native';
+import { useEffect } from 'react';
 
 export default function CommunityGemsScreen() {
   const { data: activePlaces, loading, error } = useActivePlaces(undefined);
+
+  const { savedPlaces, toggleSave, setSavedPlaces } = useSavePlace();
+
+  // ✅ hydrate once
+  useEffect(() => {
+    getUserProfile()
+      .then(profile => setSavedPlaces(profile.savedPlaces))
+      .catch(() => {});
+  }, [setSavedPlaces]);
 
   if (error) {
     return (
@@ -35,6 +47,8 @@ export default function CommunityGemsScreen() {
               key={place.placeId}
               place={place}
               onPress={() => router.push(`/places/${place.placeId}`)}
+              isSaved={savedPlaces.includes(place.placeId)} // ✅
+              onToggleSave={p => toggleSave(p.placeId)} // ✅
             />
           ))
         )}

@@ -4,6 +4,7 @@ import { Screen } from '@/components/Screen';
 import { PlaceCard } from '@/components/cards/variants/PlaceCard/PlaceCard';
 import type { Place } from '@/features/place/place.types';
 import { getSavedPlaces } from '@/services/user.service';
+import { useSavePlace } from '@/hooks/place/useSavePlace'; // ✅ NEW
 import colors from '@/theme/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -14,12 +15,26 @@ export default function SavedPlacesScreen() {
   const [places, setPlaces] = useState<Place[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // ✅ shared save logic
+  const { savedPlaces, toggleSave, setSavedPlaces } = useSavePlace();
+
+  // ✅ initial fetch + hydrate
   useEffect(() => {
     getSavedPlaces()
-      .then(setPlaces)
+      .then(data => {
+        setPlaces(data);
+        setSavedPlaces(data.map(p => p.placeId)); // hydrate IDs
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, []);
+  }, [setSavedPlaces]);
+
+  // ✅ IMPORTANT: sync UI when unsaving
+  useEffect(() => {
+    setPlaces(prev =>
+      prev.filter(place => savedPlaces.includes(place.placeId))
+    );
+  }, [savedPlaces]);
 
   return (
     <Screen>
@@ -52,6 +67,8 @@ export default function SavedPlacesScreen() {
               key={place.placeId}
               place={place}
               onPress={() => router.push(`/places/${place.placeId}`)}
+              isSaved={savedPlaces.includes(place.placeId)} // ✅
+              onToggleSave={p => toggleSave(p.placeId)} // ✅
             />
           ))}
         </View>

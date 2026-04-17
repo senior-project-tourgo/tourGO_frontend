@@ -5,12 +5,13 @@ import { PlaceCard } from '@/components/cards/variants/PlaceCard/PlaceCard';
 import { VIBE_ICONS } from '@/constants/vibes/vibeIcons';
 import { VIBES } from '@/constants/vibes/vibes';
 import type { Place } from '@/features/place/place.types';
+import { useSavePlace } from '@/hooks/place/useSavePlace';
 import {
   getHomeRecommendations,
   getSurpriseRecommendation,
   type HomeTripSuggestion
 } from '@/services/trip.service';
-import { getUserProfile, toggleSavePlace } from '@/services/user.service';
+import { getUserProfile } from '@/services/user.service'; // ❌ removed toggleSavePlace
 import colors from '@/theme/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -29,36 +30,30 @@ import { useAuth } from '../../../context/AuthContext';
 export default function HomeScreen() {
   const { user } = useAuth();
 
-  const [savedPlaces, setSavedPlaces] = useState<string[]>([]);
-  const [savingId, setSavingId] = useState<string | null>(null);
+  // ✅ hook replaces local state + logic
+  const { savedPlaces, toggleSave, setSavedPlaces } = useSavePlace();
 
-  // Vibe filter — 'all' means use history-based algo
   const [selectedVibe, setSelectedVibe] = useState<string>('all');
   const [topVibes, setTopVibes] = useState<string[]>([]);
 
-  // Infinite-scroll place feed
   const [places, setPlaces] = useState<Place[]>([]);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [loadingFeed, setLoadingFeed] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
 
-  // Personalised trip suggestions
   const [tripSuggestions, setTripSuggestions] = useState<HomeTripSuggestion[]>(
     []
   );
-
-  // Surprise Me loading state
   const [loadingSurprise, setLoadingSurprise] = useState(false);
 
-  // Fetch saved places on mount
+  // ✅ hydrate saved places
   useEffect(() => {
     getUserProfile()
       .then(profile => setSavedPlaces(profile.savedPlaces))
       .catch(() => {});
-  }, []);
+  }, [setSavedPlaces]);
 
-  // Fetch first page of feed + trip suggestions
   const fetchFeed = useCallback(
     async (vibe: string, pageNum: number, append: boolean) => {
       if (pageNum === 0) setLoadingFeed(true);
@@ -73,14 +68,12 @@ export default function HomeScreen() {
         } else {
           setPlaces(result.places);
           setTripSuggestions(result.tripSuggestions);
-          // Merge in top vibes (keep user's existing selection visible)
           setTopVibes(prev => {
             const merged = [...new Set([...result.topVibes, ...prev])];
             return merged.slice(0, 10);
           });
         }
       } catch {
-        // silently fail — keep existing data
       } finally {
         setLoadingFeed(false);
         setLoadingMore(false);
@@ -89,7 +82,6 @@ export default function HomeScreen() {
     []
   );
 
-  // Initial load
   useEffect(() => {
     setPage(0);
     fetchFeed(selectedVibe, 0, false);
@@ -100,28 +92,6 @@ export default function HomeScreen() {
     const next = page + 1;
     setPage(next);
     fetchFeed(selectedVibe, next, true);
-  };
-
-  const handleToggleSave = async (placeId: string) => {
-    if (savingId) return;
-    setSavingId(placeId);
-    setSavedPlaces(prev =>
-      prev.includes(placeId)
-        ? prev.filter(id => id !== placeId)
-        : [...prev, placeId]
-    );
-    try {
-      const result = await toggleSavePlace(placeId);
-      setSavedPlaces(result.savedPlaces);
-    } catch {
-      setSavedPlaces(prev =>
-        prev.includes(placeId)
-          ? prev.filter(id => id !== placeId)
-          : [...prev, placeId]
-      );
-    } finally {
-      setSavingId(null);
-    }
   };
 
   const handleSurpriseMe = async () => {
@@ -138,7 +108,6 @@ export default function HomeScreen() {
         }
       });
     } catch {
-      // ignore
     } finally {
       setLoadingSurprise(false);
     }
@@ -156,14 +125,12 @@ export default function HomeScreen() {
   const formattedUsername =
     username.charAt(0).toUpperCase() + username.slice(1);
 
-  // All vibe chips: "All" + user's top vibes from history + rest of VIBES
   const vibeChips = [
     { id: 'all', title: 'All', image: null },
     ...topVibes.map(id => VIBES.find(v => v.id === id)).filter(Boolean),
     ...VIBES.filter(v => !topVibes.includes(v.id))
   ] as { id: string; title: string; image: string | null }[];
 
-  // ── List header ─────────────────────────────────────────────────────────────
   const ListHeader = (
     <View style={{ gap: 0 }}>
       {/* ── Top bar ── */}
@@ -184,7 +151,6 @@ export default function HomeScreen() {
           </AppText>
         </View>
 
-        {/* Surprise Me pill button */}
         <Pressable
           onPress={handleSurpriseMe}
           disabled={loadingSurprise}
@@ -211,7 +177,6 @@ export default function HomeScreen() {
         </Pressable>
       </View>
 
-      {/* ── Curate trip CTA ── */}
       <View style={{ paddingHorizontal: 16, paddingBottom: 16 }}>
         <Button
           title="Curate New Trip"
@@ -219,7 +184,6 @@ export default function HomeScreen() {
         />
       </View>
 
-      {/* ── Vibe selector ── */}
       <View style={{ paddingBottom: 16 }}>
         <ScrollView
           horizontal
@@ -280,7 +244,7 @@ export default function HomeScreen() {
                 >
                   {chip.title}
                 </AppText>
-                {/* "For you" badge on top vibes */}
+
                 {!isSelected &&
                   chip.id !== 'all' &&
                   topVibes.includes(chip.id) && (
@@ -299,7 +263,6 @@ export default function HomeScreen() {
         </ScrollView>
       </View>
 
-      {/* ── Trip suggestions ── */}
       {tripSuggestions.length > 0 && (
         <View style={{ gap: 12, marginBottom: 20 }}>
           <AppText
@@ -323,7 +286,6 @@ export default function HomeScreen() {
         </View>
       )}
 
-      {/* ── Section title for the place feed ── */}
       <View
         style={{
           flexDirection: 'row',
@@ -382,7 +344,7 @@ export default function HomeScreen() {
                 place={place}
                 onPress={() => router.push(`/places/${place.placeId}`)}
                 isSaved={savedPlaces.includes(place.placeId)}
-                onToggleSave={p => handleToggleSave(p.placeId)}
+                onToggleSave={p => toggleSave(p.placeId)}
               />
             </View>
           )}
