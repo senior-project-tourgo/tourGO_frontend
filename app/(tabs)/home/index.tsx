@@ -1,8 +1,18 @@
 import { AppText } from '@/components/AppText';
 import { Button } from '@/components/Button';
-import { PlaceCard } from '@/components/cards/variants/PlaceCard/PlaceCard';
 import { HomeSuggestionCard } from '@/components/cards/variants/HomeSuggestionCard';
-import { VIBES } from '@/constants/vibes';
+import { PlaceCard } from '@/components/cards/variants/PlaceCard/PlaceCard';
+import { VIBE_ICONS } from '@/constants/vibes/vibeIcons';
+import { VIBES } from '@/constants/vibes/vibes';
+import type { Place } from '@/features/place/place.types';
+import {
+  getHomeRecommendations,
+  getSurpriseRecommendation,
+  type HomeTripSuggestion
+} from '@/services/trip.service';
+import { getUserProfile, toggleSavePlace } from '@/services/user.service';
+import colors from '@/theme/colors';
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import {
@@ -13,36 +23,8 @@ import {
   ScrollView,
   View
 } from 'react-native';
-import { useAuth } from '../../../context/AuthContext';
-import { getUserProfile, toggleSavePlace } from '@/services/user.service';
-import {
-  getHomeRecommendations,
-  getSurpriseRecommendation,
-  type HomeTripSuggestion
-} from '@/services/trip.service';
-import type { Place } from '@/features/place/place.types';
-import colors from '@/theme/colors';
-import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-const VIBE_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
-  thrill: 'rocket-outline',
-  mountain: 'triangle-outline',
-  spiritual: 'leaf-outline',
-  culture: 'book-outline',
-  nature: 'leaf-outline',
-  foodie: 'restaurant-outline',
-  chill: 'moon-outline',
-  social: 'people-outline',
-  photo: 'camera-outline',
-  budget: 'wallet-outline',
-  luxury: 'star-outline',
-  family: 'home-outline',
-  romantic: 'heart-outline',
-  solo: 'person-outline',
-  offbeat: 'compass-outline',
-  wellness: 'fitness-outline'
-};
+import { useAuth } from '../../../context/AuthContext';
 
 export default function HomeScreen() {
   const { user } = useAuth();
