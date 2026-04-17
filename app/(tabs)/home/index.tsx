@@ -2,7 +2,7 @@ import { AppText } from '@/components/AppText';
 import { Button } from '@/components/Button';
 import { HomeSuggestionCard } from '@/components/cards/variants/HomeSuggestionCard';
 import { PlaceCard } from '@/components/cards/variants/PlaceCard/PlaceCard';
-import { VIBE_ICONS } from '@/constants/vibes/vibeIcons';
+import { VibeChip } from '@/components/VibeChip'; // ✅ NEW
 import { VIBES } from '@/constants/vibes/vibes';
 import type { Place } from '@/features/place/place.types';
 import { useSavePlace } from '@/hooks/place/useSavePlace';
@@ -19,7 +19,6 @@ import { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
-  Image,
   Pressable,
   ScrollView,
   View
@@ -30,7 +29,6 @@ import { useAuth } from '../../../context/AuthContext';
 export default function HomeScreen() {
   const { user } = useAuth();
 
-  // ✅ hook replaces local state + logic
   const { savedPlaces, toggleSave, setSavedPlaces } = useSavePlace();
 
   const [selectedVibe, setSelectedVibe] = useState<string>('all');
@@ -47,7 +45,6 @@ export default function HomeScreen() {
   );
   const [loadingSurprise, setLoadingSurprise] = useState(false);
 
-  // ✅ hydrate saved places
   useEffect(() => {
     getUserProfile()
       .then(profile => setSavedPlaces(profile.savedPlaces))
@@ -133,7 +130,7 @@ export default function HomeScreen() {
 
   const ListHeader = (
     <View style={{ gap: 0 }}>
-      {/* ── Top bar ── */}
+      {/* Top bar */}
       <View
         style={{
           flexDirection: 'row',
@@ -184,82 +181,23 @@ export default function HomeScreen() {
         />
       </View>
 
+      {/* ✅ Vibe Chips */}
       <View style={{ paddingBottom: 16 }}>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ paddingHorizontal: 16, gap: 10 }}
         >
-          {vibeChips.map(chip => {
-            const isSelected = selectedVibe === chip.id;
-            return (
-              <Pressable
-                key={chip.id}
-                onPress={() => setSelectedVibe(chip.id)}
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: 8,
-                  paddingHorizontal: 14,
-                  paddingVertical: 8,
-                  borderRadius: 24,
-                  backgroundColor: isSelected
-                    ? colors.brand.primary
-                    : colors.brand.neutrals,
-                  borderWidth: 1.5,
-                  borderColor: isSelected
-                    ? colors.brand.primary
-                    : colors.brand.neutrals
-                }}
-              >
-                {chip.id !== 'all' && chip.image ? (
-                  <Image
-                    source={{ uri: chip.image }}
-                    style={{
-                      width: 22,
-                      height: 22,
-                      borderRadius: 11,
-                      opacity: isSelected ? 1 : 0.85
-                    }}
-                  />
-                ) : chip.id === 'all' ? (
-                  <Ionicons
-                    name="apps-outline"
-                    size={16}
-                    color={isSelected ? 'white' : colors.brand.secondary}
-                  />
-                ) : (
-                  <Ionicons
-                    name={VIBE_ICONS[chip.id] ?? 'sparkles-outline'}
-                    size={16}
-                    color={isSelected ? 'white' : colors.brand.secondary}
-                  />
-                )}
-                <AppText
-                  style={{
-                    fontSize: 13,
-                    fontWeight: '600',
-                    color: isSelected ? 'white' : colors.brand.secondary
-                  }}
-                >
-                  {chip.title}
-                </AppText>
-
-                {!isSelected &&
-                  chip.id !== 'all' &&
-                  topVibes.includes(chip.id) && (
-                    <View
-                      style={{
-                        backgroundColor: colors.brand.primary,
-                        width: 7,
-                        height: 7,
-                        borderRadius: 3.5
-                      }}
-                    />
-                  )}
-              </Pressable>
-            );
-          })}
+          {vibeChips.map(chip => (
+            <VibeChip
+              key={chip.id}
+              id={chip.id}
+              title={chip.title}
+              isSelected={selectedVibe === chip.id}
+              showDot={chip.id !== 'all' && topVibes.includes(chip.id)}
+              onPress={() => setSelectedVibe(chip.id)}
+            />
+          ))}
         </ScrollView>
       </View>
 
