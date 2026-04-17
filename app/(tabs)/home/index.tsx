@@ -11,7 +11,7 @@ import {
   getSurpriseRecommendation,
   type HomeTripSuggestion
 } from '@/services/trip.service';
-import { getUserProfile } from '@/services/user.service'; // ❌ removed toggleSavePlace
+import { getUserProfile } from '@/services/user.service';
 import colors from '@/theme/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';

@@ -1,4 +1,5 @@
 import { ScrollView, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface ScreenProps {
   children: React.ReactNode;
@@ -11,11 +12,13 @@ export function Screen({
   scroll = true,
   padded = true
 }: ScreenProps) {
+  const insets = useSafeAreaInsets();
+
   const paddingStyles = padded
     ? {
-        paddingTop: 64,
+        paddingTop: insets.top + 16, // 👈 dynamic instead of 64
         paddingHorizontal: 24,
-        paddingBottom: 120
+        paddingBottom: insets.bottom + 40
       }
     : {};
 
