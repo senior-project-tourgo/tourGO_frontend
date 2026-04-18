@@ -12,6 +12,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { Image, Linking, Pressable, ScrollView, View } from 'react-native';
 import { PromotionCard } from '../PromotionCard';
+import { VIBE_ICONS } from '@/constants/vibes/vibeIcons';
+import { FACILITY_ICONS } from '@/constants/facilityIcons';
 
 type PlaceInfoProps = {
   place: Place;
@@ -44,48 +46,6 @@ const DAYS: (keyof OpeningHours)[] = [
   'saturday',
   'sunday'
 ];
-
-const FACILITY_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
-  parking: 'car-outline',
-  wifi: 'wifi-outline',
-  wheelchair: 'accessibility-outline',
-  restroom: 'water-outline',
-  atm: 'card-outline',
-  restaurant: 'restaurant-outline',
-  'kid-friendly': 'happy-outline',
-  photography: 'camera-outline',
-  'guided tour': 'person-outline',
-  souvenir: 'bag-outline',
-  prayer: 'book-outline',
-  meditation: 'leaf-outline'
-};
-
-const VIBE_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
-  thrill: 'rocket-outline',
-  mountain: 'triangle-outline',
-  spiritual: 'leaf-outline',
-  culture: 'book-outline',
-  nature: 'leaf-outline',
-  foodie: 'restaurant-outline',
-  chill: 'moon-outline',
-  social: 'people-outline',
-  photo: 'camera-outline',
-  budget: 'wallet-outline',
-  luxury: 'star-outline',
-  family: 'home-outline',
-  romantic: 'heart-outline',
-  solo: 'person-outline',
-  offbeat: 'compass-outline',
-  wellness: 'fitness-outline',
-  nightlife: 'moon-outline',
-  bars_and_pubs: 'wine-outline',
-  shopping: 'bag-outline',
-  arts: 'color-palette-outline',
-  music: 'musical-notes-outline',
-  sports: 'football-outline',
-  history: 'library-outline',
-  beaches: 'sunny-outline'
-};
 
 function getFacilityIcon(facility: string): keyof typeof Ionicons.glyphMap {
   return FACILITY_ICONS[facility.toLowerCase()] ?? 'checkmark-circle-outline';
@@ -368,7 +328,7 @@ export function PlaceInfoCard({
                       fontWeight: '600'
                     }}
                   >
-                    #{label}
+                    {label}
                   </AppText>
                 </View>
               );
