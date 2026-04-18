@@ -6,10 +6,10 @@ interface SaveStore {
 }
 
 export const useSaveStore = create<SaveStore>(
-  (set: (fn: (state: SaveStore) => Partial<SaveStore>) => void) => ({
+  (set) => ({
     savedPlaces: [],
     setSavedPlaces: (places: string[] | ((prev: string[]) => string[])) =>
-      set((state: SaveStore) => ({
+      set((state) => ({
         savedPlaces:
           typeof places === 'function' ? places(state.savedPlaces) : places
       }))
