@@ -1,12 +1,12 @@
 import { AppText } from '@/components/AppText';
 import { Badge } from '@/components/Badge';
 import { SwipeToUnlock } from '@/components/SwipeToUnlock';
-import type { ApiPromotion } from '@/services/promotion.service';
+import { VIBES } from '@/constants/vibes/vibes';
 import type { Place } from '@/features/place/place.types';
+import type { ApiPromotion } from '@/services/promotion.service';
 import colors from '@/theme/colors';
 import { getPlaceOpeningStatus } from '@/utils/openingHours';
 import { Ionicons } from '@expo/vector-icons';
-import { VIBES } from '@/constants/vibes';
 import { useState } from 'react';
 import { Pressable, TouchableOpacity, View } from 'react-native';
 import { ImageWithFallback } from './ImageWithFallback';

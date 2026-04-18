@@ -1,13 +1,13 @@
 import { AppText } from '@/components/AppText';
+import { Badge } from '@/components/Badge';
+import { VIBES } from '@/constants/vibes/vibes';
 import type { Place } from '@/features/place/place.types';
 import colors from '@/theme/colors';
+import { getPlaceOpeningStatus } from '@/utils/openingHours';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, View } from 'react-native';
 import { BaseCardProps } from '../../BaseCard';
 import { ImageWithFallback } from './ImageWithFallback';
-import { getPlaceOpeningStatus } from '@/utils/openingHours';
-import { Badge } from '@/components/Badge';
-import { VIBES } from '@/constants/vibes';
 
 function formatVibeLabel(id: string) {
   return id
@@ -39,7 +39,7 @@ export function PlaceCard({
   const vibeImageUrl = VIBES.find(v => place.vibe?.includes(v.id))?.image;
 
   return (
-    <Pressable onPress={() => onPress?.(place)} className="w-[345px]">
+    <Pressable onPress={() => onPress?.(place)} className="w-full">
       <View className="relative h-60 flex-row gap-4 rounded-2xl bg-colors-surface-background p-4 shadow-sm">
         <ImageWithFallback
           primaryImageUrl={place.image}
