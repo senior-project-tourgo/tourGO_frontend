@@ -210,7 +210,7 @@ export default function HomeScreen() {
             flexDirection: 'row',
             alignItems: 'center',
             gap: 6,
-            backgroundColor: colors.brand.primary,
+            backgroundColor: colors.brand.secondary,
             paddingHorizontal: 14,
             paddingVertical: 10,
             borderRadius: 20,
