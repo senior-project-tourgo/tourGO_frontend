@@ -15,7 +15,7 @@ import { getUserProfile } from '@/services/user.service';
 import colors from '@/theme/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -28,7 +28,6 @@ import { useAuth } from '../../../context/AuthContext';
 
 export default function HomeScreen() {
   const { user } = useAuth();
-
   const { savedPlaces, toggleSave, setSavedPlaces } = useSavePlace();
 
   const [selectedVibe, setSelectedVibe] = useState<string>('all');
@@ -37,7 +36,8 @@ export default function HomeScreen() {
   const [places, setPlaces] = useState<Place[]>([]);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
-  const [loadingFeed, setLoadingFeed] = useState(true);
+
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
 
   const [tripSuggestions, setTripSuggestions] = useState<HomeTripSuggestion[]>(
@@ -45,7 +45,6 @@ export default function HomeScreen() {
   );
   const [loadingSurprise, setLoadingSurprise] = useState(false);
 
-  // ✅ hydrate ONLY if not already loaded
   useEffect(() => {
     if (savedPlaces.length > 0) return;
 
@@ -56,11 +55,12 @@ export default function HomeScreen() {
 
   const fetchFeed = useCallback(
     async (vibe: string, pageNum: number, append: boolean) => {
-      if (pageNum === 0) setLoadingFeed(true);
+      if (pageNum === 0) setIsRefreshing(true);
       else setLoadingMore(true);
 
       try {
         const result = await getHomeRecommendations(vibe, pageNum);
+
         setHasMore(result.hasMore);
 
         if (append) {
@@ -68,14 +68,14 @@ export default function HomeScreen() {
         } else {
           setPlaces(result.places);
           setTripSuggestions(result.tripSuggestions);
+
           setTopVibes(prev => {
             const merged = [...new Set([...result.topVibes, ...prev])];
             return merged.slice(0, 10);
           });
         }
-      } catch {
       } finally {
-        setLoadingFeed(false);
+        setIsRefreshing(false);
         setLoadingMore(false);
       }
     },
@@ -97,9 +97,11 @@ export default function HomeScreen() {
   const handleSurpriseMe = async () => {
     if (loadingSurprise) return;
     setLoadingSurprise(true);
+
     try {
       const result = await getSurpriseRecommendation();
       const placeIds = result.recommendedPlaces.map(p => p.placeId).join(',');
+
       router.push({
         pathname: '/review-trip',
         params: {
@@ -107,7 +109,6 @@ export default function HomeScreen() {
           itineraryName: `Surprise Trip ✨`
         }
       });
-    } catch {
     } finally {
       setLoadingSurprise(false);
     }
@@ -115,6 +116,7 @@ export default function HomeScreen() {
 
   const handleSuggestionPress = (suggestion: HomeTripSuggestion) => {
     const placeIds = suggestion.places.map(p => p.placeId).join(',');
+
     router.push({
       pathname: '/review-trip',
       params: { placeIds, itineraryName: `${suggestion.vibe} trip` }
@@ -125,68 +127,70 @@ export default function HomeScreen() {
   const formattedUsername =
     username.charAt(0).toUpperCase() + username.slice(1);
 
-  const vibeChips = [
-    { id: 'all', title: 'All', image: null },
-    ...topVibes.map(id => VIBES.find(v => v.id === id)).filter(Boolean),
-    ...VIBES.filter(v => !topVibes.includes(v.id))
-  ] as { id: string; title: string; image: string | null }[];
+  const vibeChips = useMemo(
+    () =>
+      [
+        { id: 'all', title: 'All', image: null },
+        ...topVibes.map(id => VIBES.find(v => v.id === id)).filter(Boolean),
+        ...VIBES.filter(v => !topVibes.includes(v.id))
+      ] as { id: string; title: string; image: string | null }[],
+    [topVibes]
+  );
 
-  const ListHeader = (
-    <View style={{ gap: 0 }}>
-      {/* Top bar */}
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'flex-start',
-          justifyContent: 'space-between',
-          paddingHorizontal: 16,
-          paddingTop: 12,
-          paddingBottom: 8
-        }}
-      >
-        <View style={{ flex: 1 }}>
-          <AppText variant="title">Namaste! {formattedUsername}</AppText>
-          <AppText variant="subtitle" style={{ marginTop: 2 }}>
-            Where to today?
-          </AppText>
-        </View>
-
-        <Pressable
-          onPress={handleSurpriseMe}
-          disabled={loadingSurprise}
+  const ListHeader = useMemo(
+    () => (
+      <View>
+        {/* Top */}
+        <View
           style={{
             flexDirection: 'row',
-            alignItems: 'center',
-            gap: 6,
-            backgroundColor: colors.brand.primary,
-            paddingHorizontal: 14,
-            paddingVertical: 10,
-            padding: 10,
-            borderRadius: 20,
-            marginTop: 4,
-            opacity: loadingSurprise ? 0.7 : 1
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            paddingHorizontal: 16,
+            paddingTop: 12,
+            paddingBottom: 8
           }}
         >
-          {loadingSurprise ? (
-            <ActivityIndicator size="small" color="white" />
-          ) : (
-            <Ionicons name="shuffle-outline" size={16} color="white" />
-          )}
-          <AppText style={{ color: 'white', fontWeight: '700', fontSize: 13 }}>
-            {loadingSurprise ? 'Thinking…' : 'Surprise Me'}
-          </AppText>
-        </Pressable>
-      </View>
+          <View style={{ flex: 1 }}>
+            <AppText variant="title">Namaste! {formattedUsername}</AppText>
+            <AppText variant="subtitle">Where to today?</AppText>
+          </View>
 
-      <View style={{ paddingHorizontal: 16, paddingBottom: 16 }}>
-        <Button
-          title="Curate New Trip"
-          onPress={() => router.push('/(tabs)/trip-generator')}
-        />
-      </View>
+          <Pressable
+            onPress={handleSurpriseMe}
+            disabled={loadingSurprise}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 6,
+              backgroundColor: colors.brand.primary,
+              paddingHorizontal: 14,
+              paddingVertical: 10,
+              borderRadius: 20,
+              opacity: loadingSurprise ? 0.7 : 1
+            }}
+          >
+            {loadingSurprise ? (
+              <ActivityIndicator size="small" color="white" />
+            ) : (
+              <Ionicons name="shuffle-outline" size={16} color="white" />
+            )}
+            <AppText
+              style={{ color: 'white', fontWeight: '700', fontSize: 13 }}
+            >
+              {loadingSurprise ? 'Thinking…' : 'Surprise Me'}
+            </AppText>
+          </Pressable>
+        </View>
 
-      {/* Vibe Chips */}
-      <View style={{ paddingBottom: 16 }}>
+        <View style={{ paddingHorizontal: 16, paddingBottom: 16 }}>
+          <Button
+            title="Curate New Trip"
+            onPress={() => router.push('/(tabs)/trip-generator')}
+          />
+        </View>
+
+        {/* Vibes */}
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -203,95 +207,72 @@ export default function HomeScreen() {
             />
           ))}
         </ScrollView>
-      </View>
 
-      {tripSuggestions.length > 0 && (
-        <View style={{ gap: 12, marginBottom: 20 }}>
-          <AppText
-            style={{
-              fontSize: 16,
-              fontWeight: '700',
-              paddingHorizontal: 16,
-              color: colors.text.DEFAULT
-            }}
-          >
-            Picked For You
-          </AppText>
-          {tripSuggestions.map((s, i) => (
-            <HomeSuggestionCard
-              key={i}
-              reason={s.reason}
-              places={s.places}
-              onPress={() => handleSuggestionPress(s)}
-            />
-          ))}
-        </View>
-      )}
+        {/* Suggestions */}
+        {tripSuggestions.length > 0 && (
+          <View style={{ marginTop: 16, gap: 12 }}>
+            {tripSuggestions.map((s, i) => (
+              <HomeSuggestionCard
+                key={i}
+                reason={s.reason}
+                places={s.places}
+                onPress={() => handleSuggestionPress(s)}
+              />
+            ))}
+          </View>
+        )}
 
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          paddingHorizontal: 16,
-          marginBottom: 10
-        }}
-      >
-        <AppText
+        {/* ✅ ALWAYS SHOW PLACE SECTION HEADER */}
+        <View
           style={{
-            fontSize: 16,
-            fontWeight: '700',
-            color: colors.text.DEFAULT
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            paddingHorizontal: 16,
+            marginTop: 20,
+            marginBottom: 10
           }}
         >
-          {selectedVibe === 'all'
-            ? 'Explore Places'
-            : `${VIBES.find(v => v.id === selectedVibe)?.title ?? selectedVibe} Spots`}
-        </AppText>
-        <Pressable onPress={() => router.push('/(tabs)/home/gems')}>
-          <AppText
-            style={{
-              fontSize: 13,
-              color: colors.brand.primary,
-              fontWeight: '600'
-            }}
-          >
-            See all
+          <AppText style={{ fontSize: 16, fontWeight: '700' }}>
+            {selectedVibe === 'all'
+              ? 'Explore Places'
+              : `${VIBES.find(v => v.id === selectedVibe)?.title ?? selectedVibe} Spots`}
           </AppText>
-        </Pressable>
+
+          <Pressable onPress={() => router.push('/(tabs)/home/gems')}>
+            <AppText style={{ fontSize: 13, color: colors.brand.primary }}>
+              See all
+            </AppText>
+          </Pressable>
+        </View>
       </View>
-    </View>
+    ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedVibe, vibeChips, tripSuggestions, loadingSurprise]
   );
 
   return (
     <SafeAreaView
       style={{ flex: 1, backgroundColor: colors.surface.background }}
     >
-      {loadingFeed ? (
-        <View style={{ flex: 1 }}>
-          {ListHeader}
-          <View
-            style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
-          >
-            <ActivityIndicator size="large" color={colors.brand.primary} />
+      <FlatList
+        data={places}
+        keyExtractor={item => item.placeId}
+        renderItem={({ item }) => (
+          <View style={{ paddingHorizontal: 16, marginBottom: 12 }}>
+            <PlaceCard
+              place={item}
+              onPress={() => router.push(`/places/${item.placeId}`)}
+              isSaved={savedPlaces.includes(item.placeId)}
+              onToggleSave={() => toggleSave(item.placeId)}
+            />
           </View>
-        </View>
-      ) : (
-        <FlatList
-          data={places}
-          keyExtractor={item => item.placeId}
-          renderItem={({ item: place }) => (
-            <View style={{ paddingHorizontal: 16, marginBottom: 12 }}>
-              <PlaceCard
-                place={place}
-                onPress={() => router.push(`/places/${place.placeId}`)}
-                isSaved={savedPlaces.includes(place.placeId)}
-                onToggleSave={() => toggleSave(place.placeId)} // ✅ updated
-              />
-            </View>
-          )}
-          ListHeaderComponent={ListHeader}
-          ListEmptyComponent={
+        )}
+        ListHeaderComponent={ListHeader}
+        refreshing={isRefreshing}
+        onRefresh={() => fetchFeed(selectedVibe, 0, false)}
+        // ✅ EMPTY STATE INSIDE SECTION
+        ListEmptyComponent={
+          !isRefreshing ? (
             <View
               style={{
                 alignItems: 'center',
@@ -309,34 +290,17 @@ export default function HomeScreen() {
                 No places found for this vibe yet.{'\n'}Try a different filter!
               </AppText>
             </View>
-          }
-          ListFooterComponent={
-            loadingMore ? (
-              <View style={{ paddingVertical: 20, alignItems: 'center' }}>
-                <ActivityIndicator size="small" color={colors.brand.primary} />
-              </View>
-            ) : hasMore ? (
-              <View style={{ paddingHorizontal: 16, paddingVertical: 12 }}>
-                <Button title="Load More" onPress={handleLoadMore} />
-              </View>
-            ) : places.length > 0 ? (
-              <AppText
-                style={{
-                  textAlign: 'center',
-                  color: '#94a3b8',
-                  fontSize: 12,
-                  paddingVertical: 20
-                }}
-              >
-                {"You've seen it all ✓"}
-              </AppText>
-            ) : null
-          }
-          onEndReached={handleLoadMore}
-          onEndReachedThreshold={0.4}
-          showsVerticalScrollIndicator={false}
-        />
-      )}
+          ) : null
+        }
+        ListFooterComponent={
+          loadingMore ? (
+            <ActivityIndicator style={{ marginVertical: 20 }} />
+          ) : null
+        }
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.4}
+        showsVerticalScrollIndicator={false}
+      />
     </SafeAreaView>
   );
 }
