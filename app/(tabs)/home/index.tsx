@@ -257,13 +257,13 @@ export default function HomeScreen() {
       <FlatList
         data={places}
         keyExtractor={item => item.placeId}
-        renderItem={({ item }) => (
+        renderItem={({ item: place }) => (
           <View style={{ paddingHorizontal: 16, marginBottom: 12 }}>
             <PlaceCard
-              place={item}
-              onPress={() => router.push(`/places/${item.placeId}`)}
-              isSaved={savedPlaces.includes(item.placeId)}
-              onToggleSave={() => toggleSave(item.placeId)}
+              place={place}
+              onPress={() => router.push(`/places/${place.placeId}`)}
+              isSaved={savedPlaces.includes(place.placeId)}
+              onToggleSave={() => toggleSave(place.placeId)}
             />
           </View>
         )}
