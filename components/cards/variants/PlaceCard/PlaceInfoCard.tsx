@@ -4,7 +4,7 @@ import { Badge } from '@/components/Badge';
 import { Button } from '@/components/Button';
 import { VIBES } from '@/constants/vibes/vibes';
 import { OpeningHours, Place, PriceRange } from '@/features/place/place.types';
-import { getPlaceGoogleDetails } from '@/services/place.service';
+import { getPlaceGoogleDetails } from '@/services/place/place.service';
 import type { ApiPromotion } from '@/services/promotion.service';
 import colors from '@/theme/colors';
 import { getPlaceOpeningStatus } from '@/utils/openingHours';
@@ -14,6 +14,8 @@ import { Image, Linking, Pressable, ScrollView, View } from 'react-native';
 import { PromotionCard } from '../PromotionCard';
 import { VIBE_ICONS } from '@/constants/vibes/vibeIcons';
 import { FACILITY_ICONS } from '@/constants/facilityIcons';
+import type { GoogleData } from '@/services/place/placeGoogle.types';
+import { BaseCard } from '../../BaseCard';
 
 type PlaceInfoProps = {
   place: Place;
@@ -21,20 +23,6 @@ type PlaceInfoProps = {
   isSaved: boolean;
   saving: boolean;
   onToggleSave: () => void;
-};
-
-type GoogleReview = {
-  author_name: string;
-  rating: number;
-  text: string;
-  relative_time_description: string;
-};
-
-type GoogleData = {
-  description?: string;
-  address?: string;
-  totalRatings?: number;
-  reviews?: GoogleReview[];
 };
 
 const DAYS: (keyof OpeningHours)[] = [
@@ -341,126 +329,114 @@ export function PlaceInfoCard({
 
       {/* ── Typical Time Spent ── */}
       {!!place.typicalTimeSpent && (
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 12,
-            backgroundColor: colors.brand.neutrals,
-            padding: 14,
-            borderRadius: 14
-          }}
-        >
-          <View
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 12,
-              backgroundColor: colors.brand.secondary + '20',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
-            <Ionicons
-              name="time-outline"
-              size={20}
-              color={colors.brand.secondary}
-            />
-          </View>
-          <View>
-            <AppText style={{ fontSize: 11, color: colors.brand.secondary }}>
-              Typical Time Spent
-            </AppText>
-            <AppText
+        <BaseCard>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+            <View
               style={{
-                fontSize: 14,
-                fontWeight: '600',
-                color: colors.text.DEFAULT
+                width: 40,
+                height: 40,
+                borderRadius: 12,
+                backgroundColor: colors.brand.secondary + '20',
+                alignItems: 'center',
+                justifyContent: 'center'
               }}
             >
-              {place.typicalTimeSpent}
-            </AppText>
+              <Ionicons
+                name="time-outline"
+                size={20}
+                color={colors.brand.secondary}
+              />
+            </View>
+
+            <View>
+              <AppText style={{ fontSize: 11 }}>Typical Time Spent</AppText>
+              <AppText
+                style={{
+                  fontSize: 14,
+                  fontWeight: '600',
+                  color: colors.text.DEFAULT
+                }}
+              >
+                {place.typicalTimeSpent}
+              </AppText>
+            </View>
           </View>
-        </View>
+        </BaseCard>
       )}
 
       {/* ── Price Range ── */}
       {!!place.priceRange && (
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 12,
-            backgroundColor: colors.brand.neutrals,
-            padding: 14,
-            borderRadius: 14
-          }}
-        >
-          <View
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 12,
-              backgroundColor: colors.brand.secondary + '20',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
-            <Ionicons
-              name="wallet-outline"
-              size={20}
-              color={colors.brand.secondary}
-            />
-          </View>
-          <View style={{ flex: 1 }}>
-            <AppText style={{ fontSize: 11, color: colors.brand.secondary }}>
-              Price Range
-            </AppText>
+        <BaseCard>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
             <View
               style={{
-                flexDirection: 'row',
+                width: 40,
+                height: 40,
+                borderRadius: 12,
+                backgroundColor: colors.brand.secondary + '20',
                 alignItems: 'center',
-                gap: 6,
-                marginTop: 2
+                justifyContent: 'center'
               }}
             >
-              {(['$', '$$', '$$$', '$$$$'] as PriceRange[]).map(tier => {
-                const active = place.priceRange === tier;
-                return (
-                  <View
-                    key={tier}
-                    style={{
-                      paddingHorizontal: 10,
-                      paddingVertical: 4,
-                      borderRadius: 8,
-                      backgroundColor: active
-                        ? colors.brand.primary
-                        : colors.brand.secondary + '15'
-                    }}
-                  >
-                    <AppText
+              <Ionicons
+                name="wallet-outline"
+                size={20}
+                color={colors.brand.secondary}
+              />
+            </View>
+
+            <View style={{ flex: 1 }}>
+              <AppText style={{ fontSize: 11 }}>Price Range</AppText>
+
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 6,
+                  marginTop: 2
+                }}
+              >
+                {(['$', '$$', '$$$', '$$$$'] as PriceRange[]).map(tier => {
+                  const active = place.priceRange === tier;
+                  return (
+                    <View
+                      key={tier}
                       style={{
-                        fontSize: 13,
-                        fontWeight: active ? '700' : '400',
-                        color: active ? 'white' : colors.brand.secondary + '80'
+                        paddingHorizontal: 10,
+                        paddingVertical: 4,
+                        borderRadius: 8,
+                        backgroundColor: active
+                          ? colors.brand.primary
+                          : colors.brand.secondary + '15'
                       }}
                     >
-                      {tier}
-                    </AppText>
-                  </View>
-                );
-              })}
-              <AppText
-                style={{ fontSize: 12, color: '#94a3b8', marginLeft: 4 }}
-              >
-                {place.priceRange === '$' && 'Under रु 500'}
-                {place.priceRange === '$$' && 'रु 500 – 1,500'}
-                {place.priceRange === '$$$' && 'रु 1,500 – 4,000'}
-                {place.priceRange === '$$$$' && 'रु 4,000+'}
-              </AppText>
+                      <AppText
+                        style={{
+                          fontSize: 13,
+                          fontWeight: active ? '700' : '400',
+                          color: active
+                            ? 'white'
+                            : colors.brand.secondary + '80'
+                        }}
+                      >
+                        {tier}
+                      </AppText>
+                    </View>
+                  );
+                })}
+
+                <AppText
+                  style={{ fontSize: 12, color: '#94a3b8', marginLeft: 4 }}
+                >
+                  {place.priceRange === '$' && 'Under रु 500'}
+                  {place.priceRange === '$$' && 'रु 500 – 1,500'}
+                  {place.priceRange === '$$$' && 'रु 1,500 – 4,000'}
+                  {place.priceRange === '$$$$' && 'रु 4,000+'}
+                </AppText>
+              </View>
             </View>
           </View>
-        </View>
+        </BaseCard>
       )}
 
       {/* ── Google Description ── */}
