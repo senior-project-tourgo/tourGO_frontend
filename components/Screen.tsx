@@ -1,5 +1,6 @@
 import { ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
 interface ScreenProps {
   children: React.ReactNode;
@@ -13,12 +14,13 @@ export function Screen({
   padded = true
 }: ScreenProps) {
   const insets = useSafeAreaInsets();
+  const tabBarHeight = useBottomTabBarHeight();
 
   const paddingStyles = padded
     ? {
-        paddingTop: insets.top + 16, // 👈 dynamic instead of 64
+        paddingTop: insets.top + 16,
         paddingHorizontal: 24,
-        paddingBottom: insets.bottom + 40
+        paddingBottom: tabBarHeight + 16 // 👈 real height + spacing
       }
     : {};
 

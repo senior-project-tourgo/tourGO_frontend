@@ -1,41 +1,44 @@
-import { useState } from 'react';
+import { useRef } from 'react';
 import { toggleSavePlace } from '@/services/user.service';
+import { useSaveStore } from '@/stores/saveStore';
 
-export function useSavePlace(initialSaved: string[] = []) {
-  const [savedPlaces, setSavedPlaces] = useState<string[]>(initialSaved);
-  const [savingId, setSavingId] = useState<string | null>(null);
+export function useSavePlace() {
+  const savedPlaces = useSaveStore(state => state.savedPlaces);
+  const setSavedPlaces = useSaveStore(state => state.setSavedPlaces);
+
+  // per-id in-flight guard (sync, no re-render)
+  const inFlightRef = useRef<Set<string>>(new Set());
 
   const toggleSave = async (placeId: string) => {
-    if (savingId) return;
+    if (inFlightRef.current.has(placeId)) return;
 
-    setSavingId(placeId);
+    inFlightRef.current.add(placeId);
 
-    // optimistic update
-    setSavedPlaces(prev =>
-      prev.includes(placeId)
-        ? prev.filter(id => id !== placeId)
-        : [...prev, placeId]
-    );
+    let wasSaved = false;
+
+    // SAFE optimistic update (no stale closure)
+    setSavedPlaces(prev => {
+      wasSaved = prev.includes(placeId);
+
+      return wasSaved ? prev.filter(id => id !== placeId) : [...prev, placeId];
+    });
 
     try {
       const result = await toggleSavePlace(placeId);
       setSavedPlaces(result.savedPlaces);
     } catch {
-      // rollback
+      // rollback using captured value
       setSavedPlaces(prev =>
-        prev.includes(placeId)
-          ? prev.filter(id => id !== placeId)
-          : [...prev, placeId]
+        wasSaved ? [...prev, placeId] : prev.filter(id => id !== placeId)
       );
     } finally {
-      setSavingId(null);
+      inFlightRef.current.delete(placeId);
     }
   };
 
   return {
     savedPlaces,
-    savingId,
     toggleSave,
-    setSavedPlaces // for initial hydration
+    setSavedPlaces // keep for hydration
   };
 }

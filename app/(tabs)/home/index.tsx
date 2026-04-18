@@ -2,7 +2,7 @@ import { AppText } from '@/components/AppText';
 import { Button } from '@/components/Button';
 import { HomeSuggestionCard } from '@/components/cards/variants/HomeSuggestionCard';
 import { PlaceCard } from '@/components/cards/variants/PlaceCard/PlaceCard';
-import { VibeChip } from '@/components/VibeChip'; // ✅ NEW
+import { VibeChip } from '@/components/VibeChip';
 import { VIBES } from '@/constants/vibes/vibes';
 import type { Place } from '@/features/place/place.types';
 import { useSavePlace } from '@/hooks/place/useSavePlace';
@@ -45,11 +45,14 @@ export default function HomeScreen() {
   );
   const [loadingSurprise, setLoadingSurprise] = useState(false);
 
+  // ✅ hydrate ONLY if not already loaded
   useEffect(() => {
+    if (savedPlaces.length > 0) return;
+
     getUserProfile()
       .then(profile => setSavedPlaces(profile.savedPlaces))
       .catch(() => {});
-  }, [setSavedPlaces]);
+  }, [savedPlaces.length, setSavedPlaces]);
 
   const fetchFeed = useCallback(
     async (vibe: string, pageNum: number, append: boolean) => {
@@ -158,6 +161,7 @@ export default function HomeScreen() {
             backgroundColor: colors.brand.primary,
             paddingHorizontal: 14,
             paddingVertical: 10,
+            padding: 10,
             borderRadius: 20,
             marginTop: 4,
             opacity: loadingSurprise ? 0.7 : 1
@@ -181,7 +185,7 @@ export default function HomeScreen() {
         />
       </View>
 
-      {/* ✅ Vibe Chips */}
+      {/* Vibe Chips */}
       <View style={{ paddingBottom: 16 }}>
         <ScrollView
           horizontal
@@ -282,7 +286,7 @@ export default function HomeScreen() {
                 place={place}
                 onPress={() => router.push(`/places/${place.placeId}`)}
                 isSaved={savedPlaces.includes(place.placeId)}
-                onToggleSave={p => toggleSave(p.placeId)}
+                onToggleSave={() => toggleSave(place.placeId)} // ✅ updated
               />
             </View>
           )}
