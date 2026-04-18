@@ -962,51 +962,47 @@ export function PlaceInfoCard({
             </View>
 
             {/* Average rating bar */}
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 10,
-                backgroundColor: colors.brand.neutrals + '60',
-                padding: 14,
-                borderRadius: 14,
-                marginBottom: 12
-              }}
-            >
-              <AppText
-                style={{
-                  fontSize: 36,
-                  fontWeight: '800',
-                  color: colors.brand.primary
-                }}
+            <BaseCard className="mb-3">
+              <View
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}
               >
-                {(
-                  place.reviews.reduce((s, r) => s + r.rating, 0) /
-                  place.reviews.length
-                ).toFixed(1)}
-              </AppText>
-              <View style={{ flex: 1, gap: 4 }}>
-                <View style={{ flexDirection: 'row', gap: 3 }}>
-                  {Array.from({ length: 5 }).map((_, si) => {
-                    const avg =
-                      place.reviews!.reduce((s, r) => s + r.rating, 0) /
-                      place.reviews!.length;
-                    return (
-                      <Ionicons
-                        key={si}
-                        name={si < Math.round(avg) ? 'star' : 'star-outline'}
-                        size={16}
-                        color={colors.brand.primary}
-                      />
-                    );
-                  })}
-                </View>
-                <AppText style={{ fontSize: 12, color: '#64748b' }}>
-                  Based on {place.reviews.length} review
-                  {place.reviews.length !== 1 ? 's' : ''}
+                <AppText
+                  style={{
+                    fontSize: 36,
+                    fontWeight: '800',
+                    color: colors.brand.primary
+                  }}
+                >
+                  {(
+                    place.reviews.reduce((s, r) => s + r.rating, 0) /
+                    place.reviews.length
+                  ).toFixed(1)}
                 </AppText>
+
+                <View style={{ flex: 1, gap: 4 }}>
+                  <View style={{ flexDirection: 'row', gap: 3 }}>
+                    {Array.from({ length: 5 }).map((_, si) => {
+                      const avg =
+                        place.reviews!.reduce((s, r) => s + r.rating, 0) /
+                        place.reviews!.length;
+                      return (
+                        <Ionicons
+                          key={si}
+                          name={si < Math.round(avg) ? 'star' : 'star-outline'}
+                          size={16}
+                          color={colors.brand.primary}
+                        />
+                      );
+                    })}
+                  </View>
+
+                  <AppText style={{ fontSize: 12, color: '#64748b' }}>
+                    Based on {place.reviews.length} review
+                    {place.reviews.length !== 1 ? 's' : ''}
+                  </AppText>
+                </View>
               </View>
-            </View>
+            </BaseCard>
 
             <ScrollView
               horizontal
