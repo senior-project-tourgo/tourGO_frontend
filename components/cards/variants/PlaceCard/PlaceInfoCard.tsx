@@ -16,6 +16,7 @@ import { VIBE_ICONS } from '@/constants/vibes/vibeIcons';
 import { FACILITY_ICONS } from '@/constants/facilityIcons';
 import type { GoogleData } from '@/services/place/placeGoogle.types';
 import { BaseCard } from '../../BaseCard';
+import { PillTabs } from '@/components/PillTabs';
 
 type PlaceInfoProps = {
   place: Place;
@@ -81,6 +82,9 @@ export function PlaceInfoCard({
   const todayName =
     DAYS[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1];
   const [googleData, setGoogleData] = useState<GoogleData>({});
+  const [placeDetailsTab, setPlaceDetailsTab] = useState<'about' | 'reviews'>(
+    'about'
+  );
 
   useEffect(() => {
     if (!place.mapsLinkKey) return;
@@ -161,6 +165,10 @@ export function PlaceInfoCard({
   }
 
   const staticMapUrl = `${process.env.EXPO_PUBLIC_API_URL}/places/static-map?lat=${place.location.lat}&lng=${place.location.lng}`;
+
+  const hasAnyReviews =
+    (googleData.reviews && googleData.reviews.length > 0) ||
+    (place.reviews && place.reviews.length > 0);
 
   const Separator = () => (
     <View
@@ -327,778 +335,863 @@ export function PlaceInfoCard({
 
       <Separator />
 
-      {/* ── Google Description ── */}
-      {googleData.description ? (
-        <View className="gap-1">
-          <AppText variant="subtitle">About This Place</AppText>
-          <AppText variant="muted">{googleData.description}</AppText>
-        </View>
-      ) : null}
+      <PillTabs
+        options={[
+          { id: 'about', label: 'About', icon: 'information-circle-outline' },
+          { id: 'reviews', label: 'Reviews', icon: 'chatbubbles-outline' }
+        ]}
+        selectedId={placeDetailsTab}
+        onChange={id => setPlaceDetailsTab(id as 'about' | 'reviews')}
+      />
 
-      {/* ── Typical Time Spent ── */}
-      {!!place.typicalTimeSpent && (
-        <BaseCard>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-            <View
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 12,
-                backgroundColor: colors.brand.secondary + '20',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
-              <Ionicons
-                name="time-outline"
-                size={20}
-                color={colors.brand.secondary}
-              />
-            </View>
-
-            <View>
-              <AppText style={{ fontSize: 11 }}>Typical Time Spent</AppText>
-              <AppText
-                style={{
-                  fontSize: 14,
-                  fontWeight: '600',
-                  color: colors.text.DEFAULT
-                }}
-              >
-                {place.typicalTimeSpent}
-              </AppText>
-            </View>
-          </View>
-        </BaseCard>
-      )}
-
-      {/* ── Price Range ── */}
-      {!!place.priceRange && (
-        <BaseCard>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-            <View
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 12,
-                backgroundColor: colors.brand.secondary + '20',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
-              <Ionicons
-                name="wallet-outline"
-                size={20}
-                color={colors.brand.secondary}
-              />
-            </View>
-
-            <View style={{ flex: 1 }}>
-              <AppText style={{ fontSize: 11 }}>Price Range</AppText>
-
+      {placeDetailsTab === 'about' && (
+        <>
+          {/* ── Google Description ── */}
+          {googleData.description ? (
+            <View className="gap-1">
               <View
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
-                  gap: 6,
-                  marginTop: 2
+                  gap: 8
                 }}
               >
-                {(['$', '$$', '$$$', '$$$$'] as PriceRange[]).map(tier => {
-                  const active = place.priceRange === tier;
-                  return (
-                    <View
-                      key={tier}
-                      style={{
-                        paddingHorizontal: 10,
-                        paddingVertical: 4,
-                        borderRadius: 8,
-                        backgroundColor: active
-                          ? colors.brand.secondary
-                          : colors.brand.secondary + '15'
-                      }}
-                    >
-                      <AppText
-                        style={{
-                          fontSize: 13,
-                          fontWeight: active ? '700' : '400',
-                          color: active
-                            ? 'white'
-                            : colors.brand.secondary + '80'
-                        }}
-                      >
-                        {tier}
-                      </AppText>
-                    </View>
-                  );
-                })}
-
-                <AppText
-                  style={{ fontSize: 12, color: '#94a3b8', marginLeft: 4 }}
-                >
-                  {place.priceRange === '$' && 'Under रु 500'}
-                  {place.priceRange === '$$' && 'रु 500 – 1,500'}
-                  {place.priceRange === '$$$' && 'रु 1,500 – 4,000'}
-                  {place.priceRange === '$$$$' && 'रु 4,000+'}
-                </AppText>
+                <Ionicons
+                  name="business"
+                  size={18}
+                  color={colors.text.DEFAULT}
+                />
+                <AppText variant="subtitle">About This Place</AppText>
               </View>
+              <AppText variant="muted">{googleData.description}</AppText>
             </View>
-          </View>
-        </BaseCard>
-      )}
+          ) : null}
 
-      {/* ── Address ── */}
-      {googleData.address || place.address ? (
-        <BaseCard>
-          <Pressable
-            onPress={openMaps}
-            style={{
-              flexDirection: 'row',
-              alignItems: 'flex-start',
-              gap: 10
-            }}
-          >
-            <View
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 12,
-                backgroundColor: colors.brand.secondary + '20',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
-              <Ionicons
-                name="location-outline"
-                size={20}
-                color={colors.brand.secondary}
-              />
-            </View>
-
-            <View>
-              <AppText style={{ fontSize: 11 }}>Location</AppText>
-              <AppText
-                style={{
-                  fontSize: 13,
-                  color: colors.brand.primary,
-                  flex: 1,
-                  lineHeight: 19
-                }}
-              >
-                {googleData.address || place.address}
-              </AppText>
-            </View>
-          </Pressable>
-        </BaseCard>
-      ) : null}
-
-      {/* ── Static Map ── */}
-      {staticMapUrl ? (
-        <Pressable
-          onPress={openMaps}
-          style={{ borderRadius: 16, overflow: 'hidden' }}
-        >
-          <Image
-            source={{ uri: staticMapUrl }}
-            style={{ width: '100%', height: 150 }}
-            resizeMode="cover"
-          />
-          <View
-            style={{
-              position: 'absolute',
-              bottom: 10,
-              right: 10,
-              backgroundColor: 'white',
-              borderRadius: 22,
-              paddingHorizontal: 10,
-              paddingVertical: 6,
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 5,
-              shadowColor: '#000',
-              shadowOpacity: 0.12,
-              shadowRadius: 6,
-              elevation: 4
-            }}
-          >
-            <Ionicons
-              name="map-outline"
-              size={13}
-              color={colors.brand.primary}
-            />
-            <AppText
-              style={{
-                fontSize: 12,
-                fontWeight: '600',
-                color: colors.brand.primary
-              }}
-            >
-              Open in Maps
-            </AppText>
-          </View>
-        </Pressable>
-      ) : null}
-
-      {/* ── Facilities ── */}
-      {place.specialFacilities?.length > 0 && (
-        <>
-          <Separator />
-          <View>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 8,
-                marginBottom: 14
-              }}
-            >
-              <Ionicons
-                name="business-outline"
-                size={16}
-                color={colors.brand.secondary}
-              />
-              <AppText style={{ fontSize: 15, fontWeight: '600' }}>
-                Facilities
-              </AppText>
-            </View>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
-              {place.specialFacilities.map(f => (
-                <View
-                  key={f}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: 6,
-                    backgroundColor: colors.brand.neutrals,
-                    paddingHorizontal: 12,
-                    paddingVertical: 8,
-                    borderRadius: 10
-                  }}
-                >
-                  <Ionicons
-                    name={getFacilityIcon(f)}
-                    size={14}
-                    color={colors.brand.secondary}
-                  />
-                  <AppText
-                    style={{ fontSize: 12, color: colors.brand.secondary }}
-                  >
-                    {capitalize(f)}
-                  </AppText>
-                </View>
-              ))}
-            </View>
-          </View>
-        </>
-      )}
-
-      {/* ── Best For ── */}
-      {place.suitableFor?.length > 0 && (
-        <>
-          <Separator />
-          <View>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 8,
-                marginBottom: 14
-              }}
-            >
-              <Ionicons
-                name="people-outline"
-                size={16}
-                color={colors.brand.secondary}
-              />
-              <AppText style={{ fontSize: 15, fontWeight: '600' }}>
-                Best For
-              </AppText>
-            </View>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-              {place.suitableFor.map(s => (
-                <Badge key={s} label={capitalize(s)} />
-              ))}
-            </View>
-          </View>
-        </>
-      )}
-
-      {/* ── Opening Hours (Accordion) ── */}
-      <Separator />
-      <Accordion
-        icon="time-outline"
-        title="Opening Hours"
-        summary={
-          openingStatus.isOpenNow
-            ? openingStatus.nextTime
-              ? `Closes ${openingStatus.nextTime.time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
-              : 'Open now'
-            : 'Closed today'
-        }
-      >
-        {DAYS.map(day => (
-          <View
-            key={day}
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center'
-            }}
-          >
-            <AppText
-              style={{
-                fontSize: 13,
-                width: 90,
-                textTransform: 'capitalize',
-                fontWeight: day === todayName ? '700' : '400',
-                color:
-                  day === todayName ? colors.brand.primary : colors.text.DEFAULT
-              }}
-            >
-              {day}
-            </AppText>
-            <AppText
-              style={{
-                fontSize: 13,
-                color: day === todayName ? colors.brand.primary : '#64748b'
-              }}
-            >
-              {formatDayHours(place.openingHours[day])}
-            </AppText>
-          </View>
-        ))}
-      </Accordion>
-
-      {/* ── Contact ── */}
-      {(place.contactNumber || socialLinks.length > 0) && (
-        <>
-          <Separator />
-          <View>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 8,
-                marginBottom: 14
-              }}
-            >
-              <Ionicons
-                name="call-outline"
-                size={16}
-                color={colors.brand.secondary}
-              />
-              <AppText style={{ fontSize: 15, fontWeight: '600' }}>
-                Contact
-              </AppText>
-            </View>
-
-            {/* Phone number pill */}
-            {place.contactNumber ? (
-              <Pressable
-                onPress={() => Linking.openURL(`tel:${place.contactNumber}`)}
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: 12,
-                  backgroundColor: colors.brand.neutrals,
-                  padding: 14,
-                  borderRadius: 14,
-                  marginBottom: socialLinks.length > 0 ? 16 : 0
-                }}
+          {/* ── Typical Time Spent ── */}
+          {!!place.typicalTimeSpent && (
+            <BaseCard>
+              <View
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}
               >
                 <View
                   style={{
-                    width: 42,
-                    height: 42,
-                    borderRadius: 21,
-                    backgroundColor: colors.brand.primary + '20',
+                    width: 40,
+                    height: 40,
+                    borderRadius: 12,
+                    backgroundColor: colors.brand.secondary + '20',
                     alignItems: 'center',
                     justifyContent: 'center'
                   }}
                 >
                   <Ionicons
-                    name="call-outline"
-                    size={19}
-                    color={colors.brand.primary}
+                    name="time-outline"
+                    size={20}
+                    color={colors.brand.secondary}
                   />
                 </View>
-                <View style={{ flex: 1 }}>
-                  <AppText style={{ fontSize: 11, color: '#94a3b8' }}>
-                    Phone
-                  </AppText>
+
+                <View>
+                  <AppText style={{ fontSize: 11 }}>Typical Time Spent</AppText>
                   <AppText
                     style={{
                       fontSize: 14,
-                      fontWeight: '700',
-                      color: colors.brand.primary
+                      fontWeight: '600',
+                      color: colors.text.DEFAULT
                     }}
                   >
-                    {place.contactNumber}
-                  </AppText>
-                </View>
-                <Ionicons name="call" size={16} color={colors.brand.primary} />
-              </Pressable>
-            ) : null}
-
-            {/* Social media circular icons */}
-            {socialLinks.length > 0 && (
-              <View style={{ flexDirection: 'row', gap: 20, flexWrap: 'wrap' }}>
-                {socialLinks.map(link => (
-                  <Pressable
-                    key={link.platform}
-                    onPress={() => Linking.openURL(link.url)}
-                    style={{ alignItems: 'center', gap: 6, minWidth: 56 }}
-                  >
-                    <View
-                      style={{
-                        width: 52,
-                        height: 52,
-                        borderRadius: 26,
-                        backgroundColor: colors.brand.neutrals,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderWidth: 1.5,
-                        borderColor: colors.brand.primary + '30'
-                      }}
-                    >
-                      <Ionicons
-                        name={link.icon}
-                        size={24}
-                        color={colors.brand.secondary}
-                      />
-                    </View>
-                    <AppText
-                      style={{
-                        fontSize: 10,
-                        color: '#64748b',
-                        textAlign: 'center',
-                        maxWidth: 72
-                      }}
-                      numberOfLines={1}
-                    >
-                      {link.subtitle}
-                    </AppText>
-                    <AppText
-                      style={{
-                        fontSize: 9,
-                        color: '#94a3b8',
-                        textAlign: 'center'
-                      }}
-                    >
-                      {link.platform}
-                    </AppText>
-                  </Pressable>
-                ))}
-              </View>
-            )}
-          </View>
-        </>
-      )}
-
-      {/* ── Save CTA ── */}
-      <Separator />
-      <Button
-        title={
-          saving
-            ? 'Saving...'
-            : isSaved
-              ? 'Saved to Wishlist'
-              : 'Save to Wishlist'
-        }
-        onPress={onToggleSave}
-        disabled={saving}
-        className={isSaved ? 'bg-colors-surface-muted' : ''}
-        textColor={isSaved ? colors.brand.secondary : colors.text.inverse}
-      />
-
-      {/* ── Promotions ── */}
-      {promotions.length > 0 && (
-        <>
-          <Separator />
-          <View>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 8,
-                marginBottom: 14
-              }}
-            >
-              <Ionicons
-                name="pricetag-outline"
-                size={16}
-                color={colors.brand.secondary}
-              />
-              <AppText style={{ fontSize: 15, fontWeight: '600' }}>
-                Exclusive Offers
-              </AppText>
-            </View>
-            <View style={{ gap: 12 }}>
-              {promotions.map(promo => (
-                <PromotionCard key={promo.promotionId} promo={promo} />
-              ))}
-            </View>
-          </View>
-        </>
-      )}
-
-      {/* ── Traveller Reviews (from Google) ── */}
-      {googleData.reviews && googleData.reviews.length > 0 && (
-        <>
-          <Separator />
-          <View>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 8,
-                marginBottom: 14
-              }}
-            >
-              <Ionicons
-                name="chatbubble-ellipses-outline"
-                size={16}
-                color={colors.brand.secondary}
-              />
-              <AppText style={{ fontSize: 15, fontWeight: '600' }}>
-                Traveller Reviews
-              </AppText>
-              {googleData.totalRatings ? (
-                <AppText
-                  style={{ fontSize: 12, color: '#94a3b8', marginLeft: 'auto' }}
-                >
-                  {googleData.totalRatings.toLocaleString()} total
-                </AppText>
-              ) : null}
-            </View>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ gap: 12, paddingRight: 4 }}
-            >
-              {googleData.reviews.map((review, i) => (
-                <View
-                  key={i}
-                  style={{
-                    width: 260,
-                    backgroundColor: colors.brand.neutrals + '60',
-                    padding: 14,
-                    borderRadius: 14,
-                    gap: 8,
-                    borderWidth: 1,
-                    borderColor: colors.brand.neutrals
-                  }}
-                >
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      alignItems: 'center'
-                    }}
-                  >
-                    <AppText
-                      style={{
-                        fontWeight: '600',
-                        fontSize: 13,
-                        flex: 1,
-                        paddingRight: 8
-                      }}
-                      numberOfLines={1}
-                    >
-                      {review.author_name}
-                    </AppText>
-                    <View style={{ flexDirection: 'row', gap: 2 }}>
-                      {Array.from({ length: 5 }).map((_, si) => (
-                        <Ionicons
-                          key={si}
-                          name={si < review.rating ? 'star' : 'star-outline'}
-                          size={11}
-                          color={colors.brand.primary}
-                        />
-                      ))}
-                    </View>
-                  </View>
-                  <AppText
-                    style={{ fontSize: 12, lineHeight: 18, color: '#555' }}
-                    numberOfLines={5}
-                  >
-                    {review.text}
-                  </AppText>
-                  <AppText style={{ fontSize: 11, color: '#94a3b8' }}>
-                    {review.relative_time_description}
-                  </AppText>
-                </View>
-              ))}
-            </ScrollView>
-          </View>
-        </>
-      )}
-
-      {/* ── Community Reviews (from our database) ── */}
-      {place.reviews && place.reviews.length > 0 && (
-        <>
-          <Separator />
-          <View>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 8,
-                marginBottom: 14
-              }}
-            >
-              <Ionicons
-                name="people-circle-outline"
-                size={16}
-                color={colors.brand.secondary}
-              />
-              <AppText style={{ fontSize: 15, fontWeight: '600' }}>
-                Community Reviews
-              </AppText>
-              <AppText
-                style={{ fontSize: 12, color: '#94a3b8', marginLeft: 'auto' }}
-              >
-                {place.reviews.length} review
-                {place.reviews.length !== 1 ? 's' : ''}
-              </AppText>
-            </View>
-
-            {/* Average rating bar */}
-            <BaseCard className="mb-3">
-              <View
-                style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}
-              >
-                <AppText
-                  style={{
-                    fontSize: 36,
-                    fontWeight: '800',
-                    color: colors.brand.primary
-                  }}
-                >
-                  {(
-                    place.reviews.reduce((s, r) => s + r.rating, 0) /
-                    place.reviews.length
-                  ).toFixed(1)}
-                </AppText>
-
-                <View style={{ flex: 1, gap: 4 }}>
-                  <View style={{ flexDirection: 'row', gap: 3 }}>
-                    {Array.from({ length: 5 }).map((_, si) => {
-                      const avg =
-                        place.reviews!.reduce((s, r) => s + r.rating, 0) /
-                        place.reviews!.length;
-                      return (
-                        <Ionicons
-                          key={si}
-                          name={si < Math.round(avg) ? 'star' : 'star-outline'}
-                          size={16}
-                          color={colors.brand.primary}
-                        />
-                      );
-                    })}
-                  </View>
-
-                  <AppText style={{ fontSize: 12, color: '#64748b' }}>
-                    Based on {place.reviews.length} review
-                    {place.reviews.length !== 1 ? 's' : ''}
+                    {place.typicalTimeSpent}
                   </AppText>
                 </View>
               </View>
             </BaseCard>
+          )}
 
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ gap: 12, paddingRight: 4 }}
-            >
-              {place.reviews.slice(0, 5).map((review, i) => (
+          {/* ── Price Range ── */}
+          {!!place.priceRange && (
+            <BaseCard>
+              <View
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}
+              >
                 <View
-                  key={i}
                   style={{
-                    width: 260,
-                    backgroundColor: colors.brand.neutrals + '60',
-                    padding: 14,
-                    borderRadius: 14,
-                    gap: 8,
-                    borderWidth: 1,
-                    borderColor: colors.brand.neutrals
+                    width: 40,
+                    height: 40,
+                    borderRadius: 12,
+                    backgroundColor: colors.brand.secondary + '20',
+                    alignItems: 'center',
+                    justifyContent: 'center'
                   }}
                 >
+                  <Ionicons
+                    name="wallet-outline"
+                    size={20}
+                    color={colors.brand.secondary}
+                  />
+                </View>
+
+                <View style={{ flex: 1 }}>
+                  <AppText style={{ fontSize: 11 }}>Price Range</AppText>
+
                   <View
                     style={{
                       flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      alignItems: 'center'
+                      alignItems: 'center',
+                      gap: 6,
+                      marginTop: 2
                     }}
                   >
-                    {/* Author avatar */}
+                    {(['$', '$$', '$$$', '$$$$'] as PriceRange[]).map(tier => {
+                      const active = place.priceRange === tier;
+                      return (
+                        <View
+                          key={tier}
+                          style={{
+                            paddingHorizontal: 10,
+                            paddingVertical: 4,
+                            borderRadius: 8,
+                            backgroundColor: active
+                              ? colors.brand.secondary
+                              : colors.brand.secondary + '15'
+                          }}
+                        >
+                          <AppText
+                            style={{
+                              fontSize: 13,
+                              fontWeight: active ? '700' : '400',
+                              color: active
+                                ? 'white'
+                                : colors.brand.secondary + '80'
+                            }}
+                          >
+                            {tier}
+                          </AppText>
+                        </View>
+                      );
+                    })}
+
+                    <AppText
+                      style={{ fontSize: 12, color: '#94a3b8', marginLeft: 4 }}
+                    >
+                      {place.priceRange === '$' && 'Under रु 500'}
+                      {place.priceRange === '$$' && 'रु 500 – 1,500'}
+                      {place.priceRange === '$$$' && 'रु 1,500 – 4,000'}
+                      {place.priceRange === '$$$$' && 'रु 4,000+'}
+                    </AppText>
+                  </View>
+                </View>
+              </View>
+            </BaseCard>
+          )}
+
+          {/* ── Address ── */}
+          {googleData.address || place.address ? (
+            <BaseCard>
+              <Pressable
+                onPress={openMaps}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'flex-start',
+                  gap: 10
+                }}
+              >
+                <View
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 12,
+                    backgroundColor: colors.brand.secondary + '20',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <Ionicons
+                    name="location-outline"
+                    size={20}
+                    color={colors.brand.secondary}
+                  />
+                </View>
+
+                <View>
+                  <AppText style={{ fontSize: 11 }}>Location</AppText>
+                  <AppText
+                    style={{
+                      fontSize: 13,
+                      color: colors.brand.primary,
+                      flex: 1,
+                      lineHeight: 19
+                    }}
+                  >
+                    {googleData.address || place.address}
+                  </AppText>
+                </View>
+              </Pressable>
+            </BaseCard>
+          ) : null}
+
+          {/* ── Static Map ── */}
+          {staticMapUrl ? (
+            <Pressable
+              onPress={openMaps}
+              style={{ borderRadius: 16, overflow: 'hidden' }}
+            >
+              <Image
+                source={{ uri: staticMapUrl }}
+                style={{ width: '100%', height: 150 }}
+                resizeMode="cover"
+              />
+              <View
+                style={{
+                  position: 'absolute',
+                  bottom: 10,
+                  right: 10,
+                  backgroundColor: 'white',
+                  borderRadius: 22,
+                  paddingHorizontal: 10,
+                  paddingVertical: 6,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 5,
+                  shadowColor: '#000',
+                  shadowOpacity: 0.12,
+                  shadowRadius: 6,
+                  elevation: 4
+                }}
+              >
+                <Ionicons
+                  name="map-outline"
+                  size={13}
+                  color={colors.brand.primary}
+                />
+                <AppText
+                  style={{
+                    fontSize: 12,
+                    fontWeight: '600',
+                    color: colors.brand.primary
+                  }}
+                >
+                  Open in Maps
+                </AppText>
+              </View>
+            </Pressable>
+          ) : null}
+
+          {/* ── Facilities ── */}
+          {place.specialFacilities?.length > 0 && (
+            <>
+              <Separator />
+              <View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 8,
+                    marginBottom: 14
+                  }}
+                >
+                  <Ionicons
+                    name="business-outline"
+                    size={16}
+                    color={colors.brand.secondary}
+                  />
+                  <AppText style={{ fontSize: 15, fontWeight: '600' }}>
+                    Facilities
+                  </AppText>
+                </View>
+                <View
+                  style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}
+                >
+                  {place.specialFacilities.map(f => (
                     <View
+                      key={f}
                       style={{
                         flexDirection: 'row',
                         alignItems: 'center',
+                        gap: 6,
+                        backgroundColor: colors.brand.neutrals,
+                        paddingHorizontal: 12,
+                        paddingVertical: 8,
+                        borderRadius: 10
+                      }}
+                    >
+                      <Ionicons
+                        name={getFacilityIcon(f)}
+                        size={14}
+                        color={colors.brand.secondary}
+                      />
+                      <AppText
+                        style={{ fontSize: 12, color: colors.brand.secondary }}
+                      >
+                        {capitalize(f)}
+                      </AppText>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            </>
+          )}
+
+          {/* ── Best For ── */}
+          {place.suitableFor?.length > 0 && (
+            <>
+              <Separator />
+              <View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 8,
+                    marginBottom: 14
+                  }}
+                >
+                  <Ionicons
+                    name="people-outline"
+                    size={16}
+                    color={colors.brand.secondary}
+                  />
+                  <AppText style={{ fontSize: 15, fontWeight: '600' }}>
+                    Best For
+                  </AppText>
+                </View>
+                <View
+                  style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}
+                >
+                  {place.suitableFor.map(s => (
+                    <Badge key={s} label={capitalize(s)} />
+                  ))}
+                </View>
+              </View>
+            </>
+          )}
+
+          {/* ── Opening Hours (Accordion) ── */}
+          <Separator />
+          <Accordion
+            icon="time-outline"
+            title="Opening Hours"
+            summary={
+              openingStatus.isOpenNow
+                ? openingStatus.nextTime
+                  ? `Closes ${openingStatus.nextTime.time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                  : 'Open now'
+                : 'Closed today'
+            }
+          >
+            {DAYS.map(day => (
+              <View
+                key={day}
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}
+              >
+                <AppText
+                  style={{
+                    fontSize: 13,
+                    width: 90,
+                    textTransform: 'capitalize',
+                    fontWeight: day === todayName ? '700' : '400',
+                    color:
+                      day === todayName
+                        ? colors.brand.primary
+                        : colors.text.DEFAULT
+                  }}
+                >
+                  {day}
+                </AppText>
+                <AppText
+                  style={{
+                    fontSize: 13,
+                    color: day === todayName ? colors.brand.primary : '#64748b'
+                  }}
+                >
+                  {formatDayHours(place.openingHours[day])}
+                </AppText>
+              </View>
+            ))}
+          </Accordion>
+
+          {/* ── Contact ── */}
+          {(place.contactNumber || socialLinks.length > 0) && (
+            <>
+              <Separator />
+              <View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 8,
+                    marginBottom: 14
+                  }}
+                >
+                  <Ionicons
+                    name="call-outline"
+                    size={16}
+                    color={colors.brand.secondary}
+                  />
+                  <AppText style={{ fontSize: 15, fontWeight: '600' }}>
+                    Contact
+                  </AppText>
+                </View>
+
+                {/* Phone number pill */}
+                {place.contactNumber ? (
+                  <Pressable
+                    onPress={() =>
+                      Linking.openURL(`tel:${place.contactNumber}`)
+                    }
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 12,
+                      backgroundColor: colors.brand.neutrals,
+                      padding: 14,
+                      borderRadius: 14,
+                      marginBottom: socialLinks.length > 0 ? 16 : 0
+                    }}
+                  >
+                    <View
+                      style={{
+                        width: 42,
+                        height: 42,
+                        borderRadius: 21,
+                        backgroundColor: colors.brand.primary + '20',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <Ionicons
+                        name="call-outline"
+                        size={19}
+                        color={colors.brand.primary}
+                      />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <AppText style={{ fontSize: 11, color: '#94a3b8' }}>
+                        Phone
+                      </AppText>
+                      <AppText
+                        style={{
+                          fontSize: 14,
+                          fontWeight: '700',
+                          color: colors.brand.primary
+                        }}
+                      >
+                        {place.contactNumber}
+                      </AppText>
+                    </View>
+                    <Ionicons
+                      name="call"
+                      size={16}
+                      color={colors.brand.primary}
+                    />
+                  </Pressable>
+                ) : null}
+
+                {/* Social media circular icons */}
+                {socialLinks.length > 0 && (
+                  <View
+                    style={{ flexDirection: 'row', gap: 20, flexWrap: 'wrap' }}
+                  >
+                    {socialLinks.map(link => (
+                      <Pressable
+                        key={link.platform}
+                        onPress={() => Linking.openURL(link.url)}
+                        style={{ alignItems: 'center', gap: 6, minWidth: 56 }}
+                      >
+                        <View
+                          style={{
+                            width: 52,
+                            height: 52,
+                            borderRadius: 26,
+                            backgroundColor: colors.brand.neutrals,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            borderWidth: 1.5,
+                            borderColor: colors.brand.primary + '30'
+                          }}
+                        >
+                          <Ionicons
+                            name={link.icon}
+                            size={24}
+                            color={colors.brand.secondary}
+                          />
+                        </View>
+                        <AppText
+                          style={{
+                            fontSize: 10,
+                            color: '#64748b',
+                            textAlign: 'center',
+                            maxWidth: 72
+                          }}
+                          numberOfLines={1}
+                        >
+                          {link.subtitle}
+                        </AppText>
+                        <AppText
+                          style={{
+                            fontSize: 9,
+                            color: '#94a3b8',
+                            textAlign: 'center'
+                          }}
+                        >
+                          {link.platform}
+                        </AppText>
+                      </Pressable>
+                    ))}
+                  </View>
+                )}
+              </View>
+            </>
+          )}
+
+          {/* ── Save CTA ── */}
+          <Separator />
+          <Button
+            title={
+              saving
+                ? 'Saving...'
+                : isSaved
+                  ? 'Saved to Wishlist'
+                  : 'Save to Wishlist'
+            }
+            onPress={onToggleSave}
+            disabled={saving}
+            className={isSaved ? 'bg-colors-surface-muted' : ''}
+            textColor={isSaved ? colors.brand.secondary : colors.text.inverse}
+          />
+
+          {/* ── Promotions ── */}
+          {promotions.length > 0 && (
+            <>
+              <Separator />
+              <View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 8,
+                    marginBottom: 14
+                  }}
+                >
+                  <Ionicons
+                    name="pricetag-outline"
+                    size={16}
+                    color={colors.brand.secondary}
+                  />
+                  <AppText style={{ fontSize: 15, fontWeight: '600' }}>
+                    Exclusive Offers
+                  </AppText>
+                </View>
+                <View style={{ gap: 12 }}>
+                  {promotions.map(promo => (
+                    <PromotionCard key={promo.promotionId} promo={promo} />
+                  ))}
+                </View>
+              </View>
+            </>
+          )}
+        </>
+      )}
+
+      {placeDetailsTab === 'reviews' && (
+        <>
+          {!hasAnyReviews ? (
+            <View
+              style={{
+                paddingVertical: 28,
+                alignItems: 'center',
+                gap: 10
+              }}
+            >
+              <Ionicons name="chatbubbles-outline" size={40} color="#94a3b8" />
+              <AppText
+                variant="muted"
+                style={{ textAlign: 'center', paddingHorizontal: 24 }}
+              >
+                No reviews yet for this place.
+              </AppText>
+            </View>
+          ) : null}
+
+          {/* ── Traveller Reviews (from Google) ── */}
+          {googleData.reviews && googleData.reviews.length > 0 && (
+            <>
+              <Separator />
+              <View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 8,
+                    marginBottom: 14
+                  }}
+                >
+                  <Ionicons
+                    name="chatbubble-ellipses-outline"
+                    size={16}
+                    color={colors.brand.secondary}
+                  />
+                  <AppText style={{ fontSize: 15, fontWeight: '600' }}>
+                    Traveller Reviews
+                  </AppText>
+                  {googleData.totalRatings ? (
+                    <AppText
+                      style={{
+                        fontSize: 12,
+                        color: '#94a3b8',
+                        marginLeft: 'auto'
+                      }}
+                    >
+                      {googleData.totalRatings.toLocaleString()} total
+                    </AppText>
+                  ) : null}
+                </View>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={{ gap: 12, paddingRight: 4 }}
+                >
+                  {googleData.reviews.map((review, i) => (
+                    <View
+                      key={i}
+                      style={{
+                        width: 260,
+                        backgroundColor: colors.brand.neutrals + '60',
+                        padding: 14,
+                        borderRadius: 14,
                         gap: 8,
-                        flex: 1
+                        borderWidth: 1,
+                        borderColor: colors.brand.neutrals
                       }}
                     >
                       <View
                         style={{
-                          width: 32,
-                          height: 32,
-                          borderRadius: 16,
-                          backgroundColor: colors.brand.primary,
-                          alignItems: 'center',
-                          justifyContent: 'center'
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
+                          alignItems: 'center'
                         }}
                       >
                         <AppText
                           style={{
-                            fontSize: 12,
-                            fontWeight: '700',
-                            color: 'white'
+                            fontWeight: '600',
+                            fontSize: 13,
+                            flex: 1,
+                            paddingRight: 8
                           }}
+                          numberOfLines={1}
                         >
-                          {review.author?.charAt(0)?.toUpperCase() ?? '?'}
+                          {review.author_name}
                         </AppText>
+                        <View style={{ flexDirection: 'row', gap: 2 }}>
+                          {Array.from({ length: 5 }).map((_, si) => (
+                            <Ionicons
+                              key={si}
+                              name={
+                                si < review.rating ? 'star' : 'star-outline'
+                              }
+                              size={11}
+                              color={colors.brand.primary}
+                            />
+                          ))}
+                        </View>
                       </View>
                       <AppText
-                        style={{ fontWeight: '600', fontSize: 13, flex: 1 }}
-                        numberOfLines={1}
+                        style={{ fontSize: 12, lineHeight: 18, color: '#555' }}
+                        numberOfLines={5}
                       >
-                        {review.author ?? 'Anonymous'}
+                        {review.text}
+                      </AppText>
+                      <AppText style={{ fontSize: 11, color: '#94a3b8' }}>
+                        {review.relative_time_description}
                       </AppText>
                     </View>
-                    <View style={{ flexDirection: 'row', gap: 2 }}>
-                      {Array.from({ length: 5 }).map((_, si) => (
-                        <Ionicons
-                          key={si}
-                          name={si < review.rating ? 'star' : 'star-outline'}
-                          size={11}
-                          color={colors.brand.primary}
-                        />
-                      ))}
+                  ))}
+                </ScrollView>
+              </View>
+            </>
+          )}
+
+          {/* ── Community Reviews (from our database) ── */}
+          {place.reviews && place.reviews.length > 0 && (
+            <>
+              <View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 8,
+                    marginBottom: 14
+                  }}
+                >
+                  <Ionicons
+                    name="people-circle-outline"
+                    size={18}
+                    color={colors.text.DEFAULT}
+                  />
+                  <AppText variant="subtitle">Community Reviews</AppText>
+                  <AppText
+                    style={{
+                      fontSize: 12,
+                      color: '#94a3b8',
+                      marginLeft: 'auto'
+                    }}
+                  >
+                    {place.reviews.length} review
+                    {place.reviews.length !== 1 ? 's' : ''}
+                  </AppText>
+                </View>
+
+                {/* Average rating bar */}
+                <BaseCard className="mb-3">
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 10
+                    }}
+                  >
+                    <AppText
+                      style={{
+                        fontSize: 36,
+                        fontWeight: '800',
+                        color: colors.brand.primary
+                      }}
+                    >
+                      {(
+                        place.reviews.reduce((s, r) => s + r.rating, 0) /
+                        place.reviews.length
+                      ).toFixed(1)}
+                    </AppText>
+
+                    <View style={{ flex: 1, gap: 4 }}>
+                      <View style={{ flexDirection: 'row', gap: 3 }}>
+                        {Array.from({ length: 5 }).map((_, si) => {
+                          const avg =
+                            place.reviews!.reduce((s, r) => s + r.rating, 0) /
+                            place.reviews!.length;
+                          return (
+                            <Ionicons
+                              key={si}
+                              name={
+                                si < Math.round(avg) ? 'star' : 'star-outline'
+                              }
+                              size={16}
+                              color={colors.brand.primary}
+                            />
+                          );
+                        })}
+                      </View>
+
+                      <AppText style={{ fontSize: 12, color: '#64748b' }}>
+                        Based on {place.reviews.length} review
+                        {place.reviews.length !== 1 ? 's' : ''}
+                      </AppText>
                     </View>
                   </View>
-                  {review.text ? (
-                    <AppText
-                      style={{ fontSize: 12, lineHeight: 18, color: '#555' }}
-                      numberOfLines={5}
+                </BaseCard>
+
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={{ gap: 12, paddingRight: 4 }}
+                >
+                  {place.reviews.slice(0, 5).map((review, i) => (
+                    <View
+                      key={i}
+                      style={{
+                        width: 260,
+                        backgroundColor: colors.brand.neutrals + '60',
+                        padding: 14,
+                        borderRadius: 14,
+                        gap: 8,
+                        borderWidth: 1,
+                        borderColor: colors.brand.neutrals
+                      }}
                     >
-                      {review.text}
-                    </AppText>
-                  ) : null}
-                  {review.time ? (
-                    <AppText style={{ fontSize: 11, color: '#94a3b8' }}>
-                      {new Date(review.time).toLocaleDateString([], {
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric'
-                      })}
-                    </AppText>
-                  ) : null}
-                </View>
-              ))}
-            </ScrollView>
-          </View>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
+                          alignItems: 'center'
+                        }}
+                      >
+                        {/* Author avatar */}
+                        <View
+                          style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            gap: 8,
+                            flex: 1
+                          }}
+                        >
+                          <View
+                            style={{
+                              width: 32,
+                              height: 32,
+                              borderRadius: 16,
+                              backgroundColor: colors.brand.primary,
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
+                          >
+                            <AppText
+                              style={{
+                                fontSize: 12,
+                                fontWeight: '700',
+                                color: 'white'
+                              }}
+                            >
+                              {review.author?.charAt(0)?.toUpperCase() ?? '?'}
+                            </AppText>
+                          </View>
+                          <AppText
+                            style={{ fontWeight: '600', fontSize: 13, flex: 1 }}
+                            numberOfLines={1}
+                          >
+                            {review.author ?? 'Anonymous'}
+                          </AppText>
+                        </View>
+                        <View style={{ flexDirection: 'row', gap: 2 }}>
+                          {Array.from({ length: 5 }).map((_, si) => (
+                            <Ionicons
+                              key={si}
+                              name={
+                                si < review.rating ? 'star' : 'star-outline'
+                              }
+                              size={11}
+                              color={colors.brand.primary}
+                            />
+                          ))}
+                        </View>
+                      </View>
+                      {review.text ? (
+                        <AppText
+                          style={{
+                            fontSize: 12,
+                            lineHeight: 18,
+                            color: '#555'
+                          }}
+                          numberOfLines={5}
+                        >
+                          {review.text}
+                        </AppText>
+                      ) : null}
+                      {review.time ? (
+                        <AppText style={{ fontSize: 11, color: '#94a3b8' }}>
+                          {new Date(review.time).toLocaleDateString([], {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric'
+                          })}
+                        </AppText>
+                      ) : null}
+                    </View>
+                  ))}
+                </ScrollView>
+              </View>
+            </>
+          )}
         </>
       )}
     </View>
