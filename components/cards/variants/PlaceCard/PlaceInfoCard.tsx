@@ -327,6 +327,14 @@ export function PlaceInfoCard({
 
       <Separator />
 
+      {/* ── Google Description ── */}
+      {googleData.description ? (
+        <View className="gap-1">
+          <AppText variant="subtitle">About This Place</AppText>
+          <AppText variant="muted">{googleData.description}</AppText>
+        </View>
+      ) : null}
+
       {/* ── Typical Time Spent ── */}
       {!!place.typicalTimeSpent && (
         <BaseCard>
@@ -406,7 +414,7 @@ export function PlaceInfoCard({
                         paddingVertical: 4,
                         borderRadius: 8,
                         backgroundColor: active
-                          ? colors.brand.primary
+                          ? colors.brand.secondary
                           : colors.brand.secondary + '15'
                       }}
                     >
@@ -439,55 +447,46 @@ export function PlaceInfoCard({
         </BaseCard>
       )}
 
-      {/* ── Google Description ── */}
-      {googleData.description ? (
-        <View
-          style={{
-            padding: 16,
-            backgroundColor: colors.brand.neutrals + '80',
-            borderRadius: 14,
-            borderLeftWidth: 3,
-            borderLeftColor: colors.brand.primary
-          }}
-        >
-          <AppText
-            style={{ fontSize: 13, lineHeight: 20, color: colors.text.DEFAULT }}
-          >
-            {googleData.description}
-          </AppText>
-        </View>
-      ) : null}
-
       {/* ── Address ── */}
       {googleData.address || place.address ? (
-        <Pressable
-          onPress={openMaps}
-          style={{
-            flexDirection: 'row',
-            alignItems: 'flex-start',
-            gap: 10,
-            backgroundColor: colors.brand.neutrals + '80',
-            padding: 12,
-            borderRadius: 12
-          }}
-        >
-          <Ionicons
-            name="location-outline"
-            size={16}
-            color={colors.brand.primary}
-            style={{ marginTop: 1 }}
-          />
-          <AppText
+        <BaseCard>
+          <Pressable
+            onPress={openMaps}
             style={{
-              fontSize: 13,
-              color: colors.brand.primary,
-              flex: 1,
-              lineHeight: 19
+              flexDirection: 'row',
+              alignItems: 'flex-start',
+              gap: 10
             }}
           >
-            {googleData.address || place.address}
-          </AppText>
-        </Pressable>
+            <View
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 12,
+                backgroundColor: colors.brand.secondary + '20',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <Ionicons
+                name="location-outline"
+                size={20}
+                color={colors.brand.secondary}
+              />
+            </View>
+
+            <AppText
+              style={{
+                fontSize: 13,
+                color: colors.brand.primary,
+                flex: 1,
+                lineHeight: 19
+              }}
+            >
+              {googleData.address || place.address}
+            </AppText>
+          </Pressable>
+        </BaseCard>
       ) : null}
 
       {/* ── Static Map ── */}
