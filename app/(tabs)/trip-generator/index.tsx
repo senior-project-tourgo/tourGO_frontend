@@ -1,18 +1,11 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import {
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  View,
-  ActivityIndicator
-} from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
 
 import { Button } from '@/components/Button';
 import { AppText } from '@/components/AppText';
 import { HeaderWithBack } from '@/components/PageHeader';
 import { Screen } from '@/components/Screen';
-import { getSurpriseRecommendation } from '@/services/trip.service';
 import colors from '@/theme/colors';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -32,23 +25,8 @@ import { buildTripPayload } from '@/utils/tripForm';
 export default function TripGeneratorScreen() {
   const router = useRouter();
 
-  const [loadingSurprise, setLoadingSurprise] = useState(false);
-
-  const handleSurpriseMe = async () => {
-    if (loadingSurprise) return;
-    setLoadingSurprise(true);
-    try {
-      const result = await getSurpriseRecommendation();
-      const placeIds = result.recommendedPlaces.map(p => p.placeId).join(',');
-      router.push({
-        pathname: '/review-trip',
-        params: { placeIds, itineraryName: 'Surprise Trip ✨' }
-      });
-    } catch {
-      // silently ignore
-    } finally {
-      setLoadingSurprise(false);
-    }
+  const handleSurpriseMe = () => {
+    router.push({ pathname: '/curating-trip', params: { mode: 'surprise' } });
   };
 
   // --- Trip Name ---
@@ -182,7 +160,6 @@ export default function TripGeneratorScreen() {
 
             <Pressable
               onPress={handleSurpriseMe}
-              disabled={loadingSurprise}
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
@@ -191,19 +168,14 @@ export default function TripGeneratorScreen() {
                 paddingVertical: 14,
                 borderRadius: 14,
                 borderWidth: 2,
-                borderColor: colors.brand.primary,
-                opacity: loadingSurprise ? 0.6 : 1
+                borderColor: colors.brand.primary
               }}
             >
-              {loadingSurprise ? (
-                <ActivityIndicator size="small" color={colors.brand.primary} />
-              ) : (
-                <Ionicons
-                  name="shuffle-outline"
-                  size={18}
-                  color={colors.brand.primary}
-                />
-              )}
+              <Ionicons
+                name="shuffle-outline"
+                size={18}
+                color={colors.brand.primary}
+              />
               <AppText
                 style={{
                   color: colors.brand.primary,
@@ -211,7 +183,7 @@ export default function TripGeneratorScreen() {
                   fontSize: 15
                 }}
               >
-                {loadingSurprise ? 'Generating…' : 'Surprise Me'}
+                Surprise Me
               </AppText>
             </Pressable>
           </View>
