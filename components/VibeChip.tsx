@@ -25,18 +25,11 @@ export function VibeChip({
   return (
     <Pressable
       onPress={onPress}
+      className="flex-row items-center gap-1 space-x-2 rounded-full px-3.5 py-2"
       style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 8,
-        paddingHorizontal: 14,
-        paddingVertical: 8,
-        borderRadius: 24,
         backgroundColor: isSelected
-          ? colors.brand.primary
-          : colors.brand.neutrals,
-        borderWidth: 1.5,
-        borderColor: isSelected ? colors.brand.primary : colors.brand.neutrals
+          ? colors.brand.secondary
+          : colors.brand.neutrals
       }}
     >
       <Ionicons
@@ -46,9 +39,8 @@ export function VibeChip({
       />
 
       <AppText
+        className="text-[13px] font-semibold"
         style={{
-          fontSize: 13,
-          fontWeight: '600',
           color: isSelected ? 'white' : colors.brand.secondary
         }}
       >
@@ -57,12 +49,8 @@ export function VibeChip({
 
       {!isSelected && showDot && (
         <View
-          style={{
-            backgroundColor: colors.brand.primary,
-            width: 7,
-            height: 7,
-            borderRadius: 3.5
-          }}
+          className="h-[7px] w-[7px] rounded-full"
+          style={{ backgroundColor: colors.brand.primary }}
         />
       )}
     </Pressable>

@@ -5,7 +5,10 @@ import { Map } from '@/components/Map';
 import type { MapRoute } from '@/components/Map';
 import { HeaderWithBack } from '@/components/PageHeader';
 import { NoPlaceCard } from '@/components/cards/variants/PlaceCard/NoPlaceCard';
-import { PlaceCard } from '@/components/cards/variants/PlaceCard/PlaceCard';
+import {
+  PlaceCard,
+  placeCarouselSnapInterval
+} from '@/components/cards/variants/PlaceCard/PlaceCard';
 import { useEditableTrip } from '@/hooks/review-trip/useEditableTrip';
 import { useReviewTripParams } from '@/hooks/review-trip/useReviewTripParams';
 import { useReviewTripRegion } from '@/hooks/review-trip/useReviewTripRegion';
@@ -16,7 +19,13 @@ import {
   type RouteSegment
 } from '@/services/directions.service';
 import colors from '@/theme/colors';
-import { ActivityIndicator, Alert, FlatList, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  View,
+  useWindowDimensions
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useFocusEffect } from 'expo-router';
 
@@ -24,6 +33,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { EditableTripPlace } from '@/hooks/review-trip/useEditableTrip';
 
 export default function ReviewTripScreen() {
+  const { width: windowWidth } = useWindowDimensions();
   const {
     places: editablePlaces,
     addPlace,
@@ -162,6 +172,7 @@ export default function ReviewTripScreen() {
           keyExtractor={item => item.place.placeId}
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ paddingHorizontal: 16, gap: 8 }}
+          snapToInterval={placeCarouselSnapInterval(windowWidth)}
           ListHeaderComponent={
             startCoords ? (
               <View className="h-60 w-40 items-center justify-center rounded-2xl bg-white shadow-sm">
@@ -197,13 +208,13 @@ export default function ReviewTripScreen() {
               </View>
             ) : null
           }
-          snapToInterval={353}
           decelerationRate="fast"
           snapToAlignment="start"
           viewabilityConfig={viewabilityConfig}
           onViewableItemsChanged={onViewableItemsChanged}
           renderItem={({ item }) => (
             <PlaceCard
+              variant="carousel"
               place={item.place}
               onPress={() => router.push(`/places/${item.place.placeId}`)}
               showCross

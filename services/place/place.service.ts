@@ -17,7 +17,7 @@ export async function getPlaceGoogleDetails(
   placeId: string
 ): Promise<PlaceGoogleDetails> {
   const response = await api.get<PlaceGoogleDetails>(
-    `/places/${placeId}/google-details`
+    `/places/${encodeURIComponent(placeId)}/google-details`
   );
   return response.data;
 }
