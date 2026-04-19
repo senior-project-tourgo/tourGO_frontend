@@ -475,16 +475,19 @@ export function PlaceInfoCard({
               />
             </View>
 
-            <AppText
-              style={{
-                fontSize: 13,
-                color: colors.brand.primary,
-                flex: 1,
-                lineHeight: 19
-              }}
-            >
-              {googleData.address || place.address}
-            </AppText>
+            <View>
+              <AppText style={{ fontSize: 11 }}>Location</AppText>
+              <AppText
+                style={{
+                  fontSize: 13,
+                  color: colors.brand.primary,
+                  flex: 1,
+                  lineHeight: 19
+                }}
+              >
+                {googleData.address || place.address}
+              </AppText>
+            </View>
           </Pressable>
         </BaseCard>
       ) : null}
@@ -506,7 +509,7 @@ export function PlaceInfoCard({
               bottom: 10,
               right: 10,
               backgroundColor: 'white',
-              borderRadius: 8,
+              borderRadius: 22,
               paddingHorizontal: 10,
               paddingVertical: 6,
               flexDirection: 'row',

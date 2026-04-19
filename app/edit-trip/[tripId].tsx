@@ -4,7 +4,10 @@ import { Map } from '@/components/Map';
 import { HeaderWithBack } from '@/components/PageHeader';
 import { ConfirmActionModal } from '@/components/ConfirmActionModal';
 import { NoPlaceCard } from '@/components/cards/variants/PlaceCard/NoPlaceCard';
-import { PlaceCard } from '@/components/cards/variants/PlaceCard/PlaceCard';
+import {
+  PlaceCard,
+  placeCarouselSnapInterval
+} from '@/components/cards/variants/PlaceCard/PlaceCard';
 import { useEditableTrip } from '@/hooks/review-trip/useEditableTrip';
 import { useReviewTripRegion } from '@/hooks/review-trip/useReviewTripRegion';
 import { getPlacesByIds } from '@/features/place/placeById.api';
@@ -21,10 +24,12 @@ import {
   View,
   Keyboard,
   TouchableWithoutFeedback,
-  BackHandler
+  BackHandler,
+  useWindowDimensions
 } from 'react-native';
 
 export default function EditTripScreen() {
+  const { width: windowWidth } = useWindowDimensions();
   const { tripId } = useLocalSearchParams<{ tripId: string }>();
 
   const {
@@ -241,13 +246,14 @@ export default function EditTripScreen() {
               keyExtractor={item => item.place.placeId}
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{ paddingHorizontal: 16, gap: 8 }}
-              snapToInterval={353}
+              snapToInterval={placeCarouselSnapInterval(windowWidth)}
               decelerationRate="fast"
               snapToAlignment="start"
               viewabilityConfig={viewabilityConfig}
               onViewableItemsChanged={onViewableItemsChanged}
               renderItem={({ item }) => (
                 <PlaceCard
+                  variant="carousel"
                   place={item.place}
                   onPress={() => router.push(`/places/${item.place.placeId}`)}
                   showCross={editablePlaces.length > 1}

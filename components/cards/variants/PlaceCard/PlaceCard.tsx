@@ -5,7 +5,7 @@ import type { Place } from '@/features/place/place.types';
 import colors from '@/theme/colors';
 import { getPlaceOpeningStatus } from '@/utils/openingHours';
 import { Ionicons } from '@expo/vector-icons';
-import { Pressable, View } from 'react-native';
+import { Pressable, View, useWindowDimensions } from 'react-native';
 import { BaseCardProps } from '../../BaseCard';
 import { ImageWithFallback } from './ImageWithFallback';
 
@@ -17,8 +17,22 @@ function formatVibeLabel(id: string) {
     .join(' ');
 }
 
+/** Horizontal trip pickers use this gap in `contentContainerStyle`. */
+export const PLACE_CAROUSEL_LIST_GAP = 8;
+
+/** Card width for horizontal lists: one column width, not unbounded `w-full`. */
+export function placeCarouselCardWidth(screenWidth: number) {
+  return Math.max(280, Math.round(screenWidth - 32));
+}
+
+export function placeCarouselSnapInterval(screenWidth: number) {
+  return placeCarouselCardWidth(screenWidth) + PLACE_CAROUSEL_LIST_GAP;
+}
+
 interface PlaceCardProps extends BaseCardProps {
   place: Place;
+  /** `carousel`: fixed width for horizontal FlatList; `full` (default): `w-full` for feed layouts */
+  variant?: 'full' | 'carousel';
   onPress?: (place: Place) => void;
   showCross?: boolean;
   onPressCross?: (place: Place) => void;
@@ -28,18 +42,28 @@ interface PlaceCardProps extends BaseCardProps {
 
 export function PlaceCard({
   place,
+  variant = 'full',
   onPress,
   showCross = false,
   onPressCross,
   isSaved = false,
   onToggleSave
 }: PlaceCardProps) {
+  const { width: windowWidth } = useWindowDimensions();
   const openingHours = getPlaceOpeningStatus(place.openingHours);
 
   const vibeImageUrl = VIBES.find(v => place.vibe?.includes(v.id))?.image;
 
   return (
-    <Pressable onPress={() => onPress?.(place)} className="w-full">
+    <Pressable
+      onPress={() => onPress?.(place)}
+      className={variant === 'full' ? 'w-full' : undefined}
+      style={
+        variant === 'carousel'
+          ? { width: placeCarouselCardWidth(windowWidth) }
+          : undefined
+      }
+    >
       <View className="relative h-60 flex-row gap-4 rounded-2xl bg-colors-surface-background p-4 shadow-sm">
         <ImageWithFallback
           primaryImageUrl={place.image}
