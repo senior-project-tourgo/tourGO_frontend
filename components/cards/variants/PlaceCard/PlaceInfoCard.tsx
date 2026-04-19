@@ -1,4 +1,3 @@
-import { Accordion } from '@/components/Accordion';
 import { AppText } from '@/components/AppText';
 import { Button } from '@/components/Button';
 import { VIBES } from '@/constants/vibes/vibes';
@@ -622,53 +621,91 @@ export function PlaceInfoCard({
             </>
           )}
 
-          {/* ── Opening Hours (Accordion) ── */}
           <Separator />
-          <Accordion
-            icon="time-outline"
-            title="Opening Hours"
-            summary={
-              openingStatus.isOpenNow
-                ? openingStatus.nextTime
-                  ? `Closes ${openingStatus.nextTime.time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
-                  : 'Open now'
-                : 'Closed today'
-            }
-          >
-            {DAYS.map(day => (
+          {/* ── Opening Hours ── */}
+          <View className="gap-2">
+            {/* Header */}
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 8
+              }}
+            >
+              <Ionicons
+                name="calendar-outline"
+                size={18}
+                color={colors.text.DEFAULT}
+              />
+              <AppText variant="subtitle">Opening Hours</AppText>
+
+              {/* Status pill (optional but nice match with modern UI) */}
               <View
-                key={day}
                 style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center'
+                  marginLeft: 'auto',
+                  paddingHorizontal: 10,
+                  paddingVertical: 3,
+                  borderRadius: 999,
+                  backgroundColor: openingStatus.isOpenNow
+                    ? '#16a34a20'
+                    : '#ef444420'
                 }}
               >
                 <AppText
                   style={{
-                    fontSize: 13,
-                    width: 90,
-                    textTransform: 'capitalize',
-                    fontWeight: day === todayName ? '700' : '400',
-                    color:
-                      day === todayName
-                        ? colors.brand.primary
-                        : colors.text.DEFAULT
+                    fontSize: 11,
+                    color: openingStatus.isOpenNow ? '#16a34a' : '#ef4444',
+                    fontWeight: '600'
                   }}
                 >
-                  {day}
-                </AppText>
-                <AppText
-                  style={{
-                    fontSize: 13,
-                    color: day === todayName ? colors.brand.primary : '#64748b'
-                  }}
-                >
-                  {formatDayHours(place.openingHours[day])}
+                  {openingStatus.isOpenNow ? 'Open' : 'Closed'}
                 </AppText>
               </View>
-            ))}
-          </Accordion>
+            </View>
+
+            {/* Content card */}
+            <BaseCard>
+              <View style={{ gap: 10 }}>
+                {DAYS.map(day => (
+                  <View
+                    key={day}
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      paddingVertical: 4,
+                      paddingHorizontal: 6,
+                      borderRadius: 22,
+                      backgroundColor:
+                        day === todayName
+                          ? colors.text.DEFAULT + '08'
+                          : 'transparent'
+                    }}
+                  >
+                    <AppText
+                      style={{
+                        fontSize: 13,
+                        textTransform: 'capitalize',
+                        fontWeight: day === todayName ? '600' : '400',
+                        color: colors.text.DEFAULT
+                      }}
+                    >
+                      {day}
+                    </AppText>
+
+                    <AppText
+                      style={{
+                        fontSize: 13,
+                        color: '#64748b'
+                      }}
+                    >
+                      {formatDayHours(place.openingHours[day])}
+                    </AppText>
+                  </View>
+                ))}
+              </View>
+            </BaseCard>
+          </View>
 
           {/* ── Contact ── */}
           {contactLinks.length > 0 && (
