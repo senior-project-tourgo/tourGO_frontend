@@ -271,7 +271,10 @@ export default function HomeScreen() {
         )}
         ListHeaderComponent={ListHeader}
         refreshing={isRefreshing}
-        onRefresh={() => fetchFeed(selectedVibe, 0, false)}
+        onRefresh={() => {
+          setPage(0);
+          fetchFeed(selectedVibe, 0, false);
+        }}
         // ✅ EMPTY STATE INSIDE SECTION
         ListEmptyComponent={
           !isRefreshing ? (

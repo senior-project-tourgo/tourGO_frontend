@@ -30,7 +30,7 @@ export const PillTabs: React.FC<PillTabsProps> = ({
           <Pressable
             key={option.id}
             onPress={() => onChange(option.id)}
-            className={`w-full flex-1 items-center justify-center rounded-full py-3 ${
+            className={`flex-1 items-center justify-center rounded-full py-3 ${
               isSelected ? 'bg-colors-surface-background' : 'bg-transparent'
             }`}
           >
