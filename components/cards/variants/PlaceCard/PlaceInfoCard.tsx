@@ -613,7 +613,10 @@ export function PlaceInfoCard({
                     <BaseChip
                       key={s}
                       label={capitalize(s)}
-                      icon={FOR_ICONS[s as keyof typeof FOR_ICONS]}
+                      icon={
+                        FOR_ICONS[s as keyof typeof FOR_ICONS] ??
+                        'help-circle-outline'
+                      }
                     />
                   ))}
                 </View>
