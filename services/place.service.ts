@@ -4,6 +4,7 @@ export type PlaceGoogleDetails = {
   description: string | null;
   address: string | null;
   totalRatings: number | null;
+  photoUrl: string | null;
   reviews: {
     author_name: string;
     rating: number;

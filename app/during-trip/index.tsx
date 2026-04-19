@@ -238,7 +238,7 @@ export default function DuringTripScreen() {
     });
 
     const fetchAll = async () => {
-      const segments = await Promise.all(
+      const results = await Promise.allSettled(
         ordered.slice(0, -1).map(async (pd, i) => {
           const from = pd.place.location;
           const to = ordered[i + 1].place.location;
@@ -252,6 +252,23 @@ export default function DuringTripScreen() {
           routeCache.current[cacheKey] = segment;
           return segment;
         })
+      );
+      const segments = results.map((r, i) =>
+        r.status === 'fulfilled'
+          ? r.value
+          : {
+              coords: [
+                {
+                  latitude: ordered[i].place.location.lat,
+                  longitude: ordered[i].place.location.lng
+                },
+                {
+                  latitude: ordered[i + 1].place.location.lat,
+                  longitude: ordered[i + 1].place.location.lng
+                }
+              ],
+              duration: ''
+            }
       );
       // Only update when all segments are ready — old routes stay visible until then
       setRouteSegments(segments);

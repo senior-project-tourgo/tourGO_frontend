@@ -36,11 +36,14 @@ export function PlaceCard({
 }: PlaceCardProps) {
   const openingHours = getPlaceOpeningStatus(place.openingHours);
 
+  const vibeImageUrl = VIBES.find(v => place.vibe?.includes(v.id))?.image;
+
   return (
     <Pressable onPress={() => onPress?.(place)} className="w-full">
       <View className="relative h-60 flex-row gap-4 rounded-2xl bg-colors-surface-background p-4 shadow-sm">
         <ImageWithFallback
           primaryImageUrl={place.image}
+          vibeImageUrl={vibeImageUrl}
           className="h-52 w-32 rounded-xl"
           resizeMode="cover"
         />
