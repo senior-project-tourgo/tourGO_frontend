@@ -17,7 +17,10 @@ import {
   Pressable,
   View
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  SafeAreaView,
+  useSafeAreaInsets
+} from 'react-native-safe-area-context';
 
 /** Minimum ms of idle (no vibe tapped) before the interstitial appears */
 const IDLE_TIMEOUT_MS = 7000;
@@ -102,20 +105,71 @@ export default function VibeSelectorScreen() {
     }
   };
 
+  const insets = useSafeAreaInsets();
+
+  const ListHeader = () => (
+    <View style={{ marginBottom: 16 }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 12
+        }}
+      >
+        <View style={{ flex: 1 }}>
+          <HeaderWithBack title="Select Your Vibes" />
+        </View>
+        <Pressable
+          onPress={handleSurpriseMe}
+          disabled={loadingSurprise}
+          style={{ padding: 8, flexShrink: 0 }}
+        >
+          <AppText
+            style={{
+              color: colors.brand.secondary,
+              fontSize: 13,
+              fontWeight: '700',
+              textDecorationLine: 'underline'
+            }}
+          >
+            Surprise Me
+          </AppText>
+        </Pressable>
+      </View>
+    </View>
+  );
+
   return (
-    <SafeAreaView className="flex-1 bg-colors-surface-background">
+    <SafeAreaView
+      edges={['top', 'bottom']}
+      className="flex-1 bg-colors-surface-background"
+    >
       <FlatList
         data={VIBES}
         keyExtractor={item => item.id}
         numColumns={2}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingTop: 16, paddingHorizontal: 16 }}
+        contentContainerStyle={{
+          paddingTop: 16,
+          paddingHorizontal: 16,
+          paddingBottom: 24 + insets.bottom
+        }}
         columnWrapperStyle={{
           gap: 16,
           justifyContent: 'space-between',
           marginBottom: 16
         }}
-        ListHeaderComponent={<HeaderWithBack title="Select Your Vibes" />}
+        ListHeaderComponent={<ListHeader />}
+        ListFooterComponent={
+          <View style={{ paddingHorizontal: 16, paddingBottom: 24, gap: 10 }}>
+            <Button
+              title="Generate Itinerary"
+              onPress={handleContinue}
+              disabled={selectedVibes.length === 0}
+            />
+          </View>
+        }
         renderItem={({ item }) => (
           <VibeCard
             title={item.title}
@@ -125,46 +179,6 @@ export default function VibeSelectorScreen() {
           />
         )}
       />
-
-      <View style={{ paddingHorizontal: 16, paddingBottom: 24, gap: 10 }}>
-        <Pressable
-          onPress={handleSurpriseMe}
-          disabled={loadingSurprise}
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 8,
-            paddingVertical: 14,
-            borderRadius: 14,
-            borderWidth: 2,
-            borderColor: colors.brand.primary,
-            backgroundColor: 'transparent',
-            opacity: loadingSurprise ? 0.6 : 1
-          }}
-        >
-          <Ionicons
-            name="shuffle-outline"
-            size={18}
-            color={colors.brand.primary}
-          />
-          <AppText
-            style={{
-              color: colors.brand.primary,
-              fontWeight: '700',
-              fontSize: 15
-            }}
-          >
-            Surprise Me Instead
-          </AppText>
-        </Pressable>
-
-        <Button
-          title="Generate Itinerary"
-          onPress={handleContinue}
-          disabled={selectedVibes.length === 0}
-        />
-      </View>
 
       {/* Vibe mismatch is now handled in review-trip via params */}
 
@@ -238,7 +252,7 @@ export default function VibeSelectorScreen() {
                 style={{
                   backgroundColor: colors.brand.primary,
                   borderRadius: 16,
-                  paddingVertical: 16,
+                  paddingVertical: 8,
                   alignItems: 'center',
                   gap: 8,
                   flexDirection: 'row',
