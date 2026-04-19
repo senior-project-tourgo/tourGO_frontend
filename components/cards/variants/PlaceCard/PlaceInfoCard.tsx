@@ -1,9 +1,8 @@
 import { Accordion } from '@/components/Accordion';
 import { AppText } from '@/components/AppText';
-import { Badge } from '@/components/Badge';
 import { Button } from '@/components/Button';
 import { VIBES } from '@/constants/vibes/vibes';
-import { OpeningHours, Place, PriceRange } from '@/features/place/place.types';
+import { OpeningHours, Place } from '@/features/place/place.types';
 import { getPlaceGoogleDetails } from '@/services/place/place.service';
 import type { ApiPromotion } from '@/services/promotion.service';
 import colors from '@/theme/colors';
@@ -12,11 +11,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { Image, Linking, Pressable, ScrollView, View } from 'react-native';
 import { PromotionCard } from '../PromotionCard';
-import { VIBE_ICONS } from '@/constants/vibes/vibeIcons';
 import { FACILITY_ICONS } from '@/constants/facilityIcons';
 import type { GoogleData } from '@/services/place/placeGoogle.types';
 import { BaseCard } from '../../BaseCard';
 import { PillTabs } from '@/components/PillTabs';
+import { BaseChip } from '@/components/BaseChip';
+import { VIBE_ICONS } from '@/constants/vibes/vibeIcons';
+import { FOR_ICONS } from '@/constants/bestforIcons';
 
 type PlaceInfoProps = {
   place: Place;
@@ -38,10 +39,6 @@ const DAYS: (keyof OpeningHours)[] = [
 
 function getFacilityIcon(facility: string): keyof typeof Ionicons.glyphMap {
   return FACILITY_ICONS[facility.toLowerCase()] ?? 'checkmark-circle-outline';
-}
-
-function getVibeIcon(id: string): keyof typeof Ionicons.glyphMap {
-  return VIBE_ICONS[id] ?? 'sparkles-outline';
 }
 
 function formatTimeRange(open: string, close: string): string {
@@ -165,6 +162,10 @@ export function PlaceInfoCard({
   }
 
   const staticMapUrl = `${process.env.EXPO_PUBLIC_API_URL}/places/static-map?lat=${place.location.lat}&lng=${place.location.lng}`;
+  const vibes = Array.isArray(place.vibe) ? place.vibe : [];
+  function getVibeIcon(id: string): keyof typeof Ionicons.glyphMap {
+    return VIBE_ICONS[id] ?? 'sparkles-outline';
+  }
 
   const hasAnyReviews =
     (googleData.reviews && googleData.reviews.length > 0) ||
@@ -296,39 +297,25 @@ export function PlaceInfoCard({
               marginTop: 4
             }}
           >
-            {(Array.isArray(place.vibe) ? place.vibe : []).map((id: string) => {
-              const label =
-                VIBES.find(v => v.id === id)?.title ?? formatVibeLabel(id);
-              return (
-                <View
-                  key={id}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: 5,
-                    backgroundColor: colors.brand.neutrals,
-                    paddingHorizontal: 10,
-                    paddingVertical: 5,
-                    borderRadius: 20
-                  }}
-                >
-                  <Ionicons
-                    name={getVibeIcon(id)}
-                    size={12}
-                    color={colors.brand.secondary}
-                  />
-                  <AppText
-                    style={{
-                      fontSize: 12,
-                      color: colors.brand.secondary,
-                      fontWeight: '600'
-                    }}
-                  >
-                    {label}
-                  </AppText>
-                </View>
-              );
-            })}
+            {vibes.length > 0 && (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  flexWrap: 'wrap',
+                  gap: 8,
+                  marginTop: 4
+                }}
+              >
+                {vibes.map(id => {
+                  const label =
+                    VIBES.find(v => v.id === id)?.title ?? formatVibeLabel(id);
+
+                  return (
+                    <BaseChip key={id} label={label} icon={getVibeIcon(id)} />
+                  );
+                })}
+              </View>
+            )}
           </View>
         )}
       </View>
@@ -357,7 +344,7 @@ export function PlaceInfoCard({
                 }}
               >
                 <Ionicons
-                  name="business"
+                  name="business-outline"
                   size={18}
                   color={colors.text.DEFAULT}
                 />
@@ -378,7 +365,7 @@ export function PlaceInfoCard({
                     width: 40,
                     height: 40,
                     borderRadius: 12,
-                    backgroundColor: colors.brand.secondary + '20',
+                    backgroundColor: colors.text.DEFAULT + '20',
                     alignItems: 'center',
                     justifyContent: 'center'
                   }}
@@ -386,7 +373,7 @@ export function PlaceInfoCard({
                   <Ionicons
                     name="time-outline"
                     size={20}
-                    color={colors.brand.secondary}
+                    color={colors.text.DEFAULT}
                   />
                 </View>
 
@@ -417,7 +404,7 @@ export function PlaceInfoCard({
                     width: 40,
                     height: 40,
                     borderRadius: 12,
-                    backgroundColor: colors.brand.secondary + '20',
+                    backgroundColor: colors.text.DEFAULT + '20',
                     alignItems: 'center',
                     justifyContent: 'center'
                   }}
@@ -425,7 +412,7 @@ export function PlaceInfoCard({
                   <Ionicons
                     name="wallet-outline"
                     size={20}
-                    color={colors.brand.secondary}
+                    color={colors.text.DEFAULT}
                   />
                 </View>
 
@@ -440,37 +427,12 @@ export function PlaceInfoCard({
                       marginTop: 2
                     }}
                   >
-                    {(['$', '$$', '$$$', '$$$$'] as PriceRange[]).map(tier => {
-                      const active = place.priceRange === tier;
-                      return (
-                        <View
-                          key={tier}
-                          style={{
-                            paddingHorizontal: 10,
-                            paddingVertical: 4,
-                            borderRadius: 8,
-                            backgroundColor: active
-                              ? colors.brand.secondary
-                              : colors.brand.secondary + '15'
-                          }}
-                        >
-                          <AppText
-                            style={{
-                              fontSize: 13,
-                              fontWeight: active ? '700' : '400',
-                              color: active
-                                ? 'white'
-                                : colors.brand.secondary + '80'
-                            }}
-                          >
-                            {tier}
-                          </AppText>
-                        </View>
-                      );
-                    })}
-
                     <AppText
-                      style={{ fontSize: 12, color: '#94a3b8', marginLeft: 4 }}
+                      style={{
+                        fontSize: 14,
+                        fontWeight: '600',
+                        color: colors.text.DEFAULT
+                      }}
                     >
                       {place.priceRange === '$' && 'Under रु 500'}
                       {place.priceRange === '$$' && 'रु 500 – 1,500'}
@@ -499,7 +461,7 @@ export function PlaceInfoCard({
                     width: 40,
                     height: 40,
                     borderRadius: 12,
-                    backgroundColor: colors.brand.secondary + '20',
+                    backgroundColor: colors.text.DEFAULT + '20',
                     alignItems: 'center',
                     justifyContent: 'center'
                   }}
@@ -507,7 +469,7 @@ export function PlaceInfoCard({
                   <Ionicons
                     name="location-outline"
                     size={20}
-                    color={colors.brand.secondary}
+                    color={colors.text.DEFAULT}
                   />
                 </View>
 
@@ -577,57 +539,40 @@ export function PlaceInfoCard({
 
           {/* ── Facilities ── */}
           {place.specialFacilities?.length > 0 && (
-            <>
-              <Separator />
-              <View>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: 8,
-                    marginBottom: 14
-                  }}
-                >
-                  <Ionicons
-                    name="business-outline"
-                    size={16}
-                    color={colors.brand.secondary}
-                  />
-                  <AppText style={{ fontSize: 15, fontWeight: '600' }}>
-                    Facilities
-                  </AppText>
-                </View>
-                <View
-                  style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}
-                >
-                  {place.specialFacilities.map(f => (
-                    <View
-                      key={f}
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        gap: 6,
-                        backgroundColor: colors.brand.neutrals,
-                        paddingHorizontal: 12,
-                        paddingVertical: 8,
-                        borderRadius: 10
-                      }}
-                    >
-                      <Ionicons
-                        name={getFacilityIcon(f)}
-                        size={14}
-                        color={colors.brand.secondary}
-                      />
-                      <AppText
-                        style={{ fontSize: 12, color: colors.brand.secondary }}
-                      >
-                        {capitalize(f)}
-                      </AppText>
-                    </View>
-                  ))}
-                </View>
+            <View className="gap-1">
+              {/* Header */}
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 8
+                }}
+              >
+                <Ionicons
+                  name="business-outline"
+                  size={18}
+                  color={colors.text.DEFAULT}
+                />
+                <AppText variant="subtitle">Facilities</AppText>
               </View>
-            </>
+
+              {/* Chips */}
+              <View
+                style={{
+                  flexDirection: 'row',
+                  flexWrap: 'wrap',
+                  gap: 8
+                }}
+              >
+                {place.specialFacilities.map(f => (
+                  <BaseChip
+                    key={f}
+                    label={capitalize(f)}
+                    icon={getFacilityIcon(f)}
+                  />
+                ))}
+              </View>
+            </View>
           )}
 
           {/* ── Best For ── */}
@@ -648,15 +593,18 @@ export function PlaceInfoCard({
                     size={16}
                     color={colors.brand.secondary}
                   />
-                  <AppText style={{ fontSize: 15, fontWeight: '600' }}>
-                    Best For
-                  </AppText>
+                  <AppText variant="subtitle">Best For</AppText>
                 </View>
+
                 <View
                   style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}
                 >
                   {place.suitableFor.map(s => (
-                    <Badge key={s} label={capitalize(s)} />
+                    <BaseChip
+                      key={s}
+                      label={capitalize(s)}
+                      icon={FOR_ICONS[s as keyof typeof FOR_ICONS]}
+                    />
                   ))}
                 </View>
               </View>
