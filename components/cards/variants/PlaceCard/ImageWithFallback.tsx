@@ -29,7 +29,11 @@ export function ImageWithFallback({
     setImageError(false);
   }, [primaryImageUrl]);
 
-  const hasPrimary = primaryImageUrl && !imageError;
+  const isValidUrl =
+    !!primaryImageUrl &&
+    (primaryImageUrl.startsWith('http://') ||
+      primaryImageUrl.startsWith('https://'));
+  const hasPrimary = isValidUrl && !imageError;
 
   return (
     <View className={`overflow-hidden ${className ?? ''}`}>
