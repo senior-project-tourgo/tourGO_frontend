@@ -246,13 +246,6 @@ export function PlaceInfoCard({
           <AppText style={{ fontSize: 13, color: '#64748b' }}>
             {place.location.area}
           </AppText>
-          <AppText style={{ fontSize: 12, color: '#cbd5e1' }}> · </AppText>
-          <AppText style={{ fontSize: 13, color: '#64748b' }}>
-            {place.priceRange === '$' && 'रु 500'}
-            {place.priceRange === '$$' && 'रु 500–1,500'}
-            {place.priceRange === '$$$' && 'रु 1,500–4,000'}
-            {place.priceRange === '$$$$' && 'रु 4,000+'}
-          </AppText>
         </View>
 
         {/* Open/Closed */}
@@ -473,13 +466,13 @@ export function PlaceInfoCard({
                   />
                 </View>
 
-                <View>
+                <View style={{ flex: 1 }}>
                   <AppText style={{ fontSize: 11 }}>Location</AppText>
+
                   <AppText
                     style={{
                       fontSize: 13,
                       color: colors.brand.primary,
-                      flex: 1,
                       lineHeight: 19
                     }}
                   >
