@@ -123,7 +123,7 @@ export default function VibeSelectorScreen() {
         <Pressable
           onPress={handleSurpriseMe}
           disabled={loadingSurprise}
-          style={{ padding: 8, flexShrink: 0 }}
+          style={{ padding: 8, flexShrink: 0, marginBottom: 16 }}
         >
           <AppText
             style={{
