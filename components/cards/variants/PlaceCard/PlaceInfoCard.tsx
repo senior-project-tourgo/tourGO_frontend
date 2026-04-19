@@ -18,6 +18,7 @@ import { PillTabs } from '@/components/PillTabs';
 import { BaseChip } from '@/components/BaseChip';
 import { VIBE_ICONS } from '@/constants/vibes/vibeIcons';
 import { FOR_ICONS } from '@/constants/bestforIcons';
+import SocialLinksGrid from '@/components/place-info/SocialLinksGrid';
 
 type PlaceInfoProps = {
   place: Place;
@@ -729,59 +730,8 @@ export function PlaceInfoCard({
                   </Pressable>
                 ) : null}
 
-                {/* Social media circular icons */}
-                {socialLinks.length > 0 && (
-                  <View
-                    style={{ flexDirection: 'row', gap: 20, flexWrap: 'wrap' }}
-                  >
-                    {socialLinks.map(link => (
-                      <Pressable
-                        key={link.platform}
-                        onPress={() => Linking.openURL(link.url)}
-                        style={{ alignItems: 'center', gap: 6, minWidth: 56 }}
-                      >
-                        <View
-                          style={{
-                            width: 52,
-                            height: 52,
-                            borderRadius: 26,
-                            backgroundColor: colors.brand.neutrals,
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            borderWidth: 1.5,
-                            borderColor: colors.brand.primary + '30'
-                          }}
-                        >
-                          <Ionicons
-                            name={link.icon}
-                            size={24}
-                            color={colors.brand.secondary}
-                          />
-                        </View>
-                        <AppText
-                          style={{
-                            fontSize: 10,
-                            color: '#64748b',
-                            textAlign: 'center',
-                            maxWidth: 72
-                          }}
-                          numberOfLines={1}
-                        >
-                          {link.subtitle}
-                        </AppText>
-                        <AppText
-                          style={{
-                            fontSize: 9,
-                            color: '#94a3b8',
-                            textAlign: 'center'
-                          }}
-                        >
-                          {link.platform}
-                        </AppText>
-                      </Pressable>
-                    ))}
-                  </View>
-                )}
+                {/* Social media circular icons (NOW COMPONENTIZED) */}
+                <SocialLinksGrid socialLinks={socialLinks} />
               </View>
             </>
           )}
