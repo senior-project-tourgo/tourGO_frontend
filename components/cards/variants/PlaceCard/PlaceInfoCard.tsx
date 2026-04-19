@@ -18,7 +18,9 @@ import { PillTabs } from '@/components/PillTabs';
 import { BaseChip } from '@/components/BaseChip';
 import { VIBE_ICONS } from '@/constants/vibes/vibeIcons';
 import { FOR_ICONS } from '@/constants/bestforIcons';
-import SocialLinksGrid from '@/components/place-info/SocialLinksGrid';
+import SocialLinksGrid, {
+  type SocialLink as SocialLinkGridItem
+} from '@/components/place-info/SocialLinksGrid';
 
 type PlaceInfoProps = {
   place: Place;
@@ -113,13 +115,13 @@ export function PlaceInfoCard({
   const sm = place.socialMedia;
   const waNumber = sm?.whatsapp?.number ?? sm?.whatsapp?.handle;
 
-  type SocialLink = {
+  type PlaceSocialLink = {
     platform: string;
     icon: keyof typeof Ionicons.glyphMap;
     url: string;
     subtitle: string;
   };
-  const socialLinks: SocialLink[] = [];
+  const socialLinks: PlaceSocialLink[] = [];
   if (sm?.instagram?.handle || sm?.instagram?.page) {
     const url =
       sm.instagram?.page ?? `https://www.instagram.com/${sm.instagram?.handle}`;
@@ -167,6 +169,21 @@ export function PlaceInfoCard({
   function getVibeIcon(id: string): keyof typeof Ionicons.glyphMap {
     return VIBE_ICONS[id] ?? 'sparkles-outline';
   }
+
+  const contactLinks: SocialLinkGridItem[] = [
+    ...(place.contactNumber
+      ? [
+          {
+            platform: 'Phone',
+            icon: 'call-outline',
+            onPress: () => {
+              void Linking.openURL(`tel:${place.contactNumber}`);
+            }
+          } satisfies SocialLinkGridItem
+        ]
+      : []),
+    ...socialLinks
+  ];
 
   const hasAnyReviews =
     (googleData.reviews && googleData.reviews.length > 0) ||
@@ -543,7 +560,7 @@ export function PlaceInfoCard({
                 }}
               >
                 <Ionicons
-                  name="business-outline"
+                  name="cog-outline"
                   size={18}
                   color={colors.text.DEFAULT}
                 />
@@ -584,8 +601,8 @@ export function PlaceInfoCard({
                 >
                   <Ionicons
                     name="people-outline"
-                    size={16}
-                    color={colors.brand.secondary}
+                    size={18}
+                    color={colors.text.DEFAULT}
                   />
                   <AppText variant="subtitle">Best For</AppText>
                 </View>
@@ -654,9 +671,10 @@ export function PlaceInfoCard({
           </Accordion>
 
           {/* ── Contact ── */}
-          {(place.contactNumber || socialLinks.length > 0) && (
+          {contactLinks.length > 0 && (
             <>
               <Separator />
+
               <View>
                 <View
                   style={{
@@ -667,71 +685,14 @@ export function PlaceInfoCard({
                   }}
                 >
                   <Ionicons
-                    name="call-outline"
-                    size={16}
+                    name="share-social-outline"
+                    size={18}
                     color={colors.brand.secondary}
                   />
-                  <AppText style={{ fontSize: 15, fontWeight: '600' }}>
-                    Contact
-                  </AppText>
+                  <AppText variant="subtitle">Contact</AppText>
                 </View>
 
-                {/* Phone number pill */}
-                {place.contactNumber ? (
-                  <Pressable
-                    onPress={() =>
-                      Linking.openURL(`tel:${place.contactNumber}`)
-                    }
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: 12,
-                      backgroundColor: colors.brand.neutrals,
-                      padding: 14,
-                      borderRadius: 14,
-                      marginBottom: socialLinks.length > 0 ? 16 : 0
-                    }}
-                  >
-                    <View
-                      style={{
-                        width: 42,
-                        height: 42,
-                        borderRadius: 21,
-                        backgroundColor: colors.brand.primary + '20',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}
-                    >
-                      <Ionicons
-                        name="call-outline"
-                        size={19}
-                        color={colors.brand.primary}
-                      />
-                    </View>
-                    <View style={{ flex: 1 }}>
-                      <AppText style={{ fontSize: 11, color: '#94a3b8' }}>
-                        Phone
-                      </AppText>
-                      <AppText
-                        style={{
-                          fontSize: 14,
-                          fontWeight: '700',
-                          color: colors.brand.primary
-                        }}
-                      >
-                        {place.contactNumber}
-                      </AppText>
-                    </View>
-                    <Ionicons
-                      name="call"
-                      size={16}
-                      color={colors.brand.primary}
-                    />
-                  </Pressable>
-                ) : null}
-
-                {/* Social media circular icons (NOW COMPONENTIZED) */}
-                <SocialLinksGrid socialLinks={socialLinks} />
+                <SocialLinksGrid socialLinks={contactLinks} />
               </View>
             </>
           )}

@@ -2,10 +2,11 @@ import { View, Pressable, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '@/theme/colors';
 
-type SocialLink = {
+export type SocialLink = {
   platform: string;
-  url: string;
   icon: keyof typeof Ionicons.glyphMap;
+  url?: string;
+  onPress?: () => void;
 };
 
 type Props = {
@@ -17,22 +18,33 @@ export default function SocialLinksGrid({ socialLinks }: Props) {
 
   return (
     <View style={{ flexDirection: 'row', gap: 14, flexWrap: 'wrap' }}>
-      {socialLinks.map(link => (
-        <Pressable
-          key={link.platform}
-          onPress={() => Linking.openURL(link.url)}
-          style={{
-            width: 44,
-            height: 44,
-            borderRadius: 22,
-            backgroundColor: colors.brand.neutrals,
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}
-        >
-          <Ionicons name={link.icon} size={20} color={colors.brand.primary} />
-        </Pressable>
-      ))}
+      {socialLinks.map(link => {
+        const handlePress = async () => {
+          if (link.onPress) return link.onPress();
+          if (link.url) return Linking.openURL(link.url);
+        };
+
+        const isDisabled = !link.onPress && !link.url;
+
+        return (
+          <Pressable
+            key={link.platform}
+            onPress={isDisabled ? undefined : handlePress}
+            disabled={isDisabled}
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: 22,
+              backgroundColor: colors.brand.neutrals,
+              alignItems: 'center',
+              justifyContent: 'center',
+              opacity: isDisabled ? 0.4 : 1
+            }}
+          >
+            <Ionicons name={link.icon} size={20} color={colors.brand.primary} />
+          </Pressable>
+        );
+      })}
     </View>
   );
 }
