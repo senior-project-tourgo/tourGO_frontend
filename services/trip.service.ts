@@ -111,13 +111,15 @@ export type GenerateRecommendationResult = {
 };
 
 export async function generateRecommendation(
-  preferences: GenerateTripInput
+  preferences: GenerateTripInput,
+  signal?: AbortSignal
 ): Promise<GenerateRecommendationResult> {
   try {
     // numberOfPlaces is now computed server-side from startTime/endTime/pace/transportMode
     const response = await api.post<GenerateRecommendationResult>(
       '/recommend',
-      preferences
+      preferences,
+      { signal }
     );
     return response.data;
   } catch (error: any) {
@@ -175,10 +177,14 @@ export type SurpriseRecommendationResult = {
   tagline: string;
 };
 
-export async function getSurpriseRecommendation(): Promise<SurpriseRecommendationResult> {
+export async function getSurpriseRecommendation(
+  signal?: AbortSignal
+): Promise<SurpriseRecommendationResult> {
   try {
     const response = await api.post<SurpriseRecommendationResult>(
-      '/recommend/surprise'
+      '/recommend/surprise',
+      undefined,
+      { signal }
     );
     return response.data;
   } catch (error: any) {
@@ -188,13 +194,18 @@ export async function getSurpriseRecommendation(): Promise<SurpriseRecommendatio
   }
 }
 
-export async function createTrip(payload: {
-  itineraryName: string;
-  places: { placeId: string; order: number }[];
-  status: 'saved' | 'current';
-}): Promise<Trip> {
+export async function createTrip(
+  payload: {
+    itineraryName: string;
+    places: { placeId: string; order: number }[];
+    status: 'saved' | 'current';
+  },
+  signal?: AbortSignal
+): Promise<Trip> {
   try {
-    const response = await api.post<Trip>('/trips/create-trip', payload);
+    const response = await api.post<Trip>('/trips/create-trip', payload, {
+      signal
+    });
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || 'Trip creation failed');

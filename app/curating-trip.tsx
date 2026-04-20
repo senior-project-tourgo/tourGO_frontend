@@ -12,6 +12,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef } from 'react';
 import { Alert, View, Pressable } from 'react-native';
 import { AppText } from '@/components/AppText';
+import colors from '@/theme/colors';
 
 /* -----------------------------
    Safe param helpers
@@ -42,19 +43,40 @@ export default function CuratingTripScreen() {
   const isSurprise = mode === 'surprise';
 
   const calledRef = useRef(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const isCancelledRef = useRef(false);
+
+  const isRequestCancelled = (error: unknown) => {
+    const axiosError = error as AxiosError;
+    return (
+      axiosError?.code === 'ERR_CANCELED' ||
+      (error as any)?.name === 'CanceledError'
+    );
+  };
+
+  const handleCancel = () => {
+    isCancelledRef.current = true;
+    abortControllerRef.current?.abort();
+    router.back();
+  };
 
   useEffect(() => {
     if (calledRef.current) return;
     calledRef.current = true;
 
     const run = async () => {
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+
       try {
         if (isSurprise) {
-          const result = await getSurpriseRecommendation();
+          const result = await getSurpriseRecommendation(controller.signal);
 
           const placeIds = result.recommendedPlaces
             .map(p => p.placeId)
             .join(',');
+
+          if (isCancelledRef.current) return;
 
           router.replace({
             pathname: '/review-trip',
@@ -78,37 +100,42 @@ export default function CuratingTripScreen() {
         const priceRangeRaw = asString(params.priceRange);
         const areaRaw = asString(params.travelingArea);
 
-        const result = await generateRecommendation({
-          area: areaRaw as Area | undefined,
-          vibes,
-          pace: asString(params.pace) as PaceValue,
-          itineraryName: asString(params.itineraryName) ?? '',
-          tripDate: asString(params.tripDate) ?? '',
-          startTime: asString(params.startTime) ?? '',
-          endTime: asString(params.endTime) ?? '',
-          numberOfPeople: (() => {
-            const n = asNumber(params.numberOfPeople);
-            if (!n) throw new Error('Invalid numberOfPeople');
-            return n;
-          })(),
-          groupType: asString(params.groupType) || undefined,
-          startLat: asNumber(params.startLat),
-          startLng: asNumber(params.startLng),
+        const result = await generateRecommendation(
+          {
+            area: areaRaw as Area | undefined,
+            vibes,
+            pace: asString(params.pace) as PaceValue,
+            itineraryName: asString(params.itineraryName) ?? '',
+            tripDate: asString(params.tripDate) ?? '',
+            startTime: asString(params.startTime) ?? '',
+            endTime: asString(params.endTime) ?? '',
+            numberOfPeople: (() => {
+              const n = asNumber(params.numberOfPeople);
+              if (!n) throw new Error('Invalid numberOfPeople');
+              return n;
+            })(),
+            groupType: asString(params.groupType) || undefined,
+            startLat: asNumber(params.startLat),
+            startLng: asNumber(params.startLng),
 
-          transportMode: TRANSPORT_OPTIONS.some(
-            o => o.value === transportModeRaw
-          )
-            ? (transportModeRaw as TransportMode)
-            : undefined,
+            transportMode: TRANSPORT_OPTIONS.some(
+              o => o.value === transportModeRaw
+            )
+              ? (transportModeRaw as TransportMode)
+              : undefined,
 
-          priceRange: (['$', '$$', '$$$', '$$$$'] as const).includes(
-            priceRangeRaw as any
-          )
-            ? (priceRangeRaw as '$' | '$$' | '$$$' | '$$$$')
-            : undefined
-        });
+            priceRange: (['$', '$$', '$$$', '$$$$'] as const).includes(
+              priceRangeRaw as any
+            )
+              ? (priceRangeRaw as '$' | '$$' | '$$$' | '$$$$')
+              : undefined
+          },
+          controller.signal
+        );
 
         const placeIds = result.recommendedPlaces.map(p => p.placeId).join(',');
+
+        if (isCancelledRef.current) return;
 
         router.replace({
           pathname: '/review-trip',
@@ -121,6 +148,10 @@ export default function CuratingTripScreen() {
           }
         });
       } catch (error) {
+        if (isRequestCancelled(error) || isCancelledRef.current) {
+          return;
+        }
+
         calledRef.current = false;
 
         const axiosError = error as AxiosError<{ message?: string }>;
@@ -131,19 +162,36 @@ export default function CuratingTripScreen() {
             'Something went wrong. Please try again.',
           [{ text: 'Go Back', onPress: () => router.back() }]
         );
+      } finally {
+        abortControllerRef.current = null;
       }
     };
 
     run();
+    return () => {
+      isCancelledRef.current = true;
+      abortControllerRef.current?.abort();
+    };
   }, [isSurprise, params, router]);
 
   return (
     <View style={{ flex: 1 }}>
       <Pressable
-        onPress={() => router.back()}
-        style={{ position: 'absolute', top: 50, left: 20 }}
+        onPress={handleCancel}
+        style={{
+          position: 'absolute',
+          top: 56,
+          left: 20,
+          zIndex: 20,
+          paddingHorizontal: 14,
+          paddingVertical: 8,
+          borderRadius: 999,
+          backgroundColor: colors.status.error // text.DEFAULT from colors with opacity
+        }}
       >
-        <AppText>Cancel</AppText>
+        <AppText style={{ color: colors.text.inverse, fontWeight: '700' }}>
+          Cancel
+        </AppText>
       </Pressable>
       <CuratingTripOverlay
         steps={isSurprise ? SURPRISE_STEPS : DEFAULT_STEPS}

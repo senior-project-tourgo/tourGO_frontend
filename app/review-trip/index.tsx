@@ -1,8 +1,8 @@
 import { AppText } from '@/components/AppText';
 import { Button } from '@/components/Button';
 import { CenteredLoading } from '@/components/CenteredLoading';
-import { Map } from '@/components/Map';
 import type { MapRoute } from '@/components/Map';
+import { Map } from '@/components/Map';
 import { HeaderWithBack } from '@/components/PageHeader';
 import { NoPlaceCard } from '@/components/cards/variants/PlaceCard/NoPlaceCard';
 import {
@@ -13,12 +13,14 @@ import { useEditableTrip } from '@/hooks/review-trip/useEditableTrip';
 import { useReviewTripParams } from '@/hooks/review-trip/useReviewTripParams';
 import { useReviewTripRegion } from '@/hooks/review-trip/useReviewTripRegion';
 import { useSaveTrip } from '@/hooks/review-trip/useSaveTrip';
-import { pendingPlaceStore } from '@/stores/pendingPlaceStore';
 import {
   fetchRouteSegment,
   type RouteSegment
 } from '@/services/directions.service';
+import { pendingPlaceStore } from '@/stores/pendingPlaceStore';
 import colors from '@/theme/colors';
+import { Ionicons } from '@expo/vector-icons';
+import { router, useFocusEffect } from 'expo-router';
 import {
   ActivityIndicator,
   Alert,
@@ -26,11 +28,9 @@ import {
   View,
   useWindowDimensions
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { router, useFocusEffect } from 'expo-router';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
 import type { EditableTripPlace } from '@/hooks/review-trip/useEditableTrip';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export default function ReviewTripScreen() {
   const { width: windowWidth } = useWindowDimensions();
