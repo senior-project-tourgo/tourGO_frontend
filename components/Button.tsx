@@ -1,4 +1,5 @@
 import { AppText } from '@/components/AppText';
+import colors from '@/theme/colors';
 import { ActivityIndicator, Pressable } from 'react-native';
 
 export function Button({
@@ -7,7 +8,7 @@ export function Button({
   isLoading = false,
   disabled = false,
   className = '',
-  textColor = '#fff'
+  textColor = colors.text.inverse
 }: {
   title: string;
   onPress?: () => void;

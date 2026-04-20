@@ -8,7 +8,6 @@ import {
   type TransportMode
 } from '@/constants/transportOptions';
 import { type PriceRange } from '@/features/place/place.types';
-import colors from '@/theme/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { BUDGET_TIERS } from '@/constants/budgetOptions';
 
@@ -90,11 +89,6 @@ export default function TripStyleSection({
 
       <View className="space-y-1.5">
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-          <Ionicons
-            name="wallet-outline"
-            size={14}
-            color={colors.brand.secondary}
-          />
           <AppText className="font-medium">Budget (optional)</AppText>
         </View>
         <View style={{ flexDirection: 'row', gap: 8 }}>

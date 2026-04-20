@@ -1,6 +1,5 @@
 import { AppText } from '@/components/AppText';
 import { Badge } from '@/components/Badge';
-import { SwipeToUnlock } from '@/components/SwipeToUnlock';
 import { VIBES } from '@/constants/vibes/vibes';
 import type { Place } from '@/features/place/place.types';
 import type { ApiPromotion } from '@/services/promotion.service';
@@ -10,6 +9,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { Pressable, TouchableOpacity, View } from 'react-native';
 import { ImageWithFallback } from './ImageWithFallback';
+import { Button } from '@/components/Button';
 
 type Tab = 'checkin' | 'promotions';
 
@@ -164,11 +164,11 @@ export function DuringTripPlaceCard({
               </AppText>
             </View>
           ) : (
-            <SwipeToUnlock
-              label="Slide to check in  ›  +10 XP"
-              onUnlock={onCheckIn}
+            <Button
+              title={'Press to check in  ›  +10 XP'}
+              onPress={onCheckIn}
               disabled={checkingIn}
-              trackWidth={310}
+              className="w-full"
             />
           ))}
 

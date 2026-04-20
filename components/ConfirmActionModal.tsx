@@ -25,7 +25,7 @@ interface ConfirmActionModalProps {
 export function ConfirmActionModal({
   visible,
   icon,
-  iconContainerClassName = 'bg-red-100',
+  iconContainerClassName = colors.status.error,
   title,
   message,
   cancelLabel = 'Cancel',
@@ -47,7 +47,7 @@ export function ConfirmActionModal({
         onPress={onCancel}
       >
         <Pressable
-          className="w-full gap-3 rounded-2xl bg-white p-6"
+          className="w-full gap-3 rounded-2xl bg-colors-surface-background p-6"
           onPress={() => {}}
         >
           <View className="items-center pb-1">
@@ -71,7 +71,7 @@ export function ConfirmActionModal({
               title={cancelLabel}
               onPress={onCancel}
               disabled={pending}
-              className="h-14 flex-1 border border-slate-200 bg-white"
+              className="h-14 flex-1 border border-slate-200 bg-colors-surface-background"
               textColor={colors.text.DEFAULT}
             />
             <Button
