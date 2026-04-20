@@ -12,29 +12,37 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef } from 'react';
 import { Alert, View } from 'react-native';
 
+/* -----------------------------
+   Safe param helpers
+------------------------------ */
+
+type Param = string | string[] | undefined;
+
+const asString = (v: Param): string | undefined => {
+  if (Array.isArray(v)) return v[0];
+  return v;
+};
+
+const asNumber = (v: Param): number | undefined => {
+  const raw = Array.isArray(v) ? v[0] : v;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : undefined;
+};
+
+/* -----------------------------
+   Component
+------------------------------ */
+
 export default function CuratingTripScreen() {
   const router = useRouter();
-  const params = useLocalSearchParams<Record<string, string>>();
 
-  const { mode } = params;
+  // IMPORTANT: don't over-type this — Expo Router params are dynamic
+  const params = useLocalSearchParams();
+
+  const mode = asString(params.mode);
   const isSurprise = mode === 'surprise';
 
-  // prevents duplicate execution per mount
   const calledRef = useRef(false);
-
-  const normalizeString = (v: string | string[] | undefined) => {
-    if (Array.isArray(v)) return v[0] ?? '';
-    return v ?? '';
-  };
-
-  const normalizeNumber = (v: string | string[] | undefined, name: string) => {
-    const raw = Array.isArray(v) ? v[0] : v;
-    const n = Number(raw);
-    if (!Number.isFinite(n)) {
-      throw new Error(`Invalid param "${name}": "${raw}"`);
-    }
-    return n;
-  };
 
   const checkVibeMismatch = (places: Place[], vibes: string[]) => {
     let matchCount = 0;
@@ -55,6 +63,9 @@ export default function CuratingTripScreen() {
 
     const run = async () => {
       try {
+        /* -------------------------
+           SURPRISE FLOW
+        -------------------------- */
         if (isSurprise) {
           const result = await getSurpriseRecommendation();
 
@@ -73,32 +84,41 @@ export default function CuratingTripScreen() {
           return;
         }
 
-        const vibes: string[] = params.vibes ? JSON.parse(params.vibes) : [];
+        /* -------------------------
+           NORMAL FLOW
+        -------------------------- */
 
-        const transportModeRaw = normalizeString(params.transportMode);
-        const priceRangeRaw = normalizeString(params.priceRange);
-        const areaRaw = normalizeString(params.travelingArea);
+        const vibes: string[] = params.vibes
+          ? JSON.parse(asString(params.vibes) ?? '[]')
+          : [];
+
+        const transportModeRaw = asString(params.transportMode);
+        const priceRangeRaw = asString(params.priceRange);
+        const areaRaw = asString(params.travelingArea);
 
         const result = await generateRecommendation({
-          area: (areaRaw || undefined) as Area | undefined,
+          area: areaRaw as Area | undefined,
           vibes,
-          pace: normalizeString(params.pace) as PaceValue,
-          itineraryName: normalizeString(params.itineraryName),
-          tripDate: normalizeString(params.tripDate),
-          startTime: normalizeString(params.startTime),
-          endTime: normalizeString(params.endTime),
-          numberOfPeople: normalizeNumber(
-            params.numberOfPeople,
-            'numberOfPeople'
-          ),
-          groupType: normalizeString(params.groupType) || undefined,
-          startLat: params.startLat ? Number(params.startLat) : undefined,
-          startLng: params.startLng ? Number(params.startLng) : undefined,
+          pace: asString(params.pace) as PaceValue,
+          itineraryName: asString(params.itineraryName) ?? '',
+          tripDate: asString(params.tripDate) ?? '',
+          startTime: asString(params.startTime) ?? '',
+          endTime: asString(params.endTime) ?? '',
+          numberOfPeople: (() => {
+            const n = asNumber(params.numberOfPeople);
+            if (!n) throw new Error('Invalid numberOfPeople');
+            return n;
+          })(),
+          groupType: asString(params.groupType) || undefined,
+          startLat: asNumber(params.startLat),
+          startLng: asNumber(params.startLng),
+
           transportMode: TRANSPORT_OPTIONS.some(
             o => o.value === transportModeRaw
           )
             ? (transportModeRaw as TransportMode)
             : undefined,
+
           priceRange: (['$', '$$', '$$$', '$$$$'] as const).includes(
             priceRangeRaw as any
           )
@@ -115,10 +135,10 @@ export default function CuratingTripScreen() {
 
         const baseParams = {
           placeIds,
-          itineraryName: params.itineraryName,
-          startLat: params.startLat,
-          startLng: params.startLng,
-          startLabel: params.startLabel
+          itineraryName: asString(params.itineraryName),
+          startLat: asString(params.startLat),
+          startLng: asString(params.startLng),
+          startLabel: asString(params.startLabel)
         };
 
         router.replace({
@@ -134,7 +154,6 @@ export default function CuratingTripScreen() {
               : baseParams
         });
       } catch (error) {
-        // allow retry on failure
         calledRef.current = false;
 
         const axiosError = error as AxiosError<{ message?: string }>;
