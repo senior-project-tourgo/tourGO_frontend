@@ -1,4 +1,4 @@
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 import { Accordion } from '@/components/Accordion';
 import { AppText } from '@/components/AppText';
 import { IconTile } from '@/components/IconTile';

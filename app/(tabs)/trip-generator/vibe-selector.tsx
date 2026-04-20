@@ -2,8 +2,6 @@ import { AppText } from '@/components/AppText';
 import { Button } from '@/components/Button';
 import { VibeCard } from '@/components/cards/variants/VibeCard';
 import { HeaderWithBack } from '@/components/PageHeader';
-import { PaceValue } from '@/constants/paceOptions';
-import { TRANSPORT_OPTIONS, TransportMode } from '@/constants/transportOptions';
 import { VIBES } from '@/constants/vibes/vibes';
 import colors from '@/theme/colors';
 import { Ionicons } from '@expo/vector-icons';
@@ -77,9 +75,6 @@ export default function VibeSelectorScreen() {
     );
   };
 
-  const normalizeStringParam = (param: string | string[] | undefined): string =>
-    (Array.isArray(param) ? param[0] : param) || '';
-
   const handleContinue = () => {
     if (selectedVibes.length === 0) return;
     router.push({
@@ -108,34 +103,16 @@ export default function VibeSelectorScreen() {
   const insets = useSafeAreaInsets();
 
   const ListHeader = () => (
-    <View style={{ marginBottom: 16 }}>
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 12
-        }}
-      >
-        <View style={{ flex: 1 }}>
-          <HeaderWithBack title="Select Your Vibes" />
-        </View>
-        <Pressable
-          onPress={handleSurpriseMe}
-          disabled={loadingSurprise}
-          style={{ padding: 8, flexShrink: 0, marginBottom: 16 }}
-        >
-          <AppText
-            style={{
-              color: colors.brand.secondary,
-              fontSize: 13,
-              fontWeight: '700',
-              textDecorationLine: 'underline'
-            }}
-          >
-            Surprise Me
-          </AppText>
-        </Pressable>
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 12
+      }}
+    >
+      <View style={{ flex: 1 }}>
+        <HeaderWithBack title="Select Your Vibes" />
       </View>
     </View>
   );
@@ -247,25 +224,7 @@ export default function VibeSelectorScreen() {
             <Animated.View
               style={{ width: '100%', transform: [{ scale: pulseAnim }] }}
             >
-              <Pressable
-                onPress={handleSurpriseMe}
-                style={{
-                  backgroundColor: colors.brand.primary,
-                  borderRadius: 16,
-                  paddingVertical: 8,
-                  alignItems: 'center',
-                  gap: 8,
-                  flexDirection: 'row',
-                  justifyContent: 'center'
-                }}
-              >
-                <Ionicons name="shuffle-outline" size={20} color="white" />
-                <AppText
-                  style={{ color: 'white', fontWeight: '700', fontSize: 16 }}
-                >
-                  Surprise Me!
-                </AppText>
-              </Pressable>
+              <Button title="Surprise Me!" onPress={handleSurpriseMe} />
             </Animated.View>
 
             <Pressable onPress={() => setShowIdleModal(false)}>
