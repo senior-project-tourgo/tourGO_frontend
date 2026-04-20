@@ -8,7 +8,6 @@ import type { Place } from '@/features/place/place.types';
 import { useSavePlace } from '@/hooks/place/useSavePlace';
 import {
   getHomeRecommendations,
-  getSurpriseRecommendation,
   type HomeTripSuggestion
 } from '@/services/trip.service';
 import { getUserProfile } from '@/services/user.service';
@@ -43,7 +42,6 @@ export default function HomeScreen() {
   const [tripSuggestions, setTripSuggestions] = useState<HomeTripSuggestion[]>(
     []
   );
-  const [loadingSurprise, setLoadingSurprise] = useState(false);
 
   useEffect(() => {
     if (savedPlaces.length > 0) return;
@@ -94,24 +92,8 @@ export default function HomeScreen() {
     fetchFeed(selectedVibe, next, true);
   };
 
-  const handleSurpriseMe = async () => {
-    if (loadingSurprise) return;
-    setLoadingSurprise(true);
-
-    try {
-      const result = await getSurpriseRecommendation();
-      const placeIds = result.recommendedPlaces.map(p => p.placeId).join(',');
-
-      router.push({
-        pathname: '/review-trip',
-        params: {
-          placeIds,
-          itineraryName: `Surprise Trip ✨`
-        }
-      });
-    } finally {
-      setLoadingSurprise(false);
-    }
+  const handleSurpriseMe = () => {
+    router.push({ pathname: '/curating-trip', params: { mode: 'surprise' } });
   };
 
   const handleSuggestionPress = (suggestion: HomeTripSuggestion) => {
@@ -158,7 +140,6 @@ export default function HomeScreen() {
 
           <Pressable
             onPress={handleSurpriseMe}
-            disabled={loadingSurprise}
             style={{
               flexDirection: 'row',
               alignItems: 'center',
@@ -168,19 +149,22 @@ export default function HomeScreen() {
               paddingVertical: 10,
               padding: 10,
               borderRadius: 20,
-              marginTop: 4,
-              opacity: loadingSurprise ? 0.7 : 1
+              marginTop: 4
             }}
           >
-            {loadingSurprise ? (
-              <ActivityIndicator size="small" color="white" />
-            ) : (
-              <Ionicons name="shuffle-outline" size={16} color="white" />
-            )}
+            <Ionicons
+              name="shuffle-outline"
+              size={16}
+              color={colors.text.inverse}
+            />
             <AppText
-              style={{ color: 'white', fontWeight: '700', fontSize: 13 }}
+              style={{
+                color: colors.text.inverse,
+                fontWeight: '700',
+                fontSize: 13
+              }}
             >
-              {loadingSurprise ? 'Thinking…' : 'Surprise Me'}
+              Surprise Me
             </AppText>
           </Pressable>
         </View>
@@ -249,7 +233,7 @@ export default function HomeScreen() {
       </View>
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [selectedVibe, vibeChips, tripSuggestions, loadingSurprise]
+    [selectedVibe, vibeChips, tripSuggestions]
   );
 
   return (
