@@ -8,7 +8,6 @@ import {
   type TransportMode
 } from '@/constants/transportOptions';
 import { type PriceRange } from '@/features/place/place.types';
-import colors from '@/theme/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { BUDGET_TIERS } from '@/constants/budgetOptions';
 
