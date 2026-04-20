@@ -105,7 +105,38 @@ export default function TripGeneratorScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <Screen>
-        <HeaderWithBack title="Plan Your Trip" />
+        <View className="flex-row justify-between">
+          <HeaderWithBack title="Plan Your Trip" />
+          <Pressable
+            onPress={handleSurpriseMe}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 6,
+              backgroundColor: colors.brand.secondary,
+              paddingHorizontal: 14,
+              paddingVertical: 10,
+              padding: 10,
+              borderRadius: 20,
+              marginTop: 4
+            }}
+          >
+            <Ionicons
+              name="shuffle-outline"
+              size={16}
+              color={colors.text.inverse}
+            />
+            <AppText
+              style={{
+                color: colors.text.inverse,
+                fontWeight: '700',
+                fontSize: 13
+              }}
+            >
+              Surprise Me
+            </AppText>
+          </Pressable>
+        </View>
         <View className="gap-4">
           <TripNameSection
             itineraryName={itineraryName}
@@ -157,35 +188,6 @@ export default function TripGeneratorScreen() {
 
           <View className="mt-4" style={{ gap: 10 }}>
             <Button title="Choose Your Vibes" onPress={handleContinue} />
-
-            <Pressable
-              onPress={handleSurpriseMe}
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 8,
-                paddingVertical: 14,
-                borderRadius: 14,
-                borderWidth: 2,
-                borderColor: colors.brand.primary
-              }}
-            >
-              <Ionicons
-                name="shuffle-outline"
-                size={18}
-                color={colors.brand.primary}
-              />
-              <AppText
-                style={{
-                  color: colors.brand.primary,
-                  fontWeight: '700',
-                  fontSize: 15
-                }}
-              >
-                Surprise Me
-              </AppText>
-            </Pressable>
           </View>
         </View>
       </Screen>
