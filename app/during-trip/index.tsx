@@ -617,7 +617,7 @@ export default function DuringTripScreen() {
                 style={{
                   borderWidth: 1.5, // for thick border
                   borderColor: userSegmentColor,
-                  shadowColor: '#000',
+                  shadowColor: colors.text.DEFAULT,
                   shadowOpacity: 0.1,
                   shadowRadius: 4,
                   elevation: 3
@@ -651,7 +651,7 @@ export default function DuringTripScreen() {
                 style={{
                   borderWidth: 1.5,
                   borderColor: segmentStyles[i].strokeColor,
-                  shadowColor: '#000',
+                  shadowColor: colors.text.DEFAULT,
                   shadowOpacity: 0.1,
                   shadowRadius: 4,
                   elevation: 3
@@ -678,7 +678,11 @@ export default function DuringTripScreen() {
             coordinate={{ latitude: m.latitude, longitude: m.longitude }}
             title={m.title}
             pinColor={
-              m.visited ? '#22c55e' : m.isCurrent ? 'red' : colors.brand.primary
+              m.visited
+                ? colors.status.success
+                : m.isCurrent
+                  ? colors.brand.primary
+                  : colors.status.complete
             }
           />
         ))}
@@ -693,7 +697,7 @@ export default function DuringTripScreen() {
                 ? startLabel
                 : 'Starting Point'
             }
-            pinColor="#22c55e"
+            pinColor={colors.status.success}
           />
         )}
 

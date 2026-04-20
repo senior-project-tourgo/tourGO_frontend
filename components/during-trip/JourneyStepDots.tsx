@@ -32,7 +32,9 @@ export function JourneyStepDots({
                   top: isCurrent ? 4 : 3,
                   width: 6,
                   height: 2,
-                  backgroundColor: isVisited ? '#22c55e' : '#cbd5e1',
+                  backgroundColor: isVisited
+                    ? colors.status.success
+                    : '#cbd5e1',
                   transform: [{ translateX: -6 }]
                 }}
               />
@@ -43,12 +45,12 @@ export function JourneyStepDots({
                 height: isCurrent ? 12 : 8,
                 borderRadius: 6,
                 backgroundColor: isVisited
-                  ? '#22c55e'
+                  ? colors.status.success
                   : isCurrent
                     ? colors.brand.primary
                     : '#cbd5e1',
                 borderWidth: isCurrent ? 2 : 0,
-                borderColor: '#fff'
+                borderColor: colors.surface.background
               }}
             />
           </View>
