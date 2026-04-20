@@ -21,10 +21,17 @@ export default function CuratingTripScreen() {
   const isSurprise = mode === 'surprise';
   const called = useRef(false);
 
-  const normalizeString = (v: string | undefined) => v || '';
-  const normalizeNumber = (v: string | undefined, name: string) => {
-    const n = Number(v);
-    if (!Number.isFinite(n)) throw new Error(`Invalid param "${name}": "${v}"`);
+  const normalizeString = (v: string | string[] | undefined) => {
+    if (Array.isArray(v)) return v[0] ?? '';
+    return v ?? '';
+  };
+
+  const normalizeNumber = (v: string | string[] | undefined, name: string) => {
+    const raw = Array.isArray(v) ? v[0] : v;
+    const n = Number(raw);
+    if (!Number.isFinite(n)) {
+      throw new Error(`Invalid param "${name}": "${raw}"`);
+    }
     return n;
   };
 

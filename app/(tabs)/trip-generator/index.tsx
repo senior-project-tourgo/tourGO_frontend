@@ -186,7 +186,7 @@ export default function TripGeneratorScreen() {
             setPeople={setPeople}
           />
 
-          <View className="mt-4" style={{ gap: 10 }}>
+          <View className="mb-12 mt-4">
             <Button title="Choose Your Vibes" onPress={handleContinue} />
           </View>
         </View>
