@@ -1,18 +1,11 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import {
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  View,
-  ActivityIndicator
-} from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
 
 import { Button } from '@/components/Button';
 import { AppText } from '@/components/AppText';
 import { HeaderWithBack } from '@/components/PageHeader';
 import { Screen } from '@/components/Screen';
-import { getSurpriseRecommendation } from '@/services/trip.service';
 import colors from '@/theme/colors';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -32,23 +25,8 @@ import { buildTripPayload } from '@/utils/tripForm';
 export default function TripGeneratorScreen() {
   const router = useRouter();
 
-  const [loadingSurprise, setLoadingSurprise] = useState(false);
-
-  const handleSurpriseMe = async () => {
-    if (loadingSurprise) return;
-    setLoadingSurprise(true);
-    try {
-      const result = await getSurpriseRecommendation();
-      const placeIds = result.recommendedPlaces.map(p => p.placeId).join(',');
-      router.push({
-        pathname: '/review-trip',
-        params: { placeIds, itineraryName: 'Surprise Trip ✨' }
-      });
-    } catch {
-      // silently ignore
-    } finally {
-      setLoadingSurprise(false);
-    }
+  const handleSurpriseMe = () => {
+    router.push({ pathname: '/curating-trip', params: { mode: 'surprise' } });
   };
 
   // --- Trip Name ---
@@ -127,7 +105,38 @@ export default function TripGeneratorScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <Screen>
-        <HeaderWithBack title="Plan Your Trip" />
+        <View className="flex-row justify-between">
+          <HeaderWithBack title="Plan Your Trip" />
+          <Pressable
+            onPress={handleSurpriseMe}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 6,
+              backgroundColor: colors.brand.secondary,
+              paddingHorizontal: 14,
+              paddingVertical: 10,
+              padding: 10,
+              borderRadius: 20,
+              marginTop: 4
+            }}
+          >
+            <Ionicons
+              name="shuffle-outline"
+              size={16}
+              color={colors.text.inverse}
+            />
+            <AppText
+              style={{
+                color: colors.text.inverse,
+                fontWeight: '700',
+                fontSize: 13
+              }}
+            >
+              Surprise Me
+            </AppText>
+          </Pressable>
+        </View>
         <View className="gap-4">
           <TripNameSection
             itineraryName={itineraryName}
@@ -177,43 +186,8 @@ export default function TripGeneratorScreen() {
             setPeople={setPeople}
           />
 
-          <View className="mt-4" style={{ gap: 10 }}>
+          <View className="mb-12 mt-4">
             <Button title="Choose Your Vibes" onPress={handleContinue} />
-
-            <Pressable
-              onPress={handleSurpriseMe}
-              disabled={loadingSurprise}
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 8,
-                paddingVertical: 14,
-                borderRadius: 14,
-                borderWidth: 2,
-                borderColor: colors.brand.primary,
-                opacity: loadingSurprise ? 0.6 : 1
-              }}
-            >
-              {loadingSurprise ? (
-                <ActivityIndicator size="small" color={colors.brand.primary} />
-              ) : (
-                <Ionicons
-                  name="shuffle-outline"
-                  size={18}
-                  color={colors.brand.primary}
-                />
-              )}
-              <AppText
-                style={{
-                  color: colors.brand.primary,
-                  fontWeight: '700',
-                  fontSize: 15
-                }}
-              >
-                {loadingSurprise ? 'Generating…' : 'Surprise Me'}
-              </AppText>
-            </Pressable>
           </View>
         </View>
       </Screen>

@@ -7,7 +7,7 @@ import axios from 'axios';
  */
 const api = axios.create({
   baseURL: process.env.EXPO_PUBLIC_API_URL,
-  timeout: 10000,
+  timeout: 30000,
   headers: {
     'Content-Type': 'application/json'
   }
@@ -46,6 +46,11 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   response => response,
   error => {
+    // Ignore expected AbortController cancellations to avoid noisy logs.
+    if (axios.isCancel(error) || error?.code === 'ERR_CANCELED') {
+      return Promise.reject(error);
+    }
+
     if (error.response) {
       // Server responded with error status
       console.error('API Error:', error.response.data);
