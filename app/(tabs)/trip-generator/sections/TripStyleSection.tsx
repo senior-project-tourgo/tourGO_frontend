@@ -103,7 +103,7 @@ export default function TripStyleSection({
               key={tier.value}
               icon="cash-outline"
               label={renderDollarDots(tier.value)}
-              description={`${tier.npr}\n${tier.desc}`}
+              description={`${tier.npr}`}
               selected={budgetTier === tier.value}
               onPress={() =>
                 setBudgetTier(budgetTier === tier.value ? null : tier.value)

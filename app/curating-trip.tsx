@@ -2,7 +2,7 @@ import CuratingTripOverlay from '@/components/CuratingTripOverlay';
 import { DEFAULT_STEPS, SURPRISE_STEPS } from '@/constants/steps';
 import { PaceValue } from '@/constants/paceOptions';
 import { TRANSPORT_OPTIONS, TransportMode } from '@/constants/transportOptions';
-import { Area, Place } from '@/features/place/place.types';
+import { Area } from '@/features/place/place.types';
 import {
   generateRecommendation,
   getSurpriseRecommendation
@@ -10,7 +10,8 @@ import {
 import { AxiosError } from 'axios';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef } from 'react';
-import { Alert, View } from 'react-native';
+import { Alert, View, Pressable } from 'react-native';
+import { AppText } from '@/components/AppText';
 
 /* -----------------------------
    Safe param helpers
@@ -35,8 +36,6 @@ const asNumber = (v: Param): number | undefined => {
 
 export default function CuratingTripScreen() {
   const router = useRouter();
-
-  // IMPORTANT: don't over-type this — Expo Router params are dynamic
   const params = useLocalSearchParams();
 
   const mode = asString(params.mode);
@@ -44,28 +43,12 @@ export default function CuratingTripScreen() {
 
   const calledRef = useRef(false);
 
-  const checkVibeMismatch = (places: Place[], vibes: string[]) => {
-    let matchCount = 0;
-    const unmatchedNames: string[] = [];
-
-    for (const place of places) {
-      const hasMatch = place.vibe.some(v => vibes.includes(v));
-      if (hasMatch) matchCount++;
-      else unmatchedNames.push(place.placeName);
-    }
-
-    return { matchCount, unmatchedNames };
-  };
-
   useEffect(() => {
     if (calledRef.current) return;
     calledRef.current = true;
 
     const run = async () => {
       try {
-        /* -------------------------
-           SURPRISE FLOW
-        -------------------------- */
         if (isSurprise) {
           const result = await getSurpriseRecommendation();
 
@@ -77,16 +60,15 @@ export default function CuratingTripScreen() {
             pathname: '/review-trip',
             params: {
               placeIds,
-              itineraryName: 'Surprise Trip ✨'
+              itineraryName: 'Surprise Trip ✨',
+              startLat: asString(params.startLat),
+              startLng: asString(params.startLng),
+              startLabel: asString(params.startLabel)
             }
           });
 
           return;
         }
-
-        /* -------------------------
-           NORMAL FLOW
-        -------------------------- */
 
         const vibes: string[] = params.vibes
           ? JSON.parse(asString(params.vibes) ?? '[]')
@@ -128,30 +110,15 @@ export default function CuratingTripScreen() {
 
         const placeIds = result.recommendedPlaces.map(p => p.placeId).join(',');
 
-        const { matchCount, unmatchedNames } = checkVibeMismatch(
-          result.recommendedPlaces,
-          vibes
-        );
-
-        const baseParams = {
-          placeIds,
-          itineraryName: asString(params.itineraryName),
-          startLat: asString(params.startLat),
-          startLng: asString(params.startLng),
-          startLabel: asString(params.startLabel)
-        };
-
         router.replace({
           pathname: '/review-trip',
-          params:
-            matchCount < result.recommendedPlaces.length
-              ? {
-                  ...baseParams,
-                  mismatchMatchCount: String(matchCount),
-                  mismatchTotalCount: String(result.recommendedPlaces.length),
-                  mismatchUnmatched: JSON.stringify(unmatchedNames)
-                }
-              : baseParams
+          params: {
+            placeIds,
+            itineraryName: asString(params.itineraryName),
+            startLat: asString(params.startLat),
+            startLng: asString(params.startLng),
+            startLabel: asString(params.startLabel)
+          }
         });
       } catch (error) {
         calledRef.current = false;
@@ -168,10 +135,16 @@ export default function CuratingTripScreen() {
     };
 
     run();
-  }, []);
+  }, [isSurprise, params, router]);
 
   return (
     <View style={{ flex: 1 }}>
+      <Pressable
+        onPress={() => router.back()}
+        style={{ position: 'absolute', top: 50, left: 20 }}
+      >
+        <AppText>Cancel</AppText>
+      </Pressable>
       <CuratingTripOverlay
         steps={isSurprise ? SURPRISE_STEPS : DEFAULT_STEPS}
         durationMs={28000}
