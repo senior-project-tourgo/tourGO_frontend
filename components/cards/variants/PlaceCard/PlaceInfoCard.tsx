@@ -524,7 +524,7 @@ export function PlaceInfoCard({
                   flexDirection: 'row',
                   alignItems: 'center',
                   gap: 5,
-                  shadowColor: '#000',
+                  shadowColor: colors.text.DEFAULT,
                   shadowOpacity: 0.12,
                   shadowRadius: 6,
                   elevation: 4
@@ -658,7 +658,9 @@ export function PlaceInfoCard({
                 <AppText
                   style={{
                     fontSize: 11,
-                    color: openingStatus.isOpenNow ? '#16a34a' : '#ef4444',
+                    color: openingStatus.isOpenNow
+                      ? colors.status.success
+                      : colors.status.error,
                     fontWeight: '600'
                   }}
                 >
