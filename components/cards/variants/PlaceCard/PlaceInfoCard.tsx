@@ -164,6 +164,7 @@ export function PlaceInfoCard({
   }
 
   const staticMapUrl = `${process.env.EXPO_PUBLIC_API_URL}/places/static-map?lat=${place.location.lat}&lng=${place.location.lng}`;
+
   const vibes = Array.isArray(place.vibe) ? place.vibe : [];
   function getVibeIcon(id: string): keyof typeof Ionicons.glyphMap {
     return VIBE_ICONS[id] ?? 'sparkles-outline';
@@ -922,20 +923,10 @@ export function PlaceInfoCard({
                     color={colors.text.DEFAULT}
                   />
                   <AppText variant="subtitle">Community Reviews</AppText>
-                  <AppText
-                    style={{
-                      fontSize: 12,
-                      color: '#94a3b8',
-                      marginLeft: 'auto'
-                    }}
-                  >
-                    {place.reviews.length} review
-                    {place.reviews.length !== 1 ? 's' : ''}
-                  </AppText>
                 </View>
 
                 {/* Average rating bar */}
-                <BaseCard className="mb-3">
+                <BaseCard className="p-99 mb-3">
                   <View
                     style={{
                       flexDirection: 'row',
@@ -943,13 +934,7 @@ export function PlaceInfoCard({
                       gap: 10
                     }}
                   >
-                    <AppText
-                      style={{
-                        fontSize: 36,
-                        fontWeight: '800',
-                        color: colors.brand.primary
-                      }}
-                    >
+                    <AppText variant="review">
                       {(
                         place.reviews.reduce((s, r) => s + r.rating, 0) /
                         place.reviews.length
