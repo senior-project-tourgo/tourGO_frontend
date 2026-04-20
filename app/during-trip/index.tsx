@@ -613,7 +613,7 @@ export default function DuringTripScreen() {
               tracksViewChanges={false}
             >
               <View
-                className="rounded-xl border bg-white px-[7px] py-[3px]"
+                className="rounded-xl border bg-colors-surface-background px-[7px] py-[3px]"
                 style={{
                   borderWidth: 1.5, // for thick border
                   borderColor: userSegmentColor,

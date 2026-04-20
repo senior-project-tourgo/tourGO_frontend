@@ -71,7 +71,7 @@ export function ConfirmActionModal({
               title={cancelLabel}
               onPress={onCancel}
               disabled={pending}
-              className="h-14 flex-1 border border-slate-200 bg-white"
+              className="h-14 flex-1 border border-slate-200 bg-colors-surface-background"
               textColor={colors.text.DEFAULT}
             />
             <Button
