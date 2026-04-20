@@ -3,33 +3,13 @@ import colors from '@/theme/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, View } from 'react-native';
-
-type Step = {
-  icon: React.ComponentProps<typeof Ionicons>['name'];
-  label: string;
-};
+import { DEFAULT_STEPS } from '@/constants/steps';
+import type { Step } from '@/constants/steps';
 
 type Props = {
   steps?: Step[];
   durationMs?: number;
 };
-
-const DEFAULT_STEPS: Step[] = [
-  { icon: 'location-outline', label: 'Scanning nearby places…' },
-  { icon: 'compass-outline', label: 'Matching your vibes…' },
-  { icon: 'time-outline', label: 'Fitting your time window…' },
-  { icon: 'star-outline', label: 'Ranking top spots…' },
-  { icon: 'map-outline', label: 'Building your itinerary…' }
-];
-
-const SURPRISE_STEPS: Step[] = [
-  { icon: 'shuffle-outline', label: 'Picking a random vibe…' },
-  { icon: 'location-outline', label: 'Finding hidden gems…' },
-  { icon: 'star-outline', label: 'Ranking the best spots…' },
-  { icon: 'map-outline', label: 'Assembling your surprise…' }
-];
-
-export { DEFAULT_STEPS, SURPRISE_STEPS };
 
 export default function CuratingTripOverlay({
   steps = DEFAULT_STEPS,
