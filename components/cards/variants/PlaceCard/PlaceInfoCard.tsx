@@ -513,7 +513,7 @@ export function PlaceInfoCard({
           {hasCoords && (
             <Pressable
               onPress={openMaps}
-              android_ripple={{ color: '#ccc' }}
+              android_ripple={{ color: colors.status.error }}
               style={({ pressed }) => [
                 { borderRadius: 16, overflow: 'hidden' },
                 pressed && { opacity: 0.85 }
@@ -522,7 +522,11 @@ export function PlaceInfoCard({
               {!mapError ? (
                 <Image
                   source={{ uri: staticMapUrl }}
-                  style={{ width: '100%', height: 150 }}
+                  style={{
+                    width: '100%',
+                    height: 150,
+                    borderRadius: 16
+                  }}
                   resizeMode="cover"
                   onError={() => setMapError(true)}
                 />
@@ -623,7 +627,7 @@ export function PlaceInfoCard({
                     flexDirection: 'row',
                     alignItems: 'center',
                     gap: 8,
-                    marginBottom: 14
+                    marginBottom: 4
                   }}
                 >
                   <Ionicons
@@ -751,7 +755,7 @@ export function PlaceInfoCard({
                     flexDirection: 'row',
                     alignItems: 'center',
                     gap: 8,
-                    marginBottom: 14
+                    marginBottom: 4
                   }}
                 >
                   <Ionicons
@@ -823,7 +827,7 @@ export function PlaceInfoCard({
               style={{
                 paddingVertical: 28,
                 alignItems: 'center',
-                gap: 10
+                gap: 8
               }}
             >
               <Ionicons name="chatbubbles-outline" size={40} color="#94a3b8" />
@@ -846,7 +850,7 @@ export function PlaceInfoCard({
                     flexDirection: 'row',
                     alignItems: 'center',
                     gap: 8,
-                    marginBottom: 14
+                    marginBottom: 4
                   }}
                 >
                   <Ionicons
@@ -943,7 +947,7 @@ export function PlaceInfoCard({
                     flexDirection: 'row',
                     alignItems: 'center',
                     gap: 8,
-                    marginBottom: 14
+                    marginBottom: 4
                   }}
                 >
                   <Ionicons
