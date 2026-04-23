@@ -18,21 +18,13 @@ export default function TripHistoryScreen() {
     [trips]
   );
 
-  // 🔥 flatten with intentional priority order
   const orderedTrips = useMemo(() => {
-    const sortByDate = (arr: typeof trips) =>
-      [...arr].sort(
-        (a, b) =>
-          new Date(b.completedAt ?? b.startedAt ?? b.createdAt).getTime() -
-          new Date(a.completedAt ?? a.startedAt ?? a.createdAt).getTime()
-      );
-
-    return [
-      ...sortByDate(current),
-      ...sortByDate(saved),
-      ...sortByDate(completed)
-    ];
-  }, [current, saved, completed]);
+    return [...completed].sort(
+      (a, b) =>
+        new Date(b.completedAt ?? b.startedAt ?? b.createdAt).getTime() -
+        new Date(a.completedAt ?? a.startedAt ?? a.createdAt).getTime()
+    );
+  }, [completed]);
 
   return (
     <Screen>
@@ -44,9 +36,9 @@ export default function TripHistoryScreen() {
           color={colors.brand.primary}
           className="mt-6"
         />
-      ) : trips.length === 0 ? (
+      ) : orderedTrips.length === 0 ? (
         <EmptyState
-          message="No trips yet"
+          message="No completed trips yet"
           icon={
             <Ionicons
               name="map-outline"

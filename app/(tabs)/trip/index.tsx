@@ -131,10 +131,7 @@ export default function TripScreen() {
     [trips]
   );
   const saved = useMemo(() => trips.filter(t => t.status === 'saved'), [trips]);
-  const completed = useMemo(
-    () => trips.filter(t => t.status === 'completed'),
-    [trips]
-  );
+  const visibleTrips = useMemo(() => [...current, ...saved], [current, saved]);
 
   if (loading) {
     return (
@@ -158,7 +155,7 @@ export default function TripScreen() {
         className="mb-6"
       />
 
-      {trips.length === 0 && (
+      {visibleTrips.length === 0 && (
         <View style={{ alignItems: 'center', marginTop: 40 }}>
           <Ionicons
             name="map-outline"
@@ -166,17 +163,16 @@ export default function TripScreen() {
             color={colors.brand.neutrals}
           />
           <AppText variant="subtitle" className="mt-4 text-center">
-            No trips yet
+            No active or saved trips
           </AppText>
           <AppText variant="muted" className="text-center">
-            Plan your first trip using the button above
+            Plan a new trip or continue one from your profile history
           </AppText>
         </View>
       )}
 
       <TripSection title="Active Trip" trips={current} cardProps={cardProps} />
       <TripSection title="Saved Plans" trips={saved} cardProps={cardProps} />
-      <TripSection title="Completed" trips={completed} cardProps={cardProps} />
 
       <ConfirmActionModal
         visible={!!tripToDelete}
