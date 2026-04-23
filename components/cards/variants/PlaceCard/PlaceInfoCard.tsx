@@ -8,7 +8,7 @@ import colors from '@/theme/colors';
 import { getPlaceOpeningStatus } from '@/utils/openingHours';
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
-import { Image, Linking, Pressable, ScrollView, View } from 'react-native';
+import { Linking, Pressable, ScrollView, View } from 'react-native';
 import { PromotionCard } from '../PromotionCard';
 import { FACILITY_ICONS } from '@/constants/facilityIcons';
 import type { GoogleData } from '@/services/place/placeGoogle.types';
@@ -162,8 +162,6 @@ export function PlaceInfoCard({
       subtitle: waNumber
     });
   }
-
-  const staticMapUrl = `${process.env.EXPO_PUBLIC_API_URL}/places/static-map?lat=${place.location.lat}&lng=${place.location.lng}`;
 
   const vibes = Array.isArray(place.vibe) ? place.vibe : [];
   function getVibeIcon(id: string): keyof typeof Ionicons.glyphMap {
@@ -499,53 +497,6 @@ export function PlaceInfoCard({
                 </View>
               </Pressable>
             </BaseCard>
-          ) : null}
-
-          {/* ── Static Map ── */}
-          {staticMapUrl ? (
-            <Pressable
-              onPress={openMaps}
-              style={{ borderRadius: 16, overflow: 'hidden' }}
-            >
-              <Image
-                source={{ uri: staticMapUrl }}
-                style={{ width: '100%', height: 150 }}
-                resizeMode="cover"
-              />
-              <View
-                style={{
-                  position: 'absolute',
-                  bottom: 10,
-                  right: 10,
-                  backgroundColor: 'white',
-                  borderRadius: 22,
-                  paddingHorizontal: 10,
-                  paddingVertical: 6,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: 5,
-                  shadowColor: colors.text.DEFAULT,
-                  shadowOpacity: 0.12,
-                  shadowRadius: 6,
-                  elevation: 4
-                }}
-              >
-                <Ionicons
-                  name="map-outline"
-                  size={13}
-                  color={colors.brand.primary}
-                />
-                <AppText
-                  style={{
-                    fontSize: 12,
-                    fontWeight: '600',
-                    color: colors.brand.primary
-                  }}
-                >
-                  Open in Maps
-                </AppText>
-              </View>
-            </Pressable>
           ) : null}
 
           {/* ── Facilities ── */}
